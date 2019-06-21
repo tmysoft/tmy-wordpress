@@ -1,23 +1,23 @@
-# TMY Wordpress Globalization Plugin
+# TMY Plugin for Wordpress Getting Started & FAQ
 
 ----
 
-TMY Wordpress Globalization is an open source system for Wordpress based websites 
+TMY Plugin is an open source system for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text from Wordpress make it ready for translation. TMY Plugin provides multiple ways to translate the extracted and integrate back with Wordpress.
 
 
 ----
 
-## To start using TMY Wordpress Plugin
+## Start using TMY Plugin 
 
 Search the "TMY plugin", install it and activate it.
 
 Translating a post go through.
 
-## how to translate a post with TMY wordpress Plugin
+## Translate a post with TMY Plugin
 
 Log into the admin panel of wordpress, navigate to the post page, clicke sync translation
 
-## how to use TMY wordpress Plugin with TMY editor
+## Translate post with TMY Editor
 
 Log into the admin panel ...
 
