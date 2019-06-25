@@ -35,7 +35,7 @@ Create access token
 
 Configure TMY Plugin on the Wordpress instance: username, token, project and version
 
-![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY CONFIG")
+<kbd>![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY CONFIG")</kbd>
 Log into the admin panel ...
 Entering the username, API token
 
@@ -45,7 +45,7 @@ Entering the username, API token
 ## Translate Post or Page with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
-![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-webeditor.png "TMY Web Editor")
+<kbd>![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-webeditor.png "TMY Web Editor")</kbd>
 
 
 ## Using Google Tranlate translate your post or pages
