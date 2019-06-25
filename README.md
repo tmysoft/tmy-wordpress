@@ -26,6 +26,8 @@ Entering the username, API token
 
 ## To start developing TMY Wordpress Plugin
 
+## TMY Plugin shows connecting server error code 7, 
+setsebool httpd_can_network_connect on
 
 ## Support
 
