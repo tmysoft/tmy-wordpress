@@ -13,7 +13,7 @@ Search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
 
-![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/tmy-setup.png "TMY Plugin Setup")
+![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-setup.png "TMY Plugin Setup")
 
 ## Use TMY Plugin to translate 
 
