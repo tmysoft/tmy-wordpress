@@ -43,6 +43,7 @@ Entering the username, API token
 ## Translate Post or Page with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
+![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-webeditor.png "TMY Web Editor")
 
 
 ## Using Google Tranlate translate your post or pages
