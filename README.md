@@ -25,9 +25,12 @@ Log into the admin panel of wordpress, navigate to the post page, clicke buton !
 
 ![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")
 
+## Start using TMY Web Editor
+Log into the admin panel ...
+
 ## Translate Post or Page with TMY Editor
 
-Log into the admin panel ...
+Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
 Entering the username, API token
 
