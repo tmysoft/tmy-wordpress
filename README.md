@@ -49,6 +49,7 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 ## Using Google Tranlate translate your post or pages
 
 ## Pull translation from TMY Editor to your local Wordpress instance
+![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")
 
 ## To start developing TMY Wordpress Plugin
 Inline `code` has `back-ticks around` it.
