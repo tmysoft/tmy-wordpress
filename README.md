@@ -32,11 +32,8 @@ Inline `code` has `back-ticks around` it.
 
 On CentOS/Feodra Linux system, using following command to change the SELinux setting:
 
-`# setsebool httpd_can_network_connect on`
-
-```python
-s = "Python syntax highlighting"
-print s
+```
+# setsebool httpd_can_network_connect on
 ```
 
 
