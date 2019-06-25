@@ -17,16 +17,19 @@ Search the "TMY plugin", install and activate it.
 
 ![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-setup.png "TMY Plugin Setup")
 
-## Use TMY Plugin to translate 
+## Use TMY Plugin to translate a Post or Page
 
-Log into the admin panel of wordpress, navigate to the post page, clicke sync translation
+Log into the admin panel of wordpress, navigate to the post page, clicke buton ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-translatebutton.png "TMY Translate Button")
 
-## Translate post with TMY Editor
+![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Plugin Setup")
+
+## Translate Post or Page with TMY Editor
 
 Log into the admin panel ...
 
 Entering the username, API token
 
+## Translate Post or Page with TMY Editor
 
 ## To start developing TMY Wordpress Plugin
 Inline `code` has `back-ticks around` it.
