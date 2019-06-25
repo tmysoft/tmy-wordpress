@@ -7,13 +7,15 @@ TMY Plugin is an open source system for internationalization and localization of
 
 ----
 
-## Start using TMY Plugin 
+## Install and activate TMY Plugin 
 
-Search the "TMY plugin", install it and activate it.
+Search the "TMY plugin", install and activate it.
 
-Translating a post go through.
+## Configure TMY Plugin
 
-## Translate a post with TMY Plugin
+![TMY Plugin Setup](https://github.com//tmysoft/tmy-wordpress/tmy-setup.png "TMY Plugin Setup")
+
+## Use TMY Plugin to translate 
 
 Log into the admin panel of wordpress, navigate to the post page, clicke sync translation
 
