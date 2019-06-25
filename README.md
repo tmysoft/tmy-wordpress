@@ -34,6 +34,12 @@ On CentOS/Feodra Linux system, using following command to change the SELinux set
 
 `# setsebool httpd_can_network_connect on`
 
+```python
+s = "Python syntax highlighting"
+print s
+```
+
+
 ## Support
 
 If you need support, reach out to us at. 
