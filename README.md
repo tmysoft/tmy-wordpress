@@ -21,7 +21,9 @@ Search the "TMY plugin", install and activate it.
 
 Log into the admin panel of wordpress, navigate to the post page, clicke buton ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-translatebutton.png "TMY Translate Button")
 
-![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Plugin Setup")
+![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Post")
+
+![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")
 
 ## Translate Post or Page with TMY Editor
 
