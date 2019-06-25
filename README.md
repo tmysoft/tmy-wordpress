@@ -29,6 +29,7 @@ Entering the username, API token
 ## TMY Plugin shows connecting server error code 7, 
 setsebool httpd_can_network_connect on
 Inline `code` has `back-ticks around` it.
+
 On CentOS/Feodra Linux system, using following command to change the SELinux setting:
 `setsebool httpd_can_network_connect on`
 
