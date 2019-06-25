@@ -33,6 +33,7 @@ Create access token
 
 Configure TMY Plugin on the Wordpress instance: username, token, project and version
 
+![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY CONFIG")
 Log into the admin panel ...
 Entering the username, API token
 
