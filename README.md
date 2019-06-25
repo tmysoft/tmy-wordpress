@@ -9,21 +9,21 @@ TMY Plugin is an open source system for internationalization and localization of
 
 ## Install and activate TMY Plugin 
 
-![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-addplugin.png "TMY Plugin Install")
+<kbd>![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-addplugin.png "TMY Plugin Install")</kbd>
 
 Search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
 
-![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-setup.png "TMY Plugin Setup")
+<kbd>![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-setup.png "TMY Plugin Setup")</kbd>
 
 ## Use TMY Plugin to translate a Post or Page
 
 Log into the admin panel of wordpress, navigate to the post page, clicke buton ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-translatebutton.png "TMY Translate Button")
 
-![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Post")
+<kbd>![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Post")</kbd>
 
-![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")
+<kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")</kbd>
 
 <kbd>![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-sitetranslatedview.png "TMY After Translation")</kbd>
 
@@ -51,7 +51,7 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 ## Using Google Tranlate translate your post or pages
 
 ## Pull translation from TMY Editor to your local Wordpress instance
-![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")
+<kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")</kbd>
 
 ## To start developing TMY Wordpress Plugin
 Inline `code` has `back-ticks around` it.
