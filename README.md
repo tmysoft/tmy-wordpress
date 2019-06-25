@@ -25,12 +25,11 @@ Entering the username, API token
 
 
 ## To start developing TMY Wordpress Plugin
-
-## TMY Plugin shows connecting server error code 7, 
-setsebool httpd_can_network_connect on
 Inline `code` has `back-ticks around` it.
 
-On CentOS/Feodra Linux system, using following command to change the SELinux setting:
+## TMY Plugin shows connecting error code 7 in Wordpress
+
+On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting which blocks the network connection, using following command to change the SELinux setting:
 
 ```
 # setsebool httpd_can_network_connect on
