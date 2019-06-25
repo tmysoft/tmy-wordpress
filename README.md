@@ -26,15 +26,27 @@ Log into the admin panel of wordpress, navigate to the post page, clicke buton !
 ![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")
 
 ## Start using TMY Web Editor
+
+Register with tmysoft.com
+
+Create access token
+
+Configure TMY Plugin on the Wordpress instance: username, token, project and version
+
 Log into the admin panel ...
+Entering the username, API token
+
+## Syncing between Wordpress instance and TMY Web Editor
+
 
 ## Translate Post or Page with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
-Entering the username, API token
 
-## Translate Post or Page with TMY Editor
+## Using Google Tranlate translate your post or pages
+
+## Pull translation from TMY Editor to your local Wordpress instance
 
 ## To start developing TMY Wordpress Plugin
 Inline `code` has `back-ticks around` it.
