@@ -25,6 +25,8 @@ Log into the admin panel of wordpress, navigate to the post page, clicke buton !
 
 ![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")
 
+![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-sitetranslatedview.png "TMY After Translation")
+
 ## Start using TMY Web Editor
 
 Register with tmysoft.com
