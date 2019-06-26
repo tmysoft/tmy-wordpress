@@ -63,7 +63,12 @@ Visit TMY Dashboard page would automatically pull the finished translation from 
 <kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")</kbd>
 
 ## To start developing TMY Wordpress Plugin
-Inline `code` has `back-ticks around` it.
+
+TMY Wordpress plugin is following open source license, look at code here:
+
+`[https://github.com/tmysoft/tmy-wordpress](https://github.com/tmysoft/tmy-wordpress)`
+
+Ask questions, submit PRs.
 
 ## There is no translation after I setup everything 
 
