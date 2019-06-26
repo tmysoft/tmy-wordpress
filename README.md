@@ -2,7 +2,7 @@
 
 ----
 
-TMY Plugin is an open source system for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text from Wordpress make it ready for translation. TMY Plugin provides multiple ways to translate the extracted and integrate back with Wordpress.
+TMY Plugin is an open source system for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text for translation, translate and integrate back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites.
 
 
 ----
@@ -19,9 +19,11 @@ Search the "TMY plugin", install and activate it.
 
 ## Use TMY Plugin to translate a Post or Page
 
-Log into the admin panel of wordpress, navigate to the post page, clicke buton ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-translatebutton.png "TMY Translate Button")
+Log into the admin panel of wordpress, navigate to the post page, click button ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-translatebutton.png "TMY Translate Button")
 
 <kbd>![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-page.png "TMY Post")</kbd>
+
+Put the translation into the corresponding translation editor of the page or post, then Publish it.
 
 <kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")</kbd>
 
