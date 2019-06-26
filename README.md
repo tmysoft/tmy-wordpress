@@ -57,10 +57,19 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 ## Using Google Tranlate translate your post or pages
 
 ## Pull translation from TMY Editor to your local Wordpress instance
+
+Visit TMY Dashboard page:
+
 <kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")</kbd>
 
 ## To start developing TMY Wordpress Plugin
 Inline `code` has `back-ticks around` it.
+
+## There is no translation after I setup everything 
+
+Make sure translation is enabled in TMY Setup page:
+
+<kbd>![TMY Enable Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-enabletranslation.png "TMY Enable Translation")</kbd>
 
 ## TMY Plugin shows connecting error code 7 in Wordpress
 
