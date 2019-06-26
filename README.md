@@ -9,37 +9,37 @@ TMY Plugin is an open source system for internationalization and localization of
 
 ## Install and activate TMY Plugin 
 
-<kbd>![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-addplugin.png "TMY Plugin Install")</kbd>
+<kbd>![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-addplugin.png "TMY Plugin Install")</kbd>
 
 Search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
 
-<kbd>![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-setup.png "TMY Plugin Setup")</kbd>
+<kbd>![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-setup.png "TMY Plugin Setup")</kbd>
 
 ## Use TMY Plugin to translate a Post or Page
 
-Log into the admin panel of wordpress, navigate to the post page, click button ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-translatebutton.png "TMY Translate Button")
+Log into the admin panel of wordpress, navigate to the post page, click button ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-translatebutton.png "TMY Translate Button")
 
-<kbd>![TMY Post](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-page.png "TMY Post")</kbd>
+<kbd>![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-page.png "TMY Post")</kbd>
 
 Put the translation into the corresponding translation editor of the page or post, then Publish it.
 
-<kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-pagetranslated.png "TMY Page Translation")</kbd>
+<kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-pagetranslated.png "TMY Page Translation")</kbd>
 
 Visit the site to confirm translation is available.
 
-<kbd>![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-sitetranslatedview.png "TMY After Translation")</kbd>
+<kbd>![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-sitetranslatedview.png "TMY After Translation")</kbd>
 
 ## Using TMY Web Editor
 
 Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key. Create the project and version of your project.
 
-<kbd>![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-apikey.png "TMY CONFIG")</kbd>
+<kbd>![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-apikey.png "TMY CONFIG")</kbd>
 
 Enter the username and API Key into TMY Wordpress setup page: username, token, project and version.
 
-<kbd>![TMY SERVER CONFIG](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-pluginserverconfig.png "TMY SERVER CONFIG")</kbd>
+<kbd>![TMY SERVER CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-pluginserverconfig.png "TMY SERVER CONFIG")</kbd>
 
 ## Pushing page or post contents to TMY Web Editor for translation
 
@@ -51,7 +51,7 @@ After the TMY Setup page is configured with Translation Server information.
 ## Translate Post or Page with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
-<kbd>![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-webeditor.png "TMY Web Editor")</kbd>
+<kbd>![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-webeditor.png "TMY Web Editor")</kbd>
 
 
 ## Using Google Translate to translate your post or pages
@@ -62,7 +62,7 @@ Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
-<kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-dashboard.png "TMY Dashboard")</kbd>
+<kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-dashboard.png "TMY Dashboard")</kbd>
 
 ## To start developing TMY Wordpress Plugin
 
@@ -76,7 +76,7 @@ Ask questions, submit PRs.
 
 Make sure translation is enabled in TMY Setup page:
 
-<kbd>![TMY Enable Translation](https://github.com/tmysoft/tmy-wordpress/doc/blob/master/tmy-enabletranslation.png "TMY Enable Translation")</kbd>
+<kbd>![TMY Enable Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-enabletranslation.png "TMY Enable Translation")</kbd>
 
 ## TMY Plugin shows connecting error code 7 in Wordpress
 
