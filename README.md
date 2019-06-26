@@ -58,7 +58,7 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
 ## Pull translation from TMY Editor to your local Wordpress instance
 
-Visit TMY Dashboard page:
+Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
 <kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-dashboard.png "TMY Dashboard")</kbd>
 
