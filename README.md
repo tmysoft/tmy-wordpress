@@ -41,8 +41,12 @@ Enter the username and API Key into TMY Wordpress setup page: username, token, p
 
 <kbd>![TMY SERVER CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pluginserverconfig.png "TMY SERVER CONFIG")</kbd>
 
-## Syncing between Wordpress instance and TMY Web Editor
+## Pushing page or post contents to TMY Web Editor for translation
 
+After the TMY Setup page is configured with Translation Server information.
+
+..* When Site Title and Tagline are updated in the Wordpress Setting page, after button "Save Changes" is pressed.
+..* When Page or Post is updated in the Posts or Pages editor, after button "Update" or "Publish" is pressed.
 
 ## Translate Post or Page with TMY Editor
 
