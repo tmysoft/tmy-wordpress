@@ -80,6 +80,6 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 ```
 
 
-## Support
+## Getting More Support
 
-If you need support, reach out to us at. 
+If you need further support, reach out to us at [tmysoft.com/subscriptions.html](https://www.tmysoft.com/subscriptions.html)
