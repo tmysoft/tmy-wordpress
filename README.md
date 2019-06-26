@@ -54,7 +54,7 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 <kbd>![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-webeditor.png "TMY Web Editor")</kbd>
 
 
-## Using Google Tranlate translate your post or pages
+## Using Google Translate to translate your post or pages
 
 ## Pull translation from TMY Editor to your local Wordpress instance
 
