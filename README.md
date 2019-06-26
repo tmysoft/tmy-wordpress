@@ -33,19 +33,13 @@ Visit the site to confirm translation is available.
 
 ## Using TMY Web Editor
 
-Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key
-
-<kbd>![TMY Create API Key](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY Create API Key")</kbd>
-
-Create access token
-
-Configure TMY Plugin on the Wordpress instance: username, token, project and version
+Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key. Create the project and version of your project.
 
 <kbd>![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY CONFIG")</kbd>
 
+Enter the username and API Key into TMY Wordpress setup page: username, token, project and version.
+
 <kbd>![TMY SERVER CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pluginserverconfig.png "TMY SERVER CONFIG")</kbd>
-Log into the admin panel ...
-Entering the username, API token
 
 ## Syncing between Wordpress instance and TMY Web Editor
 
