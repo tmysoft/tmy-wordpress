@@ -27,11 +27,15 @@ Put the translation into the corresponding translation editor of the page or pos
 
 <kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-pagetranslated.png "TMY Page Translation")</kbd>
 
+Visit the site to confirm translation is available.
+
 <kbd>![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-sitetranslatedview.png "TMY After Translation")</kbd>
 
-## Start using TMY Web Editor
+## Using TMY Web Editor
 
-Register with tmysoft.com
+Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key
+
+<kbd>![TMY Create API Key](https://github.com/tmysoft/tmy-wordpress/blob/master/tmy-apikey.png "TMY Create API Key")</kbd>
 
 Create access token
 
