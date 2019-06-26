@@ -45,8 +45,8 @@ Enter the username and API Key into TMY Wordpress setup page: username, token, p
 
 After the TMY Setup page is configured with Translation Server information.
 
-..* When Site Title and Tagline are updated in the Wordpress Setting page, after button "Save Changes" is pressed.
-..* When Page or Post is updated in the Posts or Pages editor, after button "Update" or "Publish" is pressed.
+1. When Site Title and Tagline are updated in the Wordpress Setting page, after button "Save Changes" is pressed.
+2. When Page or Post is updated in the Posts or Pages editor, after button "Update" or "Publish" is pressed.
 
 ## Translate Post or Page with TMY Editor
 
