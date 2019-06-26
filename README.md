@@ -56,6 +56,8 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
 ## Using Google Translate to translate your post or pages
 
+Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow the page at [tmysoft.com/subscriptions.html](https://www.tmysoft.com/subscriptions.html) to start.
+
 ## Pull translation from TMY Editor to your local Wordpress instance
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
