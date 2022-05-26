@@ -13,7 +13,7 @@ TMY Plugin is an open source system for internationalization and localization of
 
 Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/tree/master/downloads 
 
-Search the "TMY plugin", install and activate it.
+Or, search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
 
