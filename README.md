@@ -11,6 +11,8 @@ TMY Plugin is an open source system for internationalization and localization of
 
 <kbd>![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-addplugin.png "TMY Plugin Install")</kbd>
 
+Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/tree/master/downloads 
+
 Search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
