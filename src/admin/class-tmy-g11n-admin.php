@@ -953,6 +953,40 @@ error_log ("Mei debug");
              $default_lang = get_option('g11n_default_lang');
              unset($all_langs[$default_lang]);
 
+
+             if (strcmp($_POST['post_type'], "g11n_translation") !== 0) {
+
+                 if (strcmp($_POST['post_type'], "product") !== 0) {
+                     error_log("Create Sync product id: " . $_POST['id']);
+                     error_log("Create Sync product title: " . get_post_field('post_title', $_POST['id'])); 
+                     error_log("Create Sync product content: " . get_post_field('post_content', $_POST['id']));
+                     error_log("Create Sync product excerpt: " . get_post_field('post_excertpt', $_POST['id']));
+
+                     $json_file_name = "WordpressG11nAret-" . $_POST['post_type'] . "-" . $_POST['id'];
+
+                     $content_title = get_post_field('post_title', $_POST['id']);
+                     //$content = $post->post_content;
+                     //$contents_array = array($content_title,$content);
+
+                     //error_log("MYSQL" . var_export($_POST['post_content'],true));
+                     $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $_POST['id']),-1, PREG_SPLIT_DELIM_CAPTURE);
+                     error_log("MYSQL" . var_export($tmp_array,true));
+                     $contents_array = array();
+                     array_push($contents_array, $content_title);
+                     $paragraph = "";
+                     foreach ($tmp_array as $line) {
+                        $paragraph .= $line;
+                        if (strlen($paragraph) > get_option('g11n_server_trunksize',900)) {
+                            array_push($contents_array, $paragraph);
+                            $paragraph = "";
+                        }
+                     }
+                     if (strlen($paragraph)>0) array_push($contents_array, $paragraph);
+                     error_log("MYSQL" . var_export($contents_array,true));
+                     $this->translator->push_contents_to_translation_server($json_file_name, $contents_array);
+                 }
+             }
+
              if (is_array($all_langs)) {
                  foreach( $all_langs as $value => $code) {
                      $message .= " [$value:$code]"; 
