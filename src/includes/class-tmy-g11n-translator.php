@@ -248,9 +248,7 @@ class TMY_G11n_Translator {
 	public function check_translation_exist( $post_id, $locale_id, $post_type ) {
 
 		global $wpdb;
-
-	        //if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
+		$sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
 			   "  where exists ( ".
 				  "select post_id ".
 				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
@@ -264,41 +262,6 @@ class TMY_G11n_Translator {
 				            "meta2.meta_value = '" . $locale_id . "')";
 		    //error_log("GET TRANS SQL = " . $sql);
 		    $result = $wpdb->get_results($sql);
-		//}
-		//if ((strcmp($post_type,"blogname") === 0)) {
-                //    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-                //           "  where exists ( ".
-                //                  "select post_id ".
-                //                      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-                //                      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-                //                            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
-                //                            "{$wpdb->prefix}posts.post_status != 'trash' and ".
-                //                            "meta1.post_id = meta2.post_id and ".
-                //                            "meta1.meta_key = 'orig_post_id' and ".
-                //                            "meta2.meta_key = 'g11n_tmy_lang'  and ".
-                //                            "meta1.meta_value = " . $post_id . " and ".
-                //                            "meta2.meta_value = '" . $locale_id . "')";
-                //    error_log("GET TRANS SQL = " . $sql);
-                //    $result = $wpdb->get_results($sql);
-		//}
-		//if ((strcmp($post_type,"blogdescription") === 0)) {
-		//    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-		//       "  where exists ( ".
-	//			  "select post_id ".
-	//			    //"from {$wpdb->prefix}postmeta as meta2 ".
-	//			      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-	//			      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-	//			            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
-	//			            "meta1.post_id = meta2.post_id and ".
-	//			    //"where meta1.post_id = meta2.post_id and ".
-	//			        "meta1.meta_key = 'option_name' and ".
-	//			        "meta2.meta_key = 'g11n_tmy_lang'  and ".
-	//			        "meta1.meta_value = '" . $post_type . "' and ".
-//				            "meta2.meta_value = '" . $locale_id . "')";
-	//	    //error_log("GET TRANS SQL = " . $sql);
-	//	    $result = $wpdb->get_results($sql);
-	//	}
-
 
 		if (isset($result[0]->post_id)) {
 		    //error_log("GET TRANS ID = " . $result[0]->post_id);
@@ -307,16 +270,15 @@ class TMY_G11n_Translator {
 		    //error_log("GET TRANS ID = null");
 		    return null;
 		}
-
 	}
 
 	public function get_translation_id( $post_id, $locale_id, $post_type ) {
 
 		global $wpdb;
 
-                //if ( WP_TMY_G11N_DEBUG ) {
-                //    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type);
-                //}
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type);
+                }
 
 		//if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
 
@@ -325,18 +287,18 @@ class TMY_G11n_Translator {
                                   "select post_id ".
                                       "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
                                       "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-                                            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
-                                            "{$wpdb->prefix}posts.post_status != 'trash' and ".
+                                            "{$wpdb->prefix}posts.post_status = 'publish' and ".
+                                            //"{$wpdb->prefix}posts.post_status != 'trash' and ".
                                             "meta1.post_id = meta2.post_id and ".
                                             "meta1.meta_key = 'orig_post_id' and ".
                                             "meta2.meta_key = 'g11n_tmy_lang'  and ".
                                             "meta1.meta_value = " . $post_id . " and ".
                                             "meta2.meta_value = '" . $locale_id . "')";
 	        $result = $wpdb->get_results($sql);
-                //if ( WP_TMY_G11N_DEBUG ) {
-                //    error_log("In get_translation_id,".$sql);
-                //    error_log("In get_translation_id,".json_encode($result));
-                //}
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In get_translation_id,".$sql);
+                    error_log("In get_translation_id,".json_encode($result));
+                }
 
 		if (isset($result[0]->post_id)) {
 		    //error_log("GET TRANS ID = " . $result[0]->post_id);

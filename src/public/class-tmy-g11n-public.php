@@ -229,7 +229,7 @@ class TMY_G11n_Public {
                     
                     if (is_array($all_langs)) {
                         foreach( $all_langs as $value => $code) {
-                            $translation_id = $this->translator->check_translation_exist($post_id,$code,$post_type);
+                            $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
     		            //echo $code . ':' . $translation_id . '<br>'; 
 			    if (isset($translation_id)) {
                                 $translation_status = get_post_status($translation_id);
@@ -642,51 +642,60 @@ class TMY_G11n_Public {
                     if ( is_admin() ) {
                         return $output;
                     }
+		    if (strcmp($show,'description')==0) {
+                        if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")==0){
+			     $g11n_current_language = $_SESSION['g11n_language'];
+			     $language_options = get_option('g11n_additional_lang');
+			     $language_name = $language_options[$g11n_current_language];
 
-		    if ((strcmp($show,'description')==0) and (strcmp(get_option('g11n_l10n_props_desc'),"Yes")==0)) {
+                             $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
+                             if (! is_null($title_post)) {
+                                 $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
+			         if (isset($translation_post_id)) {
+                                     if ( WP_TMY_G11N_DEBUG ) {
+                                         error_log("In g11n_wp_title_filter,blogdescription translation id:" . $translation_post_id);
+                                     }
+			             $output = get_post_field("post_content", $translation_post_id);
+			         }
+		             }
+                        }
 			if(strcmp(get_option('g11n_switcher_tagline'),"Yes")==0){
 			    $switcher_html = $this->translator->get_language_switcher();
 			} else {
 			    $switcher_html = "";
 			}
-			$g11n_current_language = $_SESSION['g11n_language'];
-			$language_options = get_option('g11n_additional_lang');
-			$language_name = $language_options[$g11n_current_language];
-
-                        $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
-                        if (! is_null($title_post)) {
-                            $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
-			    if (isset($translation_post_id)) {
-                                if ( WP_TMY_G11N_DEBUG ) {
-                                    error_log("In g11n_wp_title_filter,blogdescription translation id:" . $translation_post_id);
-                                }
-			        return get_post_field("post_content", $translation_post_id) . $switcher_html;
-			    }
-			    return $output . $switcher_html;
-		        }
+		        return $output . $switcher_html;
                     }
 
-		    if ((strcmp($show,'name')==0) and (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")==0)) {
+		    if (strcmp($show,'name')==0) {
+                        if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")==0){
+			    $g11n_current_language = $_SESSION['g11n_language'];
+			    $language_options = get_option('g11n_additional_lang');
+			    $language_name = $language_options[$g11n_current_language];
+
+                            $title_post  = get_page_by_title('blogname',OBJECT,'post');
+                            if (! is_null($title_post)) {
+                                $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
+			        if (isset($translation_post_id)) {
+                                    if ( WP_TMY_G11N_DEBUG ) {
+                                        error_log("In g11n_wp_title_filter,blogname translation id:" . $translation_post_id);
+                                    }
+			            $output = get_post_field("post_content", $translation_post_id);
+			        }
+                            }
+		        }
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In g11n_wp_title_filter, g11n_switcher_title,".get_option('g11n_switcher_title'));
+                        }
 			if(strcmp(get_option('g11n_switcher_title'),"Yes")==0){
 			    $switcher_html = $this->translator->get_language_switcher();
 			} else {
 			    $switcher_html = "";
 			}
-			$g11n_current_language = $_SESSION['g11n_language'];
-			$language_options = get_option('g11n_additional_lang');
-			$language_name = $language_options[$g11n_current_language];
-
-                        $title_post  = get_page_by_title('blogname',OBJECT,'post');
-                        if (! is_null($title_post)) {
-                            $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
-			    if (isset($translation_post_id)) {
-                                if ( WP_TMY_G11N_DEBUG ) {
-                                    error_log("In g11n_wp_title_filter,blogname translation id:" . $translation_post_id);
-                                }
-			        return get_post_field("post_content", $translation_post_id) . $switcher_html;
-			    }
-			    return $output . $switcher_html;
-		        }
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In g11n_wp_title_filter, output,".$output . $switcher_html);
+                        }
+		        return $output . $switcher_html;
 		    } 
 
 		    return $output;
