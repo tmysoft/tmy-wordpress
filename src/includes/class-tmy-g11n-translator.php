@@ -280,7 +280,43 @@ class TMY_G11n_Translator {
                     error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type);
                 }
 
+                if  (strcmp(get_post_field("post_title", $post_id),'blogname')===0) {
+                    if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In get_translation_id, g11n_l10n_props_blogname is disabled");
+                        }
+                        return null;
+                    }
+                } elseif (strcmp(get_post_field("post_title", $post_id),'blogdescription')===0) {
+                    if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In get_translation_id, g11n_l10n_props_desc is disabled");
+                        }
+                        return null;
+                    }
+                } elseif (strcmp($post_type,'post') === 0) {
+                    if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In get_translation_id, g11n_l10n_props_posts is disabled");
+                        }
+                        return null;
+                    }
+                } elseif (strcmp($post_type,'page') === 0) {
+                    if (strcmp(get_option('g11n_l10n_props_page'),"Yes")!==0) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In get_translation_id, g11n_l10n_props_page is disabled");
+                        }
+                        return null;
+                    }
+                }
+
 		//if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
+                //g11n_l10n_props_blogname
+            	//g11n_l10n_props_desc
+            	//g11n_l10n_props_posts
+            	//g11n_l10n_props_pages
+                // check if post page blogname blogdescription are enabled, if not return null
+                // get_post_field("post_content", $translation_post_id)
 
                 $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
                            "  where exists ( ".
