@@ -217,7 +217,6 @@ class TMY_G11n_Translator {
 		    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload_string);
 
 		    $output = curl_exec($ch);      
-
 		    $return_msg = "Sent for translation " . $rest_url;
 		    //$return_msg .= "\npayload : " . $payload_string;
 		    $return_msg .= " server return: " . curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -225,13 +224,24 @@ class TMY_G11n_Translator {
 		    if(curl_errno($ch)){
 		        error_log ('Request Error:' . curl_error($ch));
 		    }
-		    $return_msg .= "  output : " . $output;
-		    $return_msg .= "  id : " . get_the_ID();
+                    if (strcmp($output,'')===0 ) {
+		        $return_msg .= "  output : " . "Successful";
+                        $output = "Successful";
+                    } else {
+		        $return_msg .= "  output : " . $output;
+                    }
+
+                    $g11n_res_filename = preg_split("/-/", $file_name);
+                    $default_post_id = $g11n_res_filename[2];
+
+		    //$return_msg .= "  id : " . get_the_ID();
+		    $return_msg .= "  id : " . $default_post_id;
     
 		    error_log("Server Push: " . $return_msg);
-		    update_post_meta( get_the_ID(), 'translation_push_status', $return_msg);
+		    update_post_meta( $default_post_id, 'translation_push_status', $return_msg);
 
 		    curl_close($ch);
+                    return $output;
             }
 	}
 
@@ -239,7 +249,7 @@ class TMY_G11n_Translator {
 
 		global $wpdb;
 
-		if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
+	        //if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
 		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
 			   "  where exists ( ".
 				  "select post_id ".
@@ -252,43 +262,42 @@ class TMY_G11n_Translator {
 				            "meta2.meta_key = 'g11n_tmy_lang'  and ".
 				            "meta1.meta_value = " . $post_id . " and ".
 				            "meta2.meta_value = '" . $locale_id . "')";
-		    error_log("GET TRANS SQL = " . $sql);
-		    $result = $wpdb->get_results($sql);
-		}
-		if ((strcmp($post_type,"blogname") === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-		       "  where exists ( ".
-				  "select post_id ".
-				    //"from {$wpdb->prefix}postmeta as meta2 ".
-				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-				      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-				            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
-				            "meta1.post_id = meta2.post_id and ".
-				    //"where meta1.post_id = meta2.post_id and ".
-				            "meta1.meta_key = 'option_name' and ".
-				            "meta2.meta_key = 'g11n_tmy_lang'  and ".
-				            "meta1.meta_value = '" . $post_type . "' and ".
-				            "meta2.meta_value = '" . $locale_id . "')";
 		    //error_log("GET TRANS SQL = " . $sql);
 		    $result = $wpdb->get_results($sql);
-		}
-		if ((strcmp($post_type,"blogdescription") === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-		       "  where exists ( ".
-				  "select post_id ".
-				    //"from {$wpdb->prefix}postmeta as meta2 ".
-				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-				      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-				            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
-				            "meta1.post_id = meta2.post_id and ".
-				    //"where meta1.post_id = meta2.post_id and ".
-				        "meta1.meta_key = 'option_name' and ".
-				        "meta2.meta_key = 'g11n_tmy_lang'  and ".
-				        "meta1.meta_value = '" . $post_type . "' and ".
-				            "meta2.meta_value = '" . $locale_id . "')";
-		    //error_log("GET TRANS SQL = " . $sql);
-		    $result = $wpdb->get_results($sql);
-		}
+		//}
+		//if ((strcmp($post_type,"blogname") === 0)) {
+                //    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
+                //           "  where exists ( ".
+                //                  "select post_id ".
+                //                      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
+                //                      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
+                //                            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
+                //                            "{$wpdb->prefix}posts.post_status != 'trash' and ".
+                //                            "meta1.post_id = meta2.post_id and ".
+                //                            "meta1.meta_key = 'orig_post_id' and ".
+                //                            "meta2.meta_key = 'g11n_tmy_lang'  and ".
+                //                            "meta1.meta_value = " . $post_id . " and ".
+                //                            "meta2.meta_value = '" . $locale_id . "')";
+                //    error_log("GET TRANS SQL = " . $sql);
+                //    $result = $wpdb->get_results($sql);
+		//}
+		//if ((strcmp($post_type,"blogdescription") === 0)) {
+		//    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
+		//       "  where exists ( ".
+	//			  "select post_id ".
+	//			    //"from {$wpdb->prefix}postmeta as meta2 ".
+	//			      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
+	//			      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
+	//			            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
+	//			            "meta1.post_id = meta2.post_id and ".
+	//			    //"where meta1.post_id = meta2.post_id and ".
+	//			        "meta1.meta_key = 'option_name' and ".
+	//			        "meta2.meta_key = 'g11n_tmy_lang'  and ".
+	//			        "meta1.meta_value = '" . $post_type . "' and ".
+//				            "meta2.meta_value = '" . $locale_id . "')";
+	//	    //error_log("GET TRANS SQL = " . $sql);
+	//	    $result = $wpdb->get_results($sql);
+	//	}
 
 
 		if (isset($result[0]->post_id)) {
@@ -305,56 +314,29 @@ class TMY_G11n_Translator {
 
 		global $wpdb;
 
-		if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-			   "  where exists ( ".
-				  "select post_id ".
-				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-				      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-				            "{$wpdb->prefix}posts.post_status = 'publish' and ".
-				            "meta1.post_id = meta2.post_id and ".
-				            "meta1.meta_key = 'orig_post_id' and ".
-				            "meta2.meta_key = 'g11n_tmy_lang'  and ".
-				            "meta1.meta_value = " . $post_id . " and ".
-				            "meta2.meta_value = '" . $locale_id . "')";
-		    error_log("GET TRANS SQL = " . $sql);
-		    $result = $wpdb->get_results($sql);
-		}
-		if ((strcmp($post_type,"blogname") === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-		       "  where exists ( ".
-				  "select post_id ".
-				    //"from {$wpdb->prefix}postmeta as meta2 ".
-				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-				      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-				            "{$wpdb->prefix}posts.post_status = 'publish' and ".
-				            "meta1.post_id = meta2.post_id and ".
-				    //"where meta1.post_id = meta2.post_id and ".
-				            "meta1.meta_key = 'option_name' and ".
-				            "meta2.meta_key = 'g11n_tmy_lang'  and ".
-				            "meta1.meta_value = '" . $post_type . "' and ".
-				            "meta2.meta_value = '" . $locale_id . "')";
-		    //error_log("GET TRANS SQL = " . $sql);
-		    $result = $wpdb->get_results($sql);
-		}
-		if ((strcmp($post_type,"blogdescription") === 0)) {
-		    $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
-		       "  where exists ( ".
-				  "select post_id ".
-				    //"from {$wpdb->prefix}postmeta as meta2 ".
-				      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
-				      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-				            "{$wpdb->prefix}posts.post_status = 'publish' and ".
-				            "meta1.post_id = meta2.post_id and ".
-				    //"where meta1.post_id = meta2.post_id and ".
-				            "meta1.meta_key = 'option_name' and ".
-				            "meta2.meta_key = 'g11n_tmy_lang'  and ".
-				            "meta1.meta_value = '" . $post_type . "' and ".
-				            "meta2.meta_value = '" . $locale_id . "')";
-		    //error_log("GET TRANS SQL = " . $sql);
-		    $result = $wpdb->get_results($sql);
-		}
+                //if ( WP_TMY_G11N_DEBUG ) {
+                //    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type);
+                //}
 
+		//if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
+
+                $sql = "select post_id from {$wpdb->prefix}postmeta as meta1 ".
+                           "  where exists ( ".
+                                  "select post_id ".
+                                      "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
+                                      "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
+                                            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
+                                            "{$wpdb->prefix}posts.post_status != 'trash' and ".
+                                            "meta1.post_id = meta2.post_id and ".
+                                            "meta1.meta_key = 'orig_post_id' and ".
+                                            "meta2.meta_key = 'g11n_tmy_lang'  and ".
+                                            "meta1.meta_value = " . $post_id . " and ".
+                                            "meta2.meta_value = '" . $locale_id . "')";
+	        $result = $wpdb->get_results($sql);
+                //if ( WP_TMY_G11N_DEBUG ) {
+                //    error_log("In get_translation_id,".$sql);
+                //    error_log("In get_translation_id,".json_encode($result));
+                //}
 
 		if (isset($result[0]->post_id)) {
 		    //error_log("GET TRANS ID = " . $result[0]->post_id);
@@ -373,7 +355,9 @@ class TMY_G11n_Translator {
        			"{$wpdb->prefix}postmeta.meta_key = 'orig_post_id' and {$wpdb->prefix}postmeta.meta_value = {$wpdb->prefix}posts.ID and " .
        			"{$wpdb->prefix}postmeta.post_id = " . $trans_id;
 
-		error_log("GET POST SQL = " . $sql);
+                if ( WP_TMY_G11N_DEBUG ) {
+		    error_log("GET POST SQL = " . $sql);
+                }
 		$result = $wpdb->get_results($sql);
 		return ($result);
 	}
@@ -430,30 +414,19 @@ class TMY_G11n_Translator {
 	public function get_preferred_language() {
 
                 if(!session_id()) {
-                        session_start();
-                }
-
-                if (isset($_SESSION['g11n_language'])) {
-                        error_log("Starting session, session lang=" . $_SESSION['g11n_language']);
+                    session_start();
                 }
 
                 if (!isset($_SESSION['g11n_language'])) {
-                        $_SESSION['g11n_language'] = get_option('g11n_default_lang');
-                        error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
-                }
+                    $_SESSION['g11n_language'] = get_option('g11n_default_lang');
+                    //error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
+                } 
 
-
-		if (isset($_SESSION['g11n_language'])) {
-                   error_log("getting preferred language, session language set: " . $_SESSION['g11n_language']);
-		} else {
-                   error_log("getting preferred language, session language no set ");
-
-                }
 		$lang_var_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
 		//error_log("QUERY LANG = ". $lang_var_from_query);
 		if (!empty($lang_var_from_query)) {
 		   $_SESSION['g11n_language'] = $lang_var_from_query;
-		   error_log("QUERY LANG 2 = ". $lang_var_from_query);
+		   //error_log("QUERY LANG 2 = ". $lang_var_from_query);
 		   return $lang_var_from_query;
 		}
 

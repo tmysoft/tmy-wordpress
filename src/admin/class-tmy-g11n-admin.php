@@ -19,6 +19,7 @@
  * @subpackage TMY_G11n/admin
  * @author     Yu Shao <yu.shao.gm@gmail.com>
  */
+
 class TMY_G11n_Admin {
 
 	/**
@@ -353,9 +354,10 @@ class TMY_G11n_Admin {
             	<input type="checkbox" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> /> In Title <br>
             	<input type="checkbox" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> /> In Tagline <br>
             	<input type="checkbox" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> /> In Each Post <br>
-            	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar
- 	    	</td></tr>
-
+            	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar <br> <br>
+                Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
+ 	    	</td>
+                </tr>
             	<?php
 
          
@@ -408,298 +410,118 @@ class TMY_G11n_Admin {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
+		?>
+                    <br>
+                    <script>
+                    function G11nGetLocalTranslationStatus() {
+                        var div = document.getElementById('tmy_local_translation_status');
 
+                        jQuery(document).ready(function($) {
+                                var data = {
+                                    'action': 'tmy_get_local_translation_status',
+                                    'secret': 8763
+                                };
+                                jQuery.post(ajaxurl, data, function(response) {
+                                    div.innerHTML = response.slice(0, -1) ;
+                                });
+                                return;
+                        });
+                    }
 
+                    function G11nmyGetServerStatus() {
+                        var div = document.getElementById('tmy_server_status');
+                        div.innerHTML = "Connecting to server ....";
 
-		echo "<h1>Translation Dashboard</h1>";
+                        jQuery(document).ready(function($) {
+                                var data = {
+                                    'action': 'tmy_get_project_status',
+                                    'secret': 8763
+                                };
+                                jQuery.post(ajaxurl, data, function(response) {
+                                    div.innerHTML = response;
+                                });
+                                return;
+                        });
+                    }
+                    </script>
+
+		<h2>Translation Status:</h2>
+                <button type="button" onclick="G11nGetLocalTranslationStatus()">Refresh Translation Status</button>
+		<div class="wrap">
+                <div id="tmy_local_translation_status">
+
+		<?php
+
+                global $wpdb;
+                $rows = $wpdb->get_results( 'SELECT ID, post_title, meta_value, post_modified  FROM '.
+                                                  $wpdb->prefix.'posts,'.
+                                                  $wpdb->prefix.'postmeta where post_type="g11n_translation" and '.
+                                                  $wpdb->prefix.'posts.post_status != "trash" and '.
+                                                  $wpdb->prefix.'posts.ID='.
+                                                  $wpdb->prefix.'postmeta.post_id and '.
+                                                  $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang" ORDER BY ID');
+
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In tmy_l10n_manager_page sql:" . json_encode($rows));
+                }
+                echo "<table>";
+                echo    '<tr><td><b>Orig. ID</b></td>' .
+                                        '<td><b>Trans. ID</b></td>' .
+                                        '<td><b>Title</b></td>' .
+                                        '<td><b>Lang</b></td>' .
+                                        '<td><b>Last Modified</b></td></tr>';
+
+                $row_arr = array();
+                foreach ( $rows as $row ) {
+                    $post_info = $this->translator->get_translation_info($row->ID);
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("In tmy_l10n_manager_page trans post:" . json_encode($post_info));
+                    }
+                    if (isset($post_info[0])) {
+                        $row_arr[] = array("TID" => $post_info[0]->ID,
+                                               "ID" => $row->ID,
+                                               "post_title" => $row->post_title,
+                                               "meta_value" => $row->meta_value,
+                                           "post_modified" => $row->post_modified);
+                    }
+                }
+                sort($row_arr);
+                echo "<br>";
+
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In tmy_l10n_manager_page trans post:" . json_encode($row_arr));
+                }
+                foreach ( $row_arr as $row ) {
+                    $id_link = 'post.php?post=' . $row["ID"] . '&action=edit';
+                    $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . $row["ID"] . '</a>';
+        
+                    $tid_link = 'post.php?post=' . $row["TID"] . '&action=edit';
+                    $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . $row["TID"] . '</a>';
+                    //if (isset($post_info[0])) {
+                        echo             '<tr><td>' . $tid_hyper . '</td><td>' .
+                                                         $id_hyper . '</td><td>' .
+                                                         $row["post_title"] . '</td><td>' .
+                                                         $row["meta_value"] . '</td><td>' .
+                                                         $row["post_modified"] . '</td></tr>';
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In tmy_l10n_manager_page trans post:" . $row["post_title"]);
+                        }
+                    //}
+                }
+                echo "</table>";
+
+                echo "</div>";
+           
+		echo "<h2>Translation Server Status:</h2>";
 
                 if ((strcmp('', get_option('g11n_server_user','')) === 0) || (strcmp('', get_option('g11n_server_token','')) === 0)) {
-
                      echo "Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>";
-
                 } else {
-
-		    ?>
-		    <div class="wrap">
-		    <h2>Translation Server Status</h2>
-		    <form method="post">
-    		    <table class="form-table">
-		    <tr valign="top"><td> Project Name:  <?php echo get_option('g11n_server_project'); ?><br>
-                    Project Version:  <?php echo get_option('g11n_server_version'); ?><br>
-		    Translation Status From TMYSoft Translation Server:</td>
-                    <div class="loader"></div>                 
-                    <div id="server_status"> </div>
-
-		    <?php
-		    $http_erro_code_msg = array(
-		        200 => 'OK',
-		        401 => 'Authentication error, check user and token',
-		        404 => 'No project or version on translation server',
-		        500 => 'Internal server error'
-		        );
-
-		    $ch = curl_init();
-    		    curl_reset($ch);
-
-                    error_log("dashboard before calling version info 1");
-    		    $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/version";
-                    error_log("dashboard before calling version info 2");
-    		    $server_reply = $this->translator->rest_get_translation_server($rest_url);
-                    error_log("dashboard before calling version info 3");
-
-                    error_log("dashboard http_code = " . $server_reply["http_code"]);
-                    error_log("dashboard server_reply = " . var_export($server_reply,true));
-
-    		    if ($server_reply["http_code"] == 200) {
-                        error_log("dashboard server_reply = 200");
-
-                        $translation_server_status = True;
-                        error_log("dashboard http_code = " . $server_reply["http_code"]);
-    		        $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/stats/proj/" . 
-                		get_option('g11n_server_project') .  "/iter/" . 
-                		get_option('g11n_server_version') .  "?detail=true&word=false";
-
-    		        $server_reply = $this->translator->rest_get_translation_server($rest_url);
-
-    		        $payload = $server_reply["payload"];
+                    echo '<button type="button" onclick="G11nmyGetServerStatus()">Get Server Status</button> Click Button To Get Latest Status';
+        	    echo '<div id="tmy_server_status"></div>';
 
 
-		        echo '<tr valign="top"><td>';
-                        echo get_option('g11n_server_url') . ':' . $http_erro_code_msg[$server_reply["http_code"]];
-                        echo '</td></tr>';
-
-		        echo '<tr valign="top">';
-        	        echo '<td>Translation Progress Overview (Translated/Total): ';
-        
-		        if (! is_null($payload)){
-		            if (is_array($payload->stats)){
-	                        foreach ( $payload->stats as $row ) {
-        	                    echo $row->locale . ': '. $row->translated . '/' . $row->total . ' ';
-        	                }
-        	            }
-		        }
-        
-		        echo '</td>';
-        	        echo '</tr>';
-
-        	        echo '<tr><td>';
-        
-		        if (! is_null($payload)){
-
-		            if (is_array($payload->detailedStats)) {
-
-		                foreach ( $payload->detailedStats as $row ) {
-		                    //echo '<tr><td><b>' . $row->id .'</b> (Translated/Total): </td><td>';
-		                    echo '<b>' . $row->id .'</b> (Translated/Total): ';
-
-		                    if (is_array($row->stats)) {
-
-		                        foreach ( $row->stats as $stat_row ) {
-        
-		                            if  ($stat_row->translated == $stat_row->total) {
-        
-		                                   echo '<b>' . $stat_row->locale . ': '. $stat_row->translated . '/' . $stat_row->total . '</b> ';
-        
-		                                   /* Pulling translation in */
-		                                   $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest" . "/projects/p/" . 
-		                                       get_option('g11n_server_project') . "/iterations/i/" . 
-		                                       get_option('g11n_server_version') . "/r/" . 
-		                                       $row->id . "/translations/" . $stat_row->locale . "?ext=gettext&ext=comment";
-        
-        
-		                                   $server_reply = $this->translator->rest_get_translation_server($rest_url);
-		                                   $translation_payload = $server_reply["payload"];
-        
-		                                   //$debug_log .= $server_reply["server_msg"];
-        
-		                                   if (isset($translation_payload->textFlowTargets[0]->content)) {
-		                                        $translation_title = $translation_payload->textFlowTargets[0]->content;
-		                                        error_log("SYNC TRANSLATION TITLE = " . $translation_title);
-		                                   } 
-        
-		                                   $payload_size = count($translation_payload->textFlowTargets);
-		                                   $translation_contents = '';
-		                                   for ($i = 1; $i < $payload_size; $i++) {
-		                                       $translation_contents .= $translation_payload->textFlowTargets[$i]->content ;
-		                                   }
-        
-		                                   //if (isset($translation_payload->textFlowTargets[1]->content)) {
-		                                   //     $translation_contents = $translation_payload->textFlowTargets[1]->content;
-		                                   //     error_log("SYNC TRANSLATION CONTENTS = " . $translation_contents);
-		                                   //} 
-    
-		                                   //$row->id is in the format of "Wordpress-post-23"
-		                                   $g11n_res_filename = preg_split("/-/", $row->id);
-    
-		                                   /* change the locale - to _ */
-		                                   $stat_row->locale = str_replace("-", "_", $stat_row->locale);
-    
-		                                   $default_lang_post_id = $g11n_res_filename[2];
-		                                   $payload_post_type = $g11n_res_filename[1];
-    
-		                                   //$debug_log .= " Finished translation,id=".$default_lang_post_id."post type=" . $payload_post_type;
-
-
-		                                   $translation_id = $this->translator->check_translation_exist($default_lang_post_id,$stat_row->locale,$payload_post_type);
-
-		                                   if ((strcmp($payload_post_type,"post") === 0)||(strcmp($payload_post_type,"page") === 0)) {
-		                                       if (isset($translation_id)) {
-		                                          //$debug_log .= " Found local item,id=".$translation_id." ".$payload_post_type;
-		                                           $g11n_translation_post = array(
-		                                             'ID'    => $translation_id,
-		                                             'post_title'    => $translation_title,
-		                                             'post_content'  => $translation_contents,
-		                                             'post_type'  => "g11n_translation"
-		                                           );
-		                                           $update_post_id = wp_update_post( $g11n_translation_post );
-		                                           //$debug_log .= " updated id=".$update_post_id;
-		                                       } else {
-		                                           $g11n_translation_post = array(
-		                                             'post_title'    => $translation_title,
-		                                             'post_content'  => $translation_contents,
-		                                             'post_type'  => "g11n_translation"
-		                                           );
-		                                           $new_translation_id = wp_insert_post( $g11n_translation_post );
-		                                           $debug_log .= " created trans post id=".$new_translation_id;
-		                                           add_post_meta( $new_translation_id, 'orig_post_id', $default_lang_post_id, true );
-		                                           add_post_meta( $new_translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
-		                                       }
-		                                   }
-
-		                                   if ((strcmp($payload_post_type,"blogname") === 0)) {
-		                                       if (isset($translation_id)) {
-		                                        error_log("TRANSLATION LANG ID = " .  $translation_id);
-		                                        $g11n_translation_post = array(
-		                                          'ID'    => $translation_id,
-		                                          'post_title'    => "Blog Name Translation",
-		                                          'post_content'  => $translation_title,
-		                                          'post_type'  => "g11n_translation"
-		                                        );
-		                                        $update_post_id = wp_update_post( $g11n_translation_post );
-		                                        //$debug_log .= " found trans post id=".$update_post_id." ".$payload_post_type;
-		                                       } else {
-		                                        error_log("TRANSLATION LANG ID = empty ");
-		                                        $g11n_translation_post = array(
-		                                          'post_title'    => "Blog Name Translation",
-		                                          'post_content'  => $translation_title,
-		                                          'post_type'  => "g11n_translation"
-		                                        );
-		                                        $new_translation_id = wp_insert_post( $g11n_translation_post );
-		                                        //$debug_log .= " new trans post id=".$new_translation_id." ".$payload_post_type;
-		                                        add_post_meta( $new_translation_id, 'option_name', "blogname", true );
-		                                        add_post_meta( $new_translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
-		                                       }
-		                                   }
-
-		                                   if ((strcmp($payload_post_type,"blogdescription") === 0)) {
-		                                       if (isset($translation_id)) {
-		                                           error_log("TRANSLATION LANG ID = " .  $translation_id);
-		                                           $g11n_translation_post = array(
-		                                             'ID'    => $translation_id,
-		                                             'post_title'    => "Blog Tag Translation",
-		                                             'post_content'  => $translation_title,
-		                                             'post_type'  => "g11n_translation"
-		                                           );
-		                                           $update_post_id = wp_update_post( $g11n_translation_post );
-		                                           //$debug_log .= " found trans post id=".$update_post_id." ".$payload_post_type;
-		                                       } else {
-		                                           error_log("TRANSLATION LANG ID = empty ");
-		                                           $g11n_translation_post = array(
-		                                             'post_title'    => "Blog Tag Translation",
-		                                             'post_content'  => $translation_title,
-		                                             'post_type'  => "g11n_translation"
-		                                           );
-		                                           $new_translation_id = wp_insert_post( $g11n_translation_post );
-		                                           //$debug_log .= " new trans post id=".$new_translation_id." ".$payload_post_type;
-		                                           add_post_meta( $new_translation_id, 'option_name', "blogdescription", true );
-		                                           add_post_meta( $new_translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
-		                                       }
-		                                   }
-                 
-		                             } else {
-		                                 echo $stat_row->locale . ': '. $stat_row->translated . '/' . $stat_row->total . ' ';
-		                             }
-		                         }
-                                         //for each row
-
-		                    }
-		                    echo '<br>';
-		                }  
-                                // is null
-
-		            }
-
-	                }
-		        echo '</td></tr></table>';
-
-                    } else {
-                        error_log("dashboard before calling version info 4");
-                        $translation_server_status = False;
-    		        echo '<table class="form-table">';
-		        echo '<tr valign="top"><td>';
-                        echo get_option('g11n_server_url') . '<br>';
-    		        echo " Status: " . $http_erro_code_msg[$server_reply["http_code"]] . "<br>";
-                        echo json_encode($server_reply);
-		        echo '</td></tr></table>';
-                    }
-    		
-                    curl_close($ch);
-
-                }
-                // if configured user and token
-
-    
-                error_log("dashboard before calling version info 5");
-		global $wpdb;
-    		//$rows = $wpdb->get_results( 'SELECT * FROM {$wpdb->prefix}posts where post_type="g11n_translation"');
-    		$rows = $wpdb->get_results( 'SELECT * FROM '.
-                                             $wpdb->prefix.'posts,'.
-                                             $wpdb->prefix.'postmeta where post_type="g11n_translation" and '.
-                                             $wpdb->prefix.'posts.post_status != "trash" and '.
-                                             $wpdb->prefix.'posts.ID='.
-                                             $wpdb->prefix.'postmeta.post_id and '.
-                                             $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang"');
-
-		?>
-		<div class="wrap">
-		<h1>Local Translation Database Status</h1>
-		    <form method="post">
-		    <table class="form-table">
- 			<tr valign="top"><td>
-		<?php
-
-		foreach ( $rows as $row ) {
-		    $post_info = $this->translator->get_translation_info($row->ID);
-		    $edit_url = 'post.php?post=' . $row->ID . '&action=edit';
-		    echo '<a href="' . admin_url($edit_url) . '">';
-		    if (isset($post_info[0])) {
-		        echo '<b>Post Id:</b> ' . $post_info[0]->ID;
-		    }
-		    echo ' <b>Title:</b> ' . $row->post_title . ' ';
-		    echo '<b>Language:</b> ' .  $row->meta_value . 
-		         ' <b>Translation Id:</b> ' .  $row->ID . 
-		         ', <b>Last Modified:</b> '. $row->post_modified . 
-		         //', <b>Title:</b> ' . $row->post_title .
-		         '</a><br>';
-		}
-		?>
-
-	    	</td>
-	    	</tr>
-	    	</table>
-		</div>
-
-
-		
-		<?php
-
-                if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
-		    echo '<h2><a href="#" onclick="window.location.reload(true);">Click To Sync Translation From Translation Server</a></b>';
-		    echo '<p style="font-size:8px">';
-                }
-		echo $debug_log;
-		echo "</p></form></b>";
-
+               }
 
         }
 
@@ -940,78 +762,102 @@ error_log ("Mei debug");
         }
 
 	public function tmy_create_sync_translation() {
-             error_log("in create_sync_translation");
 
+            if ( WP_TMY_G11N_DEBUG ) {
+                error_log("In tmy_create_sync_translation,id:".$_POST['id'].",type:".$_POST['post_type']);
+            }
 
+            $message = "Number of translation entries created: ";
 
-             $message = "create_sync_trans";
-             $message .= "{" . $_POST['id'] . "}";
-             $message .= "{" . $_POST['post_type'] . "}";
+            $all_langs = get_option('g11n_additional_lang');
+            $default_lang = get_option('g11n_default_lang');
+            unset($all_langs[$default_lang]);
 
-
-             $all_langs = get_option('g11n_additional_lang');
-             $default_lang = get_option('g11n_default_lang');
-             unset($all_langs[$default_lang]);
-
+            if ( WP_TMY_G11N_DEBUG ) {
+                error_log("In tmy_create_sync_translation,title:".get_post_field('post_title', $_POST['id']));
+                error_log("In tmy_create_sync_translation,type:".get_post_field('post_type', $_POST['id']));
+            }
 
              if (strcmp($_POST['post_type'], "g11n_translation") !== 0) {
 
                  if (strcmp($_POST['post_type'], "product") !== 0) {
-                     error_log("Create Sync product id: " . $_POST['id']);
-                     error_log("Create Sync product title: " . get_post_field('post_title', $_POST['id'])); 
-                     error_log("Create Sync product content: " . get_post_field('post_content', $_POST['id']));
-                     error_log("Create Sync product excerpt: " . get_post_field('post_excertpt', $_POST['id']));
+                    
+                     if ( WP_TMY_G11N_DEBUG ) { error_log("In tmy_create_sync_translation langs,".json_encode($all_langs));};
 
-                     $json_file_name = "WordpressG11nAret-" . $_POST['post_type'] . "-" . $_POST['id'];
-
-                     $content_title = get_post_field('post_title', $_POST['id']);
-                     //$content = $post->post_content;
-                     //$contents_array = array($content_title,$content);
-
-                     //error_log("MYSQL" . var_export($_POST['post_content'],true));
-                     $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $_POST['id']),-1, PREG_SPLIT_DELIM_CAPTURE);
-                     error_log("MYSQL" . var_export($tmp_array,true));
-                     $contents_array = array();
-                     array_push($contents_array, $content_title);
-                     $paragraph = "";
-                     foreach ($tmp_array as $line) {
-                        $paragraph .= $line;
-                        if (strlen($paragraph) > get_option('g11n_server_trunksize',900)) {
-                            array_push($contents_array, $paragraph);
-                            $paragraph = "";
-                        }
+                     // creating language translations for each language
+                     $num_success_entries = 0;
+                     $num_langs = 0;
+                     if (is_array($all_langs)) {
+                         $num_langs = count($all_langs);
+                         foreach( $all_langs as $value => $code) {
+                             $translation_id = $this->translator->check_translation_exist($_POST['id'],$code,$_POST['post_type']);
+                             if ( WP_TMY_G11N_DEBUG ) { 
+                                 error_log("In tmy_create_sync_translation, translation_id = " . $translation_id);
+                             }
+                             if (! isset($translation_id)) {
+                                 $num_success_entries += 1;
+                                 //$message .= " $value($code)";
+                                 //error_log("in create_sync_translation, no translation_id");
+                                 $translation_title = get_post_field('post_title', $_POST['id']);
+                                 $translation_contents = get_post_field('post_content', $_POST['id']);
+                                 $g11n_translation_post = array(
+                                       'post_title'    => $translation_title,
+                                       'post_content'  => $translation_contents,
+                                       'post_type'  => "g11n_translation"
+                                 );
+                                 $new_translation_id = wp_insert_post( $g11n_translation_post );
+                                 add_post_meta( $new_translation_id, 'orig_post_id', $_POST['id'], true );
+                                 add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
+                             }
+                             if ( WP_TMY_G11N_DEBUG ) { 
+                                 error_log("In tmy_create_sync_translation, new_translation_id = " . $new_translation_id);
+                             }
+                         }
                      }
-                     if (strlen($paragraph)>0) array_push($contents_array, $paragraph);
-                     error_log("MYSQL" . var_export($contents_array,true));
-                     $this->translator->push_contents_to_translation_server($json_file_name, $contents_array);
-                 }
-             }
+                     $message .= $num_success_entries." (no. of languages configured: ". $num_langs.").";
 
-             if (is_array($all_langs)) {
-                 foreach( $all_langs as $value => $code) {
-                     $message .= " [$value:$code]"; 
-                     $translation_id = $this->translator->check_translation_exist($_POST['id'],$code,$_POST['post_type']);
+                     // creating language translations for each language
 
-                         if (! isset($translation_id)) {
-                                   error_log("in create_sync_translation, no translation_id");
-                                   $translation_title = get_post_field('post_title', $_POST['id']);
-                                   $translation_contents = get_post_field('post_content', $_POST['id']);
-                                   $g11n_translation_post = array(
-                                     'post_title'    => $translation_title,
-                                     'post_content'  => $translation_contents,
-                                     'post_type'  => "g11n_translation"
-                                   );
-                                   $new_translation_id = wp_insert_post( $g11n_translation_post );
-                                   error_log("in create_sync_translation, translation_id = " . $new_translation_id);
-                                   add_post_meta( $new_translation_id, 'orig_post_id', $_POST['id'], true );
-                                   add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
+                     // push to translation if all setup
+                     if ((strcmp('', get_option('g11n_server_user','')) !== 0) && 
+                         (strcmp('', get_option('g11n_server_token','')) !== 0) &&
+                         (strcmp('', get_option('g11n_server_url','')) !== 0)) {
+
+                         $content_title = get_post_field('post_title', $_POST['id']);
+                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $_POST['id']),-1, PREG_SPLIT_DELIM_CAPTURE);
+                         $contents_array = array();
+
+                         if (strcmp(get_post_field('post_title', $_POST['id']),'blogname') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . $_POST['id'];
+                         } elseif (strcmp(get_post_field('post_title', $_POST['id']),'blogdescription') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . $_POST['id'];
+                         } else {
+                             $json_file_name = "WordpressG11nAret-" . $_POST['post_type'] . "-" . $_POST['id'];
+                             array_push($contents_array, $content_title);
                          }
 
-
-
-                     $message .= "{[" . $translation_id . "]}";
+                         $paragraph = "";
+                         foreach ($tmp_array as $line) {
+                            $paragraph .= $line;
+                            if (strlen($paragraph) > get_option('g11n_server_trunksize',900)) {
+                                array_push($contents_array, $paragraph);
+                                $paragraph = "";
+                            }
+                         }
+                         if (strlen($paragraph)>0) array_push($contents_array, $paragraph);
+                         //error_log("MYSQL" . var_export($contents_array,true));
+                         $push_return_msg = $this->translator->push_contents_to_translation_server($json_file_name, $contents_array);
+                         $message .= " " . $json_file_name . " is pushed to Translation Server: ".$push_return_msg;
+                         if ( WP_TMY_G11N_DEBUG ) {
+                              error_log("In tmy_create_sync_translation,filename:".$json_file_name);
+                         }
+                     } else {
+                        $message .= " No translation server setup.";
+                     }
+                     // push to translation if all setup
                  }
              }
+
              echo $message;
 
 	     wp_die();
@@ -1073,6 +919,332 @@ error_log ("Mei debug");
 		wp_die();
 
 	}
+
+
+
+
+
+	public function tmy_g11n_pull_translation($id, $locale) {
+
+        
+            // will probable need to remove this function
+            /* Pulling translation in */
+	    $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest" . "/projects/p/" . 
+	                    get_option('g11n_server_project') . "/iterations/i/" . 
+	                    get_option('g11n_server_version') . "/r/" . 
+	                    $id . "/translations/" . $locale . "?ext=gettext&ext=comment";
+        
+        
+	    $server_reply = $this->translator->rest_get_translation_server($rest_url);
+	    $translation_payload = $server_reply["payload"];
+        
+	                //$debug_log .= $server_reply["server_msg"];
+        
+	    if (isset($translation_payload->textFlowTargets[0]->content)) {
+	        $translation_title = $translation_payload->textFlowTargets[0]->content;
+	        //error_log("SYNC TRANSLATION TITLE = " . $translation_title);
+	    } 
+       
+            $payload_size = count($translation_payload->textFlowTargets);
+            $translation_contents = '';
+            for ($i = 1; $i < $payload_size; $i++) {
+                $translation_contents .= $translation_payload->textFlowTargets[$i]->content ;
+            }
+        
+		               //if (isset($translation_payload->textFlowTargets[1]->content)) {
+		               //     $translation_contents = $translation_payload->textFlowTargets[1]->content;
+		               //     error_log("SYNC TRANSLATION CONTENTS = " . $translation_contents);
+		               //} 
+    
+		               //$row->id is in the format of "Wordpress-post-23"
+            $g11n_res_filename = preg_split("/-/", $id);
+    
+	    /* change the locale - to _ */
+	    $locale = str_replace("-", "_", $locale);
+   
+            $default_lang_post_id = $g11n_res_filename[2];
+            $payload_post_type = $g11n_res_filename[1];
+
+                 //$debug_log .= " Finished translation,id=".$default_lang_post_id."post type=" . $payload_post_type;
+
+
+            $translation_id = $this->translator->check_translation_exist($default_lang_post_id,$locale,$payload_post_type);
+
+            if ((strcmp($payload_post_type,"post") === 0)||(strcmp($payload_post_type,"page") === 0)) {
+                     if (isset($translation_id)) {
+                        //$debug_log .= " Found local item,id=".$translation_id." ".$payload_post_type;
+                         $g11n_translation_post = array(
+                           'ID'    => $translation_id,
+                           'post_title'    => $translation_title,
+                           'post_content'  => $translation_contents,
+                           'post_type'  => "g11n_translation"
+                         );
+                         $update_post_id = wp_update_post( $g11n_translation_post );
+                         //$debug_log .= " updated id=".$update_post_id;
+                     } else {
+                         $g11n_translation_post = array(
+                           'post_title'    => $translation_title,
+                           'post_content'  => $translation_contents,
+                           'post_type'  => "g11n_translation"
+                         );
+                         $new_translation_id = wp_insert_post( $g11n_translation_post );
+                         //$debug_log .= " created trans post id=".$new_translation_id;
+                         add_post_meta( $new_translation_id, 'orig_post_id', $default_lang_post_id, true );
+                         add_post_meta( $new_translation_id, 'g11n_tmy_lang', $locale, true );
+                     }
+            }
+
+            if ((strcmp($payload_post_type,"blogname") === 0)) {
+                     if (isset($translation_id)) {
+                      //error_log("TRANSLATION LANG ID = " .  $translation_id);
+                      $g11n_translation_post = array(
+                        'ID'    => $translation_id,
+                        'post_title'    => "Blog Name Translation",
+                        'post_content'  => $translation_title,
+                        'post_type'  => "g11n_translation"
+                      );
+                      $update_post_id = wp_update_post( $g11n_translation_post );
+                      //$debug_log .= " found trans post id=".$update_post_id." ".$payload_post_type;
+                     } else {
+                      //error_log("TRANSLATION LANG ID = empty ");
+                      $g11n_translation_post = array(
+                        'post_title'    => "Blog Name Translation",
+                        'post_content'  => $translation_title,
+                        'post_type'  => "g11n_translation"
+                      );
+                      $new_translation_id = wp_insert_post( $g11n_translation_post );
+                      //$debug_log .= " new trans post id=".$new_translation_id." ".$payload_post_type;
+                      add_post_meta( $new_translation_id, 'option_name', "blogname", true );
+                      add_post_meta( $new_translation_id, 'g11n_tmy_lang', $locale, true );
+                     }
+            }
+
+            if ((strcmp($payload_post_type,"blogdescription") === 0)) {
+                     if (isset($translation_id)) {
+                         //error_log("TRANSLATION LANG ID = " .  $translation_id);
+                         $g11n_translation_post = array(
+                           'ID'    => $translation_id,
+                           'post_title'    => "Blog Tag Translation",
+                           'post_content'  => $translation_title,
+                           'post_type'  => "g11n_translation"
+                         );
+                         $update_post_id = wp_update_post( $g11n_translation_post );
+                         //$debug_log .= " found trans post id=".$update_post_id." ".$payload_post_type;
+                     } else {
+                         //error_log("TRANSLATION LANG ID = empty ");
+                         $g11n_translation_post = array(
+                           'post_title'    => "Blog Tag Translation",
+                           'post_content'  => $translation_title,
+                           'post_type'  => "g11n_translation"
+                         );
+                         $new_translation_id = wp_insert_post( $g11n_translation_post );
+                         //$debug_log .= " new trans post id=".$new_translation_id." ".$payload_post_type;
+                         add_post_meta( $new_translation_id, 'option_name', "blogdescription", true );
+                         add_post_meta( $new_translation_id, 'g11n_tmy_lang', $locale, true );
+                     }
+            }
+
+	}
+
+	public function tmy_g11n_get_local_translation_status() {
+
+            global $wpdb;
+            $rows = $wpdb->get_results( 'SELECT ID, post_title, meta_value, post_modified  FROM '.
+                                                  $wpdb->prefix.'posts,'.
+                                                  $wpdb->prefix.'postmeta where post_type="g11n_translation" and '.
+                                                  $wpdb->prefix.'posts.post_status != "trash" and '.
+                                                  $wpdb->prefix.'posts.ID='.
+                                                  $wpdb->prefix.'postmeta.post_id and '.
+                                                  $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang" ORDER BY ID');
+
+            $ret_msg = "<table>";
+            $ret_msg .=  '<tr><td><b>Orig. ID</b></td>' .
+                                        '<td><b>Trans. ID</b></td>' .
+                                        '<td><b>Title</b></td>' .
+                                        '<td><b>Lang</b></td>' .
+                                        '<td><b>Last Modified</b></td></tr>';
+
+            $row_arr = array();
+            foreach ( $rows as $row ) {
+                        $post_info = $this->translator->get_translation_info($row->ID);
+                        if (isset($post_info[0])) {
+                            $row_arr[] = array("TID" => $post_info[0]->ID,
+                                               "ID" => $row->ID,
+                                               "post_title" => $row->post_title,
+                                               "meta_value" => $row->meta_value,
+                                               "post_modified" => $row->post_modified);
+                        }
+            }
+            sort($row_arr);
+            //$return_msg .= json_encode($row_arr);
+            $ret_msg .= "<br>";
+            if ( WP_TMY_G11N_DEBUG ) {
+                error_log("In tmy_g11n_get_local_translation_status, rows:".json_encode($row_arr));
+            }
+            foreach ( $row_arr as $row ) {
+                $id_link = 'post.php?post=' . $row["ID"] . '&action=edit';
+                $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . $row["ID"] . '</a>';
+
+                $tid_link = 'post.php?post=' . $row["TID"] . '&action=edit';
+                $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . $row["TID"] . '</a>';
+                //if (isset($post_info[0])) {
+                    $ret_msg .=  '<tr><td>' . $tid_hyper . '</td><td>' .
+                                                         $id_hyper . '</td><td>' .
+                                                         $row["post_title"] . '</td><td>' .
+                                                         $row["meta_value"] . '</td><td>' .
+                                                         $row["post_modified"] . '</td></tr>';
+                //}
+            }
+            $ret_msg .= "<tr><td>". time() ."</td></tr>";
+            $ret_msg .= "</table>  ";
+            echo $ret_msg;
+            if ( WP_TMY_G11N_DEBUG ) {
+                error_log("In tmy_g11n_get_local_translation_status, ret:".json_encode($ret_msg));
+            }
+
+        }
+
+	public function tmy_g11n_get_project_status() {
+
+                $http_erro_code_msg = array(
+                        200 => 'OK',
+                        401 => 'Authentication error, check user and token',
+                        404 => 'No project or version on translation server',
+                        500 => 'Internal server error'
+                        );
+
+                $return_msg = '';
+		$return_msg .= "Translation Server URL: ". get_option('g11n_server_url') . '<br>';
+
+      	        $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/version";
+    		$server_reply = $this->translator->rest_get_translation_server($rest_url);
+
+    	        if ($server_reply["http_code"] == 200) {
+                    $return_msg .= "Sever Version: " . $server_reply["payload"]->versionNo . "<br>";
+                    $return_msg .= "Project Name: " . get_option('g11n_server_project'). "<br>";
+                    $return_msg .= "Project Version: " . get_option('g11n_server_version') . "<br>";
+                    $return_msg .= "<br>Translations Hosted on the Server: <br>";
+
+                    $translation_server_status = True;
+                    $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/stats/proj/" .
+                                get_option('g11n_server_project') .  "/iter/" .
+                                get_option('g11n_server_version') .  "?detail=true&word=false";
+                    $server_reply = $this->translator->rest_get_translation_server($rest_url);
+                    $payload = $server_reply["payload"];
+
+                    $return_msg .= "Progress Overview (Translated/Total): <br>";
+
+                    if (! is_null($payload)){
+                        if (is_array($payload->stats)){
+                            foreach ( $payload->stats as $row ) {
+                                $return_msg .= "--- " . $row->locale . ": ". $row->translated . "/" . $row->total . "<br>";
+                            }
+                        }
+		        if (is_array($payload->detailedStats)) {
+                            $return_msg .= "<br>Document List(s):: <br>";
+                            //$return_msg .= var_export($payload,true);
+                            //$return_msg .= json_encode($payload);
+                            foreach ( $payload->detailedStats as $row ) {
+                                if (is_array($row->stats)) {
+                                    $doc_lang_str = "";
+                                    foreach ( $row->stats as $stat_row ) {
+                                         if  ($stat_row->translated == $stat_row->total) {
+                                             $doc_lang_str .= "<b>" . $stat_row->locale . ": ". 
+                                                   $stat_row->translated . "/" . $stat_row->total . "</b> ";
+
+                                             //begin fully translated, need to pull the translation down to local WP database
+
+		                             /* Pulling translation in */
+		                             $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest" . "/projects/p/" . 
+		                                       get_option('g11n_server_project') . "/iterations/i/" . 
+		                                       get_option('g11n_server_version') . "/r/" . 
+		                                       $row->id . "/translations/" . $stat_row->locale . "?ext=gettext&ext=comment";
+        
+        
+		                             $server_reply = $this->translator->rest_get_translation_server($rest_url);
+		                             $translation_payload = $server_reply["payload"];
+        
+		                                   //$debug_log .= $server_reply["server_msg"];
+        
+		                             if (isset($translation_payload->textFlowTargets[0]->content)) {
+		                                  $translation_title = $translation_payload->textFlowTargets[0]->content;
+		                                        //error_log("SYNC TRANSLATION TITLE = " . $translation_title);
+		                             } 
+        
+		                             $payload_size = count($translation_payload->textFlowTargets);
+		                             $translation_contents = '';
+		                             for ($i = 1; $i < $payload_size; $i++) {
+		                                 $translation_contents .= $translation_payload->textFlowTargets[$i]->content ;
+		                             }
+        
+		                                   //if (isset($translation_payload->textFlowTargets[1]->content)) {
+		                                   //     $translation_contents = $translation_payload->textFlowTargets[1]->content;
+		                                   //     error_log("SYNC TRANSLATION CONTENTS = " . $translation_contents);
+		                                   //} 
+    
+		                             //$row->id is in the format of "Wordpress-post-23"
+		                             $g11n_res_filename = preg_split("/-/", $row->id);
+    
+		                             /* change the locale - to _ */
+		                             $stat_row->locale = str_replace("-", "_", $stat_row->locale);
+    
+		                             $default_lang_post_id = $g11n_res_filename[2];
+		                             $payload_post_type = $g11n_res_filename[1];
+    
+		                                   //$debug_log .= " Finished translation,id=".$default_lang_post_id."post type=" . $payload_post_type;
+
+
+		                             $translation_id = $this->translator->check_translation_exist($default_lang_post_id,$stat_row->locale,$payload_post_type);
+                                             if ( WP_TMY_G11N_DEBUG ) {
+                                                 error_log("In tmy_g11n_get_project_status, id:".$default_lang_post_id." locale:".
+                                                                                     $stat_row->locale." type: ".$payload_post_type);
+                                                 error_log("In tmy_g11n_get_project_status, translation id:".$translation_id);
+                                             }
+                                             if (strcmp($payload_post_type,'blogname') === 0){
+		                                 $translation_contents = $translation_title . $translation_contents;
+		                                 $translation_title = "blogname";
+                                             } elseif (strcmp($payload_post_type,'blogdescription') === 0){
+		                                 $translation_contents = $translation_title . $translation_contents;
+		                                 $translation_title = "blogdescription";
+                                             } 
+
+		                             if (isset($translation_id)) {
+		                                 $update_post_id = wp_update_post(array(
+		                                                        'ID'    => $translation_id,
+		                                                        'post_title'    => $translation_title,
+		                                                        'post_content'  => $translation_contents,
+		                                                        'post_type'  => "g11n_translation"));
+		                             } else {
+		                                 $new_translation_id = wp_insert_post(array(
+		                                                        'post_title'    => $translation_title,
+		                                                        'post_content'  => $translation_contents,
+		                                                        'post_type'  => "g11n_translation"));
+		                                 add_post_meta( $new_translation_id, 'orig_post_id', $default_lang_post_id, true );
+		                                 add_post_meta( $new_translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
+		                             }
+
+	                                     //tmy_g11n_pull_translation($stat_row->id, $stat_row->locale);
+                                             //finish fully translated, need to pull the translation down to local WP database
+
+                                         } else {
+                                             $doc_lang_str .= " " . $stat_row->locale . ": ". 
+                                                   $stat_row->translated . "/" . $stat_row->total . " ";
+                                         }
+                                    }//foreach
+                                    $return_msg .= "<b>" . $row->id ."</b> (Translated/Total): ". $doc_lang_str . "<br>";
+                                }// if (is_array($row->stats))
+                            }//for each document row
+                        }// if (is_array($payload->detailedStats))
+                    } // if (! is_null($payload))
+                } else {
+                    $return_msg .= "Sever is not reachable: <br>";
+                    $return_msg .= var_export($server_reply,true);
+                }
+
+                echo $return_msg;
+		wp_die();
+
+        }
 	public function tmy_g11n_clear_plugin_data() {
 
 		global $wpdb; 
@@ -1080,11 +1252,11 @@ error_log ("Mei debug");
 		if ($whatever == 8888) {
 
 		    $no_g11n_config = $wpdb->get_results( 'delete from '.$wpdb->prefix.'options where option_name like "g11n%"');
-		    $no_g11n_trans = $wpdb->get_results( 'delete from '.$wpdb->prefix.'posts where post_type="g11n_translation"');
+		    $no_g11n_trans = $wpdb->get_results( 'delete from '.$wpdb->prefix.'posts where post_type="g11n_translation" or post_title="blogname" or post_title="blogdescription"');
 		    $no_g11n_metas = $wpdb->get_results( 'delete from '.$wpdb->prefix.'postmeta where meta_key="g11n_tmy_lang" or meta_key="orig_post_id" or meta_key="translation_push_status"');
-		    error_log(var_export($no_g11n_config,true));
+		    //error_log(var_export($no_g11n_config,true));
 		    error_log(var_export($no_g11n_trans,true));
-		    error_log(var_export($no_g11n_metas,true));
+		    //error_log(var_export($no_g11n_metas,true));
 		    echo "Cleared Data";
 		    wp_die();
 
@@ -1094,6 +1266,140 @@ error_log ("Mei debug");
 		wp_die();
 
         }
+
+	public function tmy_plugin_option_update_description($old, $new) {
+
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("tmy_plugin_option_update_description:" . $old. "->" . $new );
+                    error_log("tmy_plugin_option_update_description blog description:" . get_bloginfo('description') );
+                } 
+                if (strcmp($new,"")==0){
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
+                        if (! is_null($title_post)) {
+                            error_log("tmy_plugin_option_update_description, curren blogdescription post ID: :" . $title_post->ID );
+                        }
+                    } 
+                }
+                if (strcmp($new,"Yes")==0){
+                    // creating placeholder entry as private post type
+                    $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
+
+                    if (is_null($title_post)) {
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogdescription',
+                                                            'post_content'  => get_bloginfo('description'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    } else {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID,
+                                                            'post_title'    => 'blogdescription',
+                                                            'post_content'  => get_bloginfo('description'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    }
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("tmy_plugin_option_update_description, blog description post ID: :" . $new_post_id );
+                    }
+                }
+
+
+		//if (strcmp($new,"Yes")==0){
+                //    $language_options = get_option('g11n_additional_lang', array());
+                //    $default_lang = get_option('g11n_default_lang');
+                          
+                //    foreach( $language_options as $value => $code) {
+
+                 //       if (strcmp($value, $default_lang) === 0) {
+                 //           continue;
+                 //       }
+                 //       error_log("langs: " . $value. " - " . $code);
+                 //       $translation_post_id = $this->translator->get_translation_id(0,$code,"blogdescription");
+                 //       if (! isset($translation_post_id)) {
+                 //           error_log("No translation, creating translation langs: " . $value. " - " . $code);
+                 //           $translation_title = get_bloginfo( 'description' );
+                 //           $g11n_translation_post = array(
+                 //                'post_title'    => "Blog Tag Translation - " . $value,
+                 //                'post_content'  => $translation_title,
+                 //                'post_type'  => "g11n_translation"
+                 //           );
+                 //           $new_translation_id = wp_insert_post( $g11n_translation_post );
+                 //           add_post_meta( $new_translation_id, 'option_name', "blogdescription", true );
+                 //           add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
+                 //       }
+                 //   }
+                //}
+
+                //error_log($option_name . "=" . get_option($option_name) . ";");
+                //error_log($option_name . "=" . get_option('g11n_l10n_props_pages') . ";");
+		//wp_die();
+
+        }
+
+
+        public function tmy_plugin_option_update_blogname($old, $new) {
+
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("tmy_plugin_option_update_blogname:" . $old. "->" . $new );
+                    error_log("tmy_plugin_option_update_blogname blogname:" . get_bloginfo('name') );
+                } 
+                if (strcmp($new,"")==0){
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        $title_post  = get_page_by_title('blogname',OBJECT,'post');
+                        if (! is_null($title_post)) {
+                            error_log("tmy_plugin_option_update_blogname, curren blogname post ID: :" . $title_post->ID );
+                        }
+                    } 
+                }
+                if (strcmp($new,"Yes")==0){
+                    // creating placeholder of the blogname entry as private post type
+                    $title_post  = get_page_by_title('blogname',OBJECT,'post');
+
+                    if (is_null($title_post)) {
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogname',
+                                                            'post_content'  => get_bloginfo('name'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    } else {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID, 
+                                                            'post_title'    => 'blogname',
+                                                            'post_content'  => get_bloginfo('name'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    }
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("tmy_plugin_option_update_blogname, blogname post ID: :" . $new_post_id );
+                    } 
+
+                    //$language_options = get_option('g11n_additional_lang', array());
+                    //$default_lang = get_option('g11n_default_lang');
+                    //foreach( $language_options as $value => $code) {
+
+                    //    if (strcmp($value, $default_lang) === 0) {
+                    //        continue;
+                    //    }
+                        //error_log("langs: " . $value. " - " . $code);
+                    //    $translation_post_id = $this->translator->get_translation_id(0,$code,"blogname");
+                    //    if (! isset($translation_post_id)) {
+                    //        //error_log("No translation, creating translation langs: " . $value. " - " . $code);
+                    //        $translation_title = get_bloginfo( 'blogname' );
+                    //        $g11n_translation_post = array(
+		    //             'post_title'    => "Blog Name Translation - " . $value,
+                    //             'post_content'  => $translation_title,
+                    //             'post_type'  => "g11n_translation"
+                    //        );
+                    //        $new_translation_id = wp_insert_post( $g11n_translation_post );
+                    //        add_post_meta( $new_translation_id, 'option_name', "blogname", true );
+                    //        add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
+                    //    }
+                    //}
+                }
+
+                //error_log($option_name . "=" . get_option($option_name) . ";");
+                //error_log($option_name . "=" . get_option('g11n_l10n_props_pages') . ";");
+                //wp_die();
+
+        }
+
 
 	function g11n_edit_posts_views( $views ) {
     		foreach ( $views as $index => $view ) {
