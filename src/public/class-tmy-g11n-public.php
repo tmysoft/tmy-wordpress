@@ -562,7 +562,7 @@ class TMY_G11n_Public {
 		        $language_name = $language_options[$g11n_current_language];
 		        //$translation_post_id = $this->translator->get_translation_id($postid,$language_name,$posttype);
 
-		        $translation_post_id = $this->translator->get_translation_id($postid,$language_name,$posttype);
+		        $translation_post_id = $this->translator->get_translation_id($postid,$language_name,$posttype,false);
 
                         if ( WP_TMY_G11N_DEBUG ) {
 		            error_log("In g11n_content_filter original post id = " . $postid . ".");
@@ -623,7 +623,7 @@ class TMY_G11n_Public {
 		    //$g11n_current_language = $_SESSION['g11n_language'];
 		    $g11n_current_language = $this->translator->get_preferred_language();
 		    $language_name = $language_options[$g11n_current_language];
-		    $translation_post_id = $this->translator->get_translation_id($id,$language_name,$wp_query->post->post_type);
+		    $translation_post_id = $this->translator->get_translation_id($id,$language_name,$wp_query->post->post_type,false);
 
 		    if (isset($translation_post_id)) {
 			return get_post_field("post_title", $translation_post_id);
@@ -650,7 +650,7 @@ class TMY_G11n_Public {
 
                              $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
                              if (! is_null($title_post)) {
-                                 $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
+                                 $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
 			         if (isset($translation_post_id)) {
                                      if ( WP_TMY_G11N_DEBUG ) {
                                          error_log("In g11n_wp_title_filter,blogdescription translation id:" . $translation_post_id);
@@ -675,7 +675,7 @@ class TMY_G11n_Public {
 
                             $title_post  = get_page_by_title('blogname',OBJECT,'post');
                             if (! is_null($title_post)) {
-                                $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post");
+                                $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
 			        if (isset($translation_post_id)) {
                                     if ( WP_TMY_G11N_DEBUG ) {
                                         error_log("In g11n_wp_title_filter,blogname translation id:" . $translation_post_id);

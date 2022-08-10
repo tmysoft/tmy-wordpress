@@ -272,44 +272,48 @@ class TMY_G11n_Translator {
 		}
 	}
 
-	public function get_translation_id( $post_id, $locale_id, $post_type ) {
+	public function get_translation_id( $post_id, $locale_id, $post_type, $admin_user = true ) {
 
 		global $wpdb;
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type);
+                    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type.",admin ".$admin_user);
                 }
 
-                if  (strcmp(get_post_field("post_title", $post_id),'blogname')===0) {
-                    if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In get_translation_id, g11n_l10n_props_blogname is disabled");
+                if ( ! $admin_user ) {
+                    if  (strcmp(get_post_field("post_title", $post_id),'blogname')===0) {
+                        if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
+                            if ( WP_TMY_G11N_DEBUG ) {
+                                error_log("In get_translation_id, g11n_l10n_props_blogname is disabled");
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                } elseif (strcmp(get_post_field("post_title", $post_id),'blogdescription')===0) {
-                    if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In get_translation_id, g11n_l10n_props_desc is disabled");
+                    } elseif (strcmp(get_post_field("post_title", $post_id),'blogdescription')===0) {
+                        if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
+                            if ( WP_TMY_G11N_DEBUG ) {
+                                error_log("In get_translation_id, g11n_l10n_props_desc is disabled");
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                } elseif (strcmp($post_type,'post') === 0) {
-                    if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In get_translation_id, g11n_l10n_props_posts is disabled");
+                    } elseif (strcmp($post_type,'post') === 0) {
+                        if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
+                            if ( WP_TMY_G11N_DEBUG ) {
+                                error_log("In get_translation_id, g11n_l10n_props_posts is disabled");
+                            }
+                            return null;
                         }
-                        return null;
-                    }
-                } elseif (strcmp($post_type,'page') === 0) {
-                    if (strcmp(get_option('g11n_l10n_props_page'),"Yes")!==0) {
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In get_translation_id, g11n_l10n_props_page is disabled");
+                    } elseif (strcmp($post_type,'page') === 0) {
+                        if (strcmp(get_option('g11n_l10n_props_page'),"Yes")!==0) {
+                            if ( WP_TMY_G11N_DEBUG ) {
+                                error_log("In get_translation_id, g11n_l10n_props_page is disabled");
+                            }
+                            return null;
                         }
-                        return null;
                     }
+                    $admin_query = "{$wpdb->prefix}posts.post_status = 'publish' and ";
+                } else {
+                    $admin_query = "{$wpdb->prefix}posts.post_status != 'trash' and ";
                 }
-
 		//if ((strcmp($post_type,'post') === 0)||(strcmp($post_type,'page') === 0)) {
                 //g11n_l10n_props_blogname
             	//g11n_l10n_props_desc
@@ -323,7 +327,8 @@ class TMY_G11n_Translator {
                                   "select post_id ".
                                       "from {$wpdb->prefix}postmeta as meta2, {$wpdb->prefix}posts ".
                                       "where meta1.post_id = {$wpdb->prefix}posts.ID and ".
-                                            "{$wpdb->prefix}posts.post_status = 'publish' and ".
+                                            $admin_query .
+                                            //"{$wpdb->prefix}posts.post_status = 'publish' and ".
                                             //"{$wpdb->prefix}posts.post_status != 'trash' and ".
                                             "meta1.post_id = meta2.post_id and ".
                                             "meta1.meta_key = 'orig_post_id' and ".
