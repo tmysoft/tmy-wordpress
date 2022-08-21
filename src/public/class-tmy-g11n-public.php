@@ -158,8 +158,54 @@ class TMY_G11n_Public {
 	public function g11n_add_floating_menu() {
 
             if(strcmp(get_option('g11n_switcher_floating'),"Yes")==0){
-               echo '<div style="position:fixed;bottom:3rem;border:1px solid;border-radius:5px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 15px 0 rgba(0,0,0,.4);padding:0.05rem 0.3rem;margin:0rem 0;right:1rem;font-size:1rem;">' . $this->translator->get_language_switcher() . '</div>';
+               echo '<div id="tmyfloatmenu" style="position:fixed;z-index:10001;bottom:3rem;left:3rem;"> <div style="border:1px solid;border-radius:5px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 15px 0 rgba(0,0,0,.4);padding:0.05rem 0.3rem;margin:0rem 0;right:1rem;font-size:1rem;">' . $this->translator->get_language_switcher() . '</div></div>';
+              ?>
+                <script>
+                //Make the DIV element draggagle:
+                dragElement(document.getElementById("tmyfloatmenu"));
 
+                function dragElement(elmnt) {
+                  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                  if (document.getElementById(elmnt.id + "header")) {
+                    /* if present, the header is where you move the DIV from:*/
+                    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+                  } else {
+                    /* otherwise, move the DIV from anywhere inside the DIV:*/
+                    elmnt.onmousedown = dragMouseDown;
+                  }
+
+                  function dragMouseDown(e) {
+                    e = e || window.event;
+                    e.preventDefault();
+                    // get the mouse cursor position at startup:
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    document.onmouseup = closeDragElement;
+                    // call a function whenever the cursor moves:
+                    document.onmousemove = elementDrag;
+                  }
+
+                  function elementDrag(e) {
+                    e = e || window.event;
+                    e.preventDefault();
+                    // calculate the new cursor position:
+                    pos1 = pos3 - e.clientX;
+                    pos2 = pos4 - e.clientY;
+                    pos3 = e.clientX;
+                    pos4 = e.clientY;
+                    // set the element's new position:
+                    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                  }
+
+                  function closeDragElement() {
+                    /* stop moving when mouse button is released:*/
+                    document.onmouseup = null;
+                    document.onmousemove = null;
+                  }
+                }
+                </script>
+              <?php
             }
         }
 	public function g11n_widget_title($title, $instance, $id_base) {

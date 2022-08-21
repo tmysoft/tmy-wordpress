@@ -467,7 +467,7 @@ class TMY_G11n_Admin {
             	<input type="checkbox" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> /> In Tagline <br>
             	<input type="checkbox" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> /> In Each Post <br>
             	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar <br>
-            	<input type="checkbox" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Flating Menu <br> <br>
+            	<input type="checkbox" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
                 Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
  	    	</td>
                 </tr>
