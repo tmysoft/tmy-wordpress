@@ -160,8 +160,111 @@ class TMY_G11n_Admin {
                           	  array( $this,
                                          'tmy_support_manager_page') );
 	
+               	add_meta_box( 'trans_status', 
+		                  'Translation Status', 
+		                  array( $this, 'tmy_translation_metabox_callback'), 
+		                  array('post','page','g11n_translation'),
+		                  'side', // (normal, side, advanced)
+		                  'default' // (default, low, high, core) 
+                            );
 	}
 
+        public function tmy_translation_metabox_callback( $post ) {
+
+	    //echo 'hey: ' . $post->ID;
+            ?>
+                <script>
+                    function create_sync_translation(id, post_type) {
+
+                        var r = confirm("This will create sync translation");
+                        if (r == true) {
+                            jQuery(document).ready(function($) {
+                                    var data = {
+                                            'action': 'tmy_create_sync_translation',
+                                            'id': id,
+                                            'post_type': post_type
+                                    };
+                                    $.ajax({
+                                        type:    "POST",
+                                        url:     ajaxurl,
+                                        data:    data,
+                                        success: function(response) {
+                                            alert('Server Reply: ' + response);
+                                        },
+                                        error:   function(jqXHR, textStatus, errorThrown ) {
+                                            alert("Error, status = " + jqXHR.status + ", " + "textStatus: " + textStatus + "ErrorThrown: " + errorThrown);
+                                        }
+                                    });
+                                    return;
+                            });
+                        }
+                    }
+                </script>
+                <?php
+
+                $post_id = $post->ID;
+                $post_type = get_post_type($post_id);
+                $post_status = get_post_status($post_id);
+
+	    	if (strcmp($post_type,"g11n_translation")===0) {
+
+                    echo '<div style="border:1px solid #A8A7A7;padding: 10px;">';
+                    $trans_info = $this->translator->get_translation_info($post_id);
+                    if (isset($trans_info[0])) {
+                        $original_id = $trans_info[0]->ID;
+                        $original_title = $trans_info[0]->post_title;
+                    }
+		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
+
+                    echo '<b>This is the ' . $trans_lang . ' translation page of <a href="' . 
+                         esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
+                       ' (ID:' . $original_id . ')</a>';
+
+		    if (strcmp($post_status,"publish")===0) {
+		        echo ' Status: Live</b></br>';
+		    } else {
+		        echo ' Status: Not Published Yet</b></br>';
+	       	    }
+                    echo "</div>";
+
+                } elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
+
+                    echo '<div style="border:1px solid #A8A7A7;padding: 10px;">';
+    		    echo '<b>Translation Satus:</b><br><br>'; 
+
+                    $all_langs = get_option('g11n_additional_lang');
+                    $default_lang = get_option('g11n_default_lang');
+                    unset($all_langs[$default_lang]);
+                    
+                    if (is_array($all_langs)) {
+                        foreach( $all_langs as $value => $code) {
+                            $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
+    		            //echo $code . ':' . $translation_id . '<br>'; 
+			    if (isset($translation_id)) {
+                                $translation_status = get_post_status($translation_id);
+                                echo $value . '-' . $code . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
+                                     '">ID ' . $translation_id . '</a>, status: ' . $translation_status . '</br>';
+                            } else {
+                                echo $value . '-' . $code . ' Not Started Yet </br>';
+                            }
+
+                         }
+                    }
+
+                    echo '<br>Click <button type="button" onclick="create_sync_translation(' . $post_id . ', \'' . $post_type . '\')">Start or Sync Translation</button> to send this page to translation server';
+                    //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
+                    echo '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
+                    echo '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
+
+                    if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
+    		        echo '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
+			    get_post_meta(get_the_ID(),'translation_push_status',true) . '</h5></div>';
+                    }
+                    echo "</div>";
+                    
+                }
+	
+        }
 
         public function tmy_admin_options_page() {
 
@@ -868,6 +971,8 @@ error_log ("Mei debug");
 		error_log("create project " . $_POST['proj_name']);
 		error_log("create project " . $_POST['proj_ver']);
 		error_log("create project " . $_POST['action_type']);
+
+
 		$ch = curl_init();
 
 		if (strcmp($_POST['action_type'],"project")==0) {
@@ -886,13 +991,13 @@ error_log ("Mei debug");
 			     "id" => $ver_name,
 			     "defaultType" => "Gettext",
 			     "status" => "ACTIVE",
-			     "privateProject" => 1
+			     "privateProject" => 0
 			    ));
 		}
 		curl_reset($ch);
 
-		  error_log("REST URL" . $rest_url);
-		  error_log("REST PALOAD" . $payload);
+		error_log("REST URL" . $rest_url);
+		error_log("REST PALOAD" . $payload);
 
 		curl_setopt($ch, CURLOPT_URL, $rest_url);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
@@ -905,7 +1010,6 @@ error_log ("Mei debug");
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 		curl_exec($ch);
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-		curl_close($ch);
 
 		$http_code_msg = array(
 		    200 => 'Already exists, read for use',
@@ -914,8 +1018,37 @@ error_log ("Mei debug");
 		    403 => 'Operation forbidden',
 		    500 => 'Internal server error');
 
-		  error_log("return msg: " . $http_code_msg[$http_code]);
+		error_log("return msg: " . $http_code_msg[$http_code]);
 		echo $http_code_msg[$http_code] . " (" . $http_code . ")";
+
+		if (strcmp($_POST['action_type'],"version")==0) {
+		    curl_reset($ch);
+                    $default_language = get_option('g11n_default_lang');
+                    $language_options = get_option('g11n_additional_lang', array());
+                    unset($language_options[$default_language]);
+                    $selected_langs = array_values($language_options);
+                    foreach ($selected_langs as &$value) {
+                        $value = str_replace("_", "-", $value);
+                    }
+		    error_log("create project optional lang list: " . json_encode($selected_langs));
+
+		    $rest_url = "https://tmysoft.com/api/project/" . $_POST['proj_name'] . "/version/" . $_POST['proj_ver'] . "/locales";
+                    curl_setopt($ch, CURLOPT_URL, $rest_url);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                        'X-Auth-User: ' . get_option('g11n_server_user'),
+                        'X-Auth-Token: ' . get_option('g11n_server_token'),
+                        'Content-Type: application/json'
+                        ));
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("data" => $selected_langs)));
+
+                    curl_exec($ch);
+
+		}
+		curl_close($ch);
+
+
 		wp_die();
 
 	}

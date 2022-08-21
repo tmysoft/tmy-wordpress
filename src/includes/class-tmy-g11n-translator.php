@@ -276,6 +276,7 @@ class TMY_G11n_Translator {
 
 		global $wpdb;
 
+//$admin_user = true;
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type.",admin ".$admin_user);
                 }
@@ -303,9 +304,9 @@ class TMY_G11n_Translator {
                             return null;
                         }
                     } elseif (strcmp($post_type,'page') === 0) {
-                        if (strcmp(get_option('g11n_l10n_props_page'),"Yes")!==0) {
+                        if (strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0) {
                             if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In get_translation_id, g11n_l10n_props_page is disabled");
+                                error_log("In get_translation_id, g11n_l10n_props_page is disabled: " . get_option('g11n_l10n_props_pages'));
                             }
                             return null;
                         }

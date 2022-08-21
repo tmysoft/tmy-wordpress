@@ -176,6 +176,7 @@ class TMY_G11n {
 		$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_description', 10, 2 );
 		$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_blogname', 10, 2 );
 
+
 	}
 
 	/**
@@ -206,7 +207,7 @@ class TMY_G11n {
 		$this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
 		$this->loader->add_action( 'get_sidebar', $plugin_public, 'add_before_my_siderbar' );
 		$this->loader->add_action( 'edit_form_after_title', $plugin_public, 'myprefix_edit_form_after_title' );
-		$this->loader->add_action( 'edit_form_after_editor', $plugin_public, 'g11n_push_status_div' );
+		//$this->loader->add_action( 'edit_form_after_editor', $plugin_public, 'g11n_push_status_div' );
 		$this->loader->add_filter( 'widget_title', $plugin_public, 'g11n_widget_title', 10, 2 );
 
                 $this->loader->add_filter( 'bloginfo', $plugin_public, 'g11n_wp_title_filter', 10, 2 );

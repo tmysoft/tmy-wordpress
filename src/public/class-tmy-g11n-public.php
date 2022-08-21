@@ -160,6 +160,7 @@ class TMY_G11n_Public {
                 return "aaaaaaaaaa";
         }
 
+
 	public function g11n_push_status_div() {
 
                 ?>
@@ -195,7 +196,6 @@ class TMY_G11n_Public {
                 $post_id = get_the_ID();
                 $post_type = get_post_type($post_id);
                 $post_status = get_post_status($post_id);
-
 
 	    	if (strcmp($post_type,"g11n_translation")===0) {
 
@@ -363,6 +363,7 @@ class TMY_G11n_Public {
 			'singular_name' => __( 'G11n Plugin Translation' )
 		      ),
 		      'public' => true,
+                      'show_in_rest' => true,
 		      'has_archive' => true,
 		    )
 		);
