@@ -209,6 +209,7 @@ class TMY_G11n {
 		$this->loader->add_action( 'edit_form_after_title', $plugin_public, 'myprefix_edit_form_after_title' );
 		//$this->loader->add_action( 'edit_form_after_editor', $plugin_public, 'g11n_push_status_div' );
 		$this->loader->add_filter( 'widget_title', $plugin_public, 'g11n_widget_title', 10, 2 );
+		$this->loader->add_action(  'wp_footer', $plugin_public, 'g11n_add_floating_menu' );
 
                 $this->loader->add_filter( 'bloginfo', $plugin_public, 'g11n_wp_title_filter', 10, 2 );
 		$this->loader->add_filter( 'the_title', $plugin_public, 'g11n_title_filter', 10, 2 );

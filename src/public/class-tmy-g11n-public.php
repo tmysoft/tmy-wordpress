@@ -155,9 +155,16 @@ class TMY_G11n_Public {
     		}
 	}
 
+	public function g11n_add_floating_menu() {
+
+            if(strcmp(get_option('g11n_switcher_floating'),"Yes")==0){
+               echo '<div style="position:fixed;bottom:3rem;border:1px solid;border-radius:5px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 15px 0 rgba(0,0,0,.4);padding:0.05rem 0.3rem;margin:0rem 0;right:1rem;font-size:1rem;">' . $this->translator->get_language_switcher() . '</div>';
+
+            }
+        }
 	public function g11n_widget_title($title, $instance, $id_base) {
                 error_log("g11n_widget_title");
-                return "aaaaaaaaaa";
+                //return "aaaaaaaaaa";
         }
 
 

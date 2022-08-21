@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'ARETE_G11N_VERSION', '1.0.0' );
-define( 'WP_TMY_G11N_DEBUG', true );
+define( 'WP_TMY_G11N_DEBUG', false );
 
 /**
  * The code that runs during plugin activation.

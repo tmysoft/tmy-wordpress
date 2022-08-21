@@ -129,6 +129,7 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_post' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_title' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_sidebar' );
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_floating' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_type' );
 
     		register_setting( 'tmy-g11n-settings-group', 'g11n_auto_pullpush_translation' );
@@ -164,7 +165,7 @@ class TMY_G11n_Admin {
 		                  'Translation Status', 
 		                  array( $this, 'tmy_translation_metabox_callback'), 
 		                  array('post','page','g11n_translation'),
-		                  'side', // (normal, side, advanced)
+		                  'normal', // (normal, side, advanced)
 		                  'default' // (default, low, high, core) 
                             );
 	}
@@ -219,12 +220,20 @@ class TMY_G11n_Admin {
                     echo '<b>This is the ' . $trans_lang . ' translation page of <a href="' . 
                          esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
                        ' (ID:' . $original_id . ')</a>';
-
-		    if (strcmp($post_status,"publish")===0) {
-		        echo ' Status: Live</b></br>';
-		    } else {
-		        echo ' Status: Not Published Yet</b></br>';
-	       	    }
+             
+                    if (((strcmp($original_title,"blogname")===0)&&(strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0)) ||
+                        ((strcmp($original_title,"blogdescription")===0)&&(strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0)) ||
+                        ((strcmp(get_post_type($original_id),"post")===0)&&(strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0)) ||
+                        ((strcmp(get_post_type($original_id),"page")===0)&&(strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0))) {
+		        echo ' Status: <button type="button" style="background-color:#C0C0C0;color:white;width:100px; height:25px;" >DISABLED</button> </b></br>';
+                    } else {
+                        if (strcmp($post_status,"publish")===0) {
+		            //echo ' Status: <button type="button" class="button button-secondary">LIVE</button> </b></br>';
+		            echo ' Status: <button type="button" style="background-color:#4CAF50;color:white;width:50px; height:25px;" >LIVE</button> </b></br>';
+		        } else {
+		            echo ' Status: <button type="button" style="background-color:#CD5C5C;color:white;width:100px; height:25px;" >Not LIVE</button></b></br>';
+	       	        }
+                    }
                     echo "</div>";
 
                 } elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
@@ -457,7 +466,8 @@ class TMY_G11n_Admin {
             	<input type="checkbox" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> /> In Title <br>
             	<input type="checkbox" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> /> In Tagline <br>
             	<input type="checkbox" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> /> In Each Post <br>
-            	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar <br> <br>
+            	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar <br>
+            	<input type="checkbox" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Flating Menu <br> <br>
                 Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
  	    	</td>
                 </tr>
