@@ -80,24 +80,27 @@ The plugin also provides a dashboard for your convenience to show the translatio
 <kbd><img src="doc/tmy-dashboard-free.png" width="600"/></kbd>
 
 
+## Using TMY Plugin Premium Service
+
+TMY Premium is designed to help users do translation much easily, when the translation server is configured, contents will be pushed to translation server and editor automatically, machine translation automation is also provided for much easier integration. This diagram illustrates the work flow with free vs premium service.
+
+<kbd><img src="doc/tmy-free-premium.png" width="800"/></kbd>
+
 ## Configuration and use TMY Translation Editor(Premium Service)
 
 Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key. Create the project and version of your project.
 
-<kbd>![TMY CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-apikey.png "TMY CONFIG")</kbd>
+<kbd><img src="doc/tmy-apikey.png" width="600"/></kbd>
 
 Enter the username and API Key into TMY Wordpress setup page: username, token, project and version.
 
-<kbd>![TMY SERVER CONFIG](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-pluginserverconfig.png "TMY SERVER CONFIG")</kbd>
+<kbd><img src="doc/tmy-pluginserverconfig.png" width="400"/></kbd>
 
-## Pushing page or post contents to TMY Web Editor for translation
+## Pushing translation after Translation Server is configured(Premium Service)
 
-After the TMY Setup page is configured with Translation Server information.
+Every time when button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button") is presse, corresponding contents will be pushed to translation server.
 
-1. When Site Title and Tagline are updated in the Wordpress Setting page, after button "Save Changes" is pressed.
-2. When Page or Post is updated in the Posts or Pages editor, after button "Update" or "Publish" is pressed.
-
-## Translate Post or Page with TMY Editor
+## Translating with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
@@ -108,7 +111,7 @@ Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
 Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow the page at [tmysoft.com/subscriptions.html](https://www.tmysoft.com/subscriptions.html) to start.
 
-## Pull translation from TMY Editor to your local Wordpress instance
+## Pulling translation from TMY Editor to your local Wordpress instance
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
