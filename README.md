@@ -104,7 +104,7 @@ Every time when button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY 
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
-<kbd>![TMY Web Editor](doc/tmy-webeditor.png "TMY Web Editor")</kbd>
+<kbd><img src="doc/tmy-webeditor.png" width="800"/></kbd>
 
 
 ## Using Google Translate to translate your post or pages(Premium Service)
@@ -115,7 +115,7 @@ Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
-<kbd>![TMY Dashboard](doc/tmy-dashboard.png "TMY Dashboard")</kbd>
+<kbd><img src="doc/tmy-dashboard.png" width="700"/></kbd>
 
 ## To start developing TMY Wordpress Plugin
 
