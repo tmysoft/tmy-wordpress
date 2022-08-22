@@ -2,14 +2,14 @@
 
 ----
 
-TMY Plugin is an open source system for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text for translation, translate and integrate back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites.
+TMY Plugin is an open source software for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text for translation, translate and integrate back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites.
 
 
 ----
 
 ## Install and activate TMY Plugin 
 
-<kbd>![TMY Plugin Install](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-addplugin.png "TMY Plugin Install")</kbd>
+<kbd>![TMY Plugin Install](doc/tmy-addplugin.png "TMY Plugin Install")</kbd>
 
 Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/releases, e.g. tmy-globalization-1.0.0.zip 
 
@@ -17,13 +17,23 @@ Or, search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin
 
-<kbd>![TMY Plugin Setup](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-setup.png "TMY Plugin Setup")</kbd>
+From the Wordpress dashboard side menu, Settings -> TMY setup:
+
+<kbd>![TMY Plugin Setup](doc/tmy-setup.png "TMY Plugin Setup")</kbd>
+
+Key configuration:
+- Configure the additional enabled languages
+- Do you enable translations on key properties: site title, tagline, posts and pages
+- Language switcher location
+- How do you want your language switcher to look like, just text or showing flags
+
+Remember to save your changes
 
 ## Use TMY Plugin to translate a Post or Page
 
-Log into the admin panel of wordpress, navigate to the post page, click button ![TMY Translate Button](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-translatebutton.png "TMY Translate Button")
+Log into the admin panel of wordpress, navigate to the post page you want to translate, click button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button")
 
-<kbd>![TMY Post](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-page.png "TMY Post")</kbd>
+<img src="doc/tmy-page.png" width="600"/>
 
 Put the translation into the corresponding translation editor of the page or post, then Publish it.
 
