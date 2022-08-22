@@ -33,7 +33,7 @@ Remember to save your changes
 
 Log into the admin panel of wordpress, navigate to the post page you want to translate, click button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button")
 
-<img src="doc/tmy-page.png" width="600"/>
+<kbd><img src="doc/tmy-page.png" width="600"/></kbd>
 
 Put the translation into the corresponding translation editor of the page or post, then Publish it.
 
