@@ -65,8 +65,8 @@ The language switcher could be placed at multiple places, in Settings -> TMY Set
 
 1. In Title
 2. In Tagline
-3. In Each Post
-4. Top of Sidebar
+3. Top of Sidebar
+4. In Each Post
 5. Draggable Floating Menu 
 
 Here is the illustration:
