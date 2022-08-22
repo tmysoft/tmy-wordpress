@@ -98,20 +98,20 @@ Enter the username and API Key into TMY Wordpress setup page: username, token, p
 
 ## Pushing translation after Translation Server is configured(Premium Service)
 
-Every time when button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button") is presse, corresponding contents will be pushed to translation server.
+Every time when button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button") is pressed, corresponding contents will be pushed to translation server.
 
-## Translating with TMY Editor
+## Translating with TMY Editor(Premium Service)
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
 
 <kbd>![TMY Web Editor](doc/tmy-webeditor.png "TMY Web Editor")</kbd>
 
 
-## Using Google Translate to translate your post or pages
+## Using Google Translate to translate your post or pages(Premium Service)
 
 Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow the page at [tmysoft.com/subscriptions.html](https://www.tmysoft.com/subscriptions.html) to start.
 
-## Pulling translation from TMY Editor to your local Wordpress instance
+## Pulling translation from TMY Editor to your local Wordpress instance(Premium Service)
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
