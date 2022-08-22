@@ -9,7 +9,7 @@ TMY Plugin is an open source software for internationalization and localization 
 
 ## Install and activate TMY Plugin 
 
-<kbd>![TMY Plugin Install](doc/tmy-addplugin.png "TMY Plugin Install")</kbd>
+<kbd><img src="doc/tmy-addplugin.png" width="450"/></kbd>
 
 Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/releases, e.g. tmy-globalization-1.0.0.zip 
 
@@ -19,7 +19,7 @@ Or, search the "TMY plugin", install and activate it.
 
 From the Wordpress dashboard side menu, Settings -> TMY setup:
 
-<kbd>![TMY Plugin Setup](doc/tmy-setup.png "TMY Plugin Setup")</kbd>
+<kbd><img src="doc/tmy-setup.png" width="500"/></kbd>
 
 Key configuration:
 - Configure the additional enabled languages
@@ -35,13 +35,50 @@ Log into the admin panel of wordpress, navigate to the post page you want to tra
 
 <kbd><img src="doc/tmy-page.png" width="600"/></kbd>
 
-Put the translation into the corresponding translation editor of the page or post, then Publish it.
+Follow the information in the Translation Status box to get to the specific lanaguge translation page:
 
-<kbd>![TMY Post Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-pagetranslated.png "TMY Page Translation")</kbd>
+<kbd><img src="doc/tmy-trans-status.png" width="300"/></kbd>
 
-Visit the site to confirm translation is available.
+Put the translation into the corresponding translation editor of the page or post, then Publish it. Make sure you see the green LIVE button
 
-<kbd>![TMY After Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-sitetranslatedview.png "TMY After Translation")</kbd>
+<kbd><img src="doc/tmy-pagetranslated.png" width="600"/></kbd>
+
+## Use TMY Plugin to translate the site title or tagline 
+
+Site title is also called blogname at some places, similarly, tage line is often being called blogdescription, you can configure or change them at Setting -> General menu:
+
+<kbd><img src="doc/tmy-blogname-setup.png" width="350"/></kbd>
+
+To start translating them, enable the translation to them from Setting -> TMY Setup:
+
+<kbd><img src="doc/tmy-blogname-enable.png" width="350"/></kbd>
+
+Then the plugin will automatically create the place holder post corresponding to the blogname or blogdesription, the place holder post will be set as private. 
+
+<kbd><img src="doc/tmy-blogname-placeholder.png" width="600"/></kbd>
+
+Following the same way to translate the page or post to complete the translation.
+
+## Configure the language swither location 
+
+The language switcher could be placed at multiple places, in Settings -> TMY Setup, you can put it in:
+
+1. In Title
+2. In Tagline
+3. In Each Post
+4. Top of Sidebar
+5. Draggable Floating Menu 
+
+Here is the illustration:
+
+<kbd><img src="doc/tmy-lang-switcher.png" width="800"/></kbd>
+
+## Using TMY Dashboard
+
+The plugin also provides a dashboard for your convenience to show the translation work in a nice summary:
+
+<kbd><img src="doc/tmy-dashboard-free.png" width="800"/></kbd>
+
 
 ## Using TMY Web Editor
 
