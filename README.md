@@ -77,10 +77,10 @@ Here is the illustration:
 
 The plugin also provides a dashboard for your convenience to show the translation work in a nice summary:
 
-<kbd><img src="doc/tmy-dashboard-free.png" width="800"/></kbd>
+<kbd><img src="doc/tmy-dashboard-free.png" width="600"/></kbd>
 
 
-## Using TMY Web Editor
+## Configuration and use TMY Translation Editor(Premium Service)
 
 Register with tmysoft.com, log into the TMY Web Editor/Zanata, create the API key. Create the project and version of your project.
 
@@ -100,7 +100,8 @@ After the TMY Setup page is configured with Translation Server information.
 ## Translate Post or Page with TMY Editor
 
 Visit `tmysoft.com` then `Editor` or `editor.tmysoft.com` directly.
-<kbd>![TMY Web Editor](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-webeditor.png "TMY Web Editor")</kbd>
+
+<kbd>![TMY Web Editor](doc/tmy-webeditor.png "TMY Web Editor")</kbd>
 
 
 ## Using Google Translate to translate your post or pages
@@ -111,7 +112,7 @@ Google Translate is fully integrated into tmysoft.com and TMY Web Editor, follow
 
 Visit TMY Dashboard page would automatically pull the finished translation from TMY Web Editor:
 
-<kbd>![TMY Dashboard](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-dashboard.png "TMY Dashboard")</kbd>
+<kbd>![TMY Dashboard](doc/tmy-dashboard.png "TMY Dashboard")</kbd>
 
 ## To start developing TMY Wordpress Plugin
 
