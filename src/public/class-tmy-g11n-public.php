@@ -113,6 +113,9 @@ class TMY_G11n_Public {
 
 
 	public function G11nStartSession() {
+
+            if (! is_admin()) {
+
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession");
                 }
@@ -136,6 +139,7 @@ class TMY_G11n_Public {
                 if ( WP_TMY_G11N_DEBUG ) {
     		    error_log("Starting session, id=" . session_id() . "session lang=" . $_SESSION['g11n_language'] );
                 }
+            }
 	}
 
 	public function G11nEndSession() {
@@ -144,6 +148,7 @@ class TMY_G11n_Public {
 
 	public function g11n_setcookie() {
 
+            if (! is_admin()) {
 	    	$lang_var = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
                 if ( WP_TMY_G11N_DEBUG ) {
 	    	    error_log("In g11n_setcookie , lang_var " . $lang_var);
@@ -159,6 +164,7 @@ class TMY_G11n_Public {
         		     error_log("In g11n_setcookie SET COOKIE from wp language option - " .  get_option('g11n_default_lang'));
                         }
     		}
+            }
 	}
 
 	public function g11n_add_floating_menu() {
@@ -341,8 +347,9 @@ class TMY_G11n_Public {
 
 	public function g11n_locale_filter($locale_in) {
 
-		//error_log("In LOCALE filter, locale = " . $locale_in);
-		//error_log("In LOCALE filter, admin = " . is_admin());
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In g11n_locale_filter: " . $locale_in . " admin: " . is_admin());
+                }
 
                 if (is_admin()) { return $locale_in; }
 
@@ -354,7 +361,9 @@ class TMY_G11n_Public {
 		    //}
 
 		$pre_lang = $this->translator->get_preferred_language();
-		//error_log("LANG". $pre_lang);
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In g11n_locale_filter, preferred language: " . $pre_lang);
+                }
 		if (array_key_exists($pre_lang, $language_options)) {
 			$s_locale = $language_options[$pre_lang];
 		    } else {
@@ -369,7 +378,9 @@ class TMY_G11n_Public {
 			    unload_textdomain($template_name);
 			    load_theme_textdomain($template_name);
 			}
-			//error_log("In LOCALE filter, change locale to: " . $s_locale . " template name = ". $template_name);
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In g11n_locale_filter, change locale to: " . $s_locale . " template name = ". $template_name);
+                        }
 
                         //$al = get_available_languages();
                         //error_log(print_r($al));
@@ -391,17 +402,17 @@ class TMY_G11n_Public {
                         //error_log("load_default_textdomain:".$s_locale);
 			load_default_textdomain($s_locale);
 
-                update_option(
-                        'widget_block',
-                        array(
+                        update_option(
+                            'widget_block',
+                              array(
                                 2              => array( 'content' => '<!-- wp:search /-->' ),
                                 3              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Recent Posts' ) . '</h2><!-- /wp:heading --><!-- wp:latest-posts /--></div><!-- /wp:group -->' ),
                                 4              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Recent Comments' ) . '</h2><!-- /wp:heading --><!-- wp:latest-comments {"displayAvatar":false,"displayDate":false,"displayExcerpt":false} /--></div><!-- /wp:group -->' ),
                                 5              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Archives' ) . '</h2><!-- /wp:heading --><!-- wp:archives /--></div><!-- /wp:group -->' ),
                                 6              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Categories' ) . '</h2><!-- /wp:heading --><!-- wp:categories /--></div><!-- /wp:group -->' ),
                                 '_multiwidget' => 1,
-                        )
-                );
+                                   )
+                        );
 
 			add_filter('locale',array($this, 'g11n_locale_filter'),10);
 			return $s_locale;

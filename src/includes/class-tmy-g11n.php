@@ -144,7 +144,7 @@ class TMY_G11n {
 
 		$plugin_i18n = new TMY_G11n_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'tmy_load_plugin_textdomain' );
 
 	}
 

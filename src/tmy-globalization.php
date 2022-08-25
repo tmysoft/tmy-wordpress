@@ -8,17 +8,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://example.com
+ * @link              https://github.com/tmysoft/tmy-wordpress
  * @since             1.0.0
  * @package           TMY_G11n
  *
  * @wordpress-plugin
  * Plugin Name:       TMY Globalization Plugin
- * Plugin URI:        http://example.com/plugin-name-uri/
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           1.0.0
+ * Plugin URI:        https://github.com/tmysoft/tmy-wordpress
+ * Description:       Translating your application into other languages.
+ * Version:           1.1.0
  * Author:            Yu Shao
- * Author URI:        http://example.com/
+ * Author URI:        https://github.com/tmysoft/tmy-wordpress
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       tmy-g11n
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'ARETE_G11N_VERSION', '1.0.0' );
+define( 'ARETE_G11N_VERSION', '1.1.0' );
 define( 'WP_TMY_G11N_DEBUG', false );
 
 /**
