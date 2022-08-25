@@ -168,6 +168,7 @@ class TMY_G11n_Admin {
 		                  'normal', // (normal, side, advanced)
 		                  'default' // (default, low, high, core) 
                             );
+
 	}
 
         public function tmy_translation_metabox_callback( $post ) {
@@ -401,9 +402,9 @@ class TMY_G11n_Admin {
             	Token <input type="text" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" /> <br>
             	Project Name <input type="text" id="g11n_server_project" name="g11n_server_project" value="<?php echo esc_attr( get_option('g11n_server_project') ); ?>" />
             	<!-- <button onclick="g11ncreateproject('project')">Create Project on Translation Server</button> -->
-                <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"><br>
+                <!-- <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"> -->
             	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" />
-                <input type="button" value="Create Version on Translation Server" onclick="g11ncreateproject('version')"><br>
+                <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"><br>
             	Trunk Size <input type="text" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" />
         	</td>
 
@@ -413,7 +414,8 @@ class TMY_G11n_Admin {
 		    //var proj_name = document.getElementById("g11n_server_project").value;
 		    //console.log(document.getElementById("g11n_server_project").value);
 		    //
-		    var r = confirm("This will create the " + type + ": " + document.getElementById("g11n_server_"+type).value + " in translation server");
+		    var r = confirm("This will create: " + document.getElementById("g11n_server_project").value + " Version: " + 
+                                                           document.getElementById("g11n_server_version").value + " in translation server");
 		    if (r == true) {
 			jQuery(document).ready(function($) {
 				var data = {
@@ -661,7 +663,7 @@ class TMY_G11n_Admin {
 		    <button onclick="g11ncopysysteminfotext()">Copy Text</button>
 		  <br></h3>
 		<?php
-error_log ("Mei debug");
+
 		date_default_timezone_set('America/New_York');
 		$g11n_sys_info = "\n***** G11n Plugin Diagnosis *****\n" . date("F d, Y l H:s e") . "\n";
     		//$g11n_sys_info .= phpversion() . "\n";
@@ -976,96 +978,148 @@ error_log ("Mei debug");
 	     wp_die();
         }
 
-	public function tmy_g11n_create_server_project() {
+	public function _tmy_g11n_create_server_project($project_name,$version_num,$lang_list) {
 
-		error_log("create project " . $_POST['proj_name']);
-		error_log("create project " . $_POST['proj_ver']);
-		error_log("create project " . $_POST['action_type']);
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In _tmy_g11n_create_server_project :". $project_name . " " . $version_num . " " . json_encode($lang_list));
+                }
 
+	        $ch = curl_init();
 
-		$ch = curl_init();
-
-		if (strcmp($_POST['action_type'],"project")==0) {
-		    $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest/projects/p/" . $_POST['proj_name'];
-		    $payload = json_encode(array(
-			     "id" => $_POST['proj_name'],
+                $ret_msg = "";
+                //
+                // create the project 
+                //
+		$rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest/projects/p/" . $project_name;
+		$payload = json_encode(array(
+			     "id" => $project_name,
 			     "defaultType" => "Gettext",
-			     "name" => $_POST['proj_name'],
+			     "name" => $project_name,
 			     "description" => "Introduction"
 			    ));
-		}
 
-		if (strcmp($_POST['action_type'],"version")==0) {
-		    $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest/project/" . $_POST['proj_name'] . "/version/" . $_POST['proj_ver'];
-		    $payload = json_encode(array(
-			     "id" => $ver_name,
-			     "defaultType" => "Gettext",
-			     "status" => "ACTIVE",
-			     "privateProject" => 0
-			    ));
-		}
-		curl_reset($ch);
+ 	        curl_reset($ch);
 
-		error_log("REST URL" . $rest_url);
-		error_log("REST PALOAD" . $payload);
+	        error_log("REST URL" . $rest_url);
+	        error_log("REST PALOAD" . $payload);
 
-		curl_setopt($ch, CURLOPT_URL, $rest_url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+  	        curl_setopt($ch, CURLOPT_URL, $rest_url);
+	        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 		    'X-Auth-User: ' . get_option('g11n_server_user'),
 		    'X-Auth-Token: ' . get_option('g11n_server_token'),
 		    'Content-Type: application/json'
 		    ));
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-		curl_exec($ch);
-		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+	        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+	        curl_exec($ch);
+	        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-		$http_code_msg = array(
+	        $http_code_msg = array(
 		    200 => 'Already exists, read for use',
 		    201 => 'Created',
 		    401 => 'Authentication error',
 		    403 => 'Operation forbidden',
 		    500 => 'Internal server error');
 
-		error_log("return msg: " . $http_code_msg[$http_code]);
-		echo $http_code_msg[$http_code] . " (" . $http_code . ")";
+                $ret_msg .= $project_name . ": " . $http_code_msg[$http_code] . " (" . $http_code . ")";
 
-		if (strcmp($_POST['action_type'],"version")==0) {
-		    curl_reset($ch);
-                    $default_language = get_option('g11n_default_lang');
-                    $language_options = get_option('g11n_additional_lang', array());
-                    unset($language_options[$default_language]);
-                    $selected_langs = array_values($language_options);
-                    foreach ($selected_langs as &$value) {
-                        $value = str_replace("_", "-", $value);
-                    }
-		    error_log("create project optional lang list: " . json_encode($selected_langs));
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In _tmy_g11n_create_server_project proj ".$http_code_msg[$http_code]."(" . $http_code . ")");
+                }
 
-		    $rest_url = "https://tmysoft.com/api/project/" . $_POST['proj_name'] . "/version/" . $_POST['proj_ver'] . "/locales";
-                    curl_setopt($ch, CURLOPT_URL, $rest_url);
-                    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                //
+                // create the version 
+                //
+	        $rest_url = rtrim(get_option('g11n_server_url'),"/") . "/rest/project/" . $project_name . "/version/" . $version_num;
+		$payload = json_encode(array(
+			     "id" => $version_num,
+			     "defaultType" => "Gettext",
+			     "status" => "ACTIVE",
+			     "privateProject" => 0
+			    ));
+
+                curl_reset($ch);
+                curl_setopt($ch, CURLOPT_URL, $rest_url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'X-Auth-User: ' . get_option('g11n_server_user'),
+                    'X-Auth-Token: ' . get_option('g11n_server_token'),
+                    'Content-Type: application/json'
+                    ));
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+                curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+                $ret_msg .= "; " . $version_num . ": " . $http_code_msg[$http_code] . " (" . $http_code . ")";
+
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In _tmy_g11n_create_server_project version ".$http_code_msg[$http_code]."(" . $http_code . ")");
+                }
+
+                //
+                // add language setting to the version 
+                //
+
+		curl_reset($ch);
+		error_log("create project optional lang list: " . json_encode($lang_list));
+
+		$rest_url = "https://tmysoft.com/api/project/" . $project_name . "/version/" . $version_num . "/locales";
+                curl_setopt($ch, CURLOPT_URL, $rest_url);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
                         'X-Auth-User: ' . get_option('g11n_server_user'),
                         'X-Auth-Token: ' . get_option('g11n_server_token'),
                         'Content-Type: application/json'
                         ));
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("data" => $selected_langs)));
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("data" => $lang_list)));
 
-                    curl_exec($ch);
+                curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                if ($http_code === 200) {
+                    $ret_msg .= "; Language Setting Updated";
+                } else {
+                    $ret_msg .= "; Language Setting Is Not Updated";
+                }
+	        curl_close($ch);
+                return $ret_msg;
 
-		}
-		curl_close($ch);
+        }
+	public function tmy_g11n_create_server_project() {
 
+            if ( WP_TMY_G11N_DEBUG ) {
+                error_log("In tmy_g11n_create_server_project ".json_encode($_POST));
+            }
 
-		wp_die();
+	    if (strcmp($_POST['action_type'],"project")!==0) {
+                echo "Wrong Action";
+ 	        wp_die();
+            }
+
+	    if ((strcmp(rtrim($_POST['proj_name']),"")===0) || (strcmp(rtrim($_POST['proj_ver']),"")===0)) {
+                echo "Please enter both project name and version";
+            } else {
+
+                $default_language = get_option('g11n_default_lang');
+                $language_options = get_option('g11n_additional_lang', array());
+                unset($language_options[$default_language]);
+                $selected_langs = array_values($language_options);
+                foreach ($selected_langs as &$value) {
+                        $value = str_replace("_", "-", $value);
+                }
+		error_log("create project optional lang list: " . json_encode($selected_langs));
+
+	        $return_msg = $this->_tmy_g11n_create_server_project(rtrim($_POST['proj_name']),
+                                                       rtrim($_POST['proj_ver']),
+                                                       $selected_langs);
+                echo $return_msg;
+            }
+
+ 	    wp_die();
 
 	}
-
-
-
-
 
 	public function tmy_g11n_pull_translation($id, $locale) {
 
@@ -1424,6 +1478,56 @@ error_log ("Mei debug");
 
 		echo "Wrong Action";
 		wp_die();
+
+        }
+
+	public function tmy_plugin_option_update($value, $option, $old_value) {
+
+            if ( WP_TMY_G11N_DEBUG ) {
+                //error_log("tmy_plugin_option_update:" . $value . " " . $option . " ".$old_value );
+            } 
+
+            if (((strcmp($option, "g11n_additional_lang")===0) && ($value != $old_value)) ||
+                ((strcmp($option, "g11n_server_project")===0) && ($value != $old_value)) ||
+                ((strcmp($option, "g11n_server_version")===0) && ($value != $old_value))) {
+ 
+                if (strcmp($option, "g11n_server_project")===0) {
+                    $project_name = $value;
+                } else {
+                    $project_name = get_option('g11n_server_project');
+                }
+                if (strcmp($option, "g11n_server_version")===0) {
+                    $version_num = $value;
+                } else {
+                    $version_num = get_option('g11n_server_version');
+                }
+                if (strcmp($option, "g11n_additional_lang")===0) {
+                    $lang_list = $value;
+                } else {
+                    $lang_list = get_option('g11n_additional_lang');
+                }
+
+                error_log("tmy_plugin_option_update: additional_lang changed");
+                error_log("tmy_plugin_option_update: " . json_encode($old_value) . "->". json_encode($value));
+
+                error_log("tmy_plugin_option_update: project info: " . $project_name . " " . $version_num . " ". json_encode($lang_list));
+
+                $default_language = get_option('g11n_default_lang');
+                $language_options = $lang_list;
+                unset($language_options[$default_language]);
+                $selected_langs = array_values($language_options);
+                foreach ($selected_langs as &$lang) {
+                        $lang = str_replace("_", "-", $lang);
+                }
+
+	        $ret_msg = $this->_tmy_g11n_create_server_project(rtrim($project_name),
+                                                       rtrim($version_num),
+                                                       $selected_langs);
+
+                error_log("tmy_plugin_option_update: " . $ret_msg);
+
+            }
+            return $value;
 
         }
 

@@ -172,6 +172,7 @@ class TMY_G11n {
 		$this->loader->add_action( 'wp_ajax_tmy_create_sync_translation', $plugin_admin, 'tmy_create_sync_translation' );
 
 		$this->loader->add_filter( 'views_edit-post', $plugin_admin, 'g11n_edit_posts_views' );
+                $this->loader->add_filter( 'pre_update_option', $plugin_admin,'tmy_plugin_option_update', 10, 3 );
 
 		$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_description', 10, 2 );
 		$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_blogname', 10, 2 );

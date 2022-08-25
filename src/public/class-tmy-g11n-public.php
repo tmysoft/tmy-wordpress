@@ -113,24 +113,29 @@ class TMY_G11n_Public {
 
 
 	public function G11nStartSession() {
-    		//error_log("Starting session ...");
+                if ( WP_TMY_G11N_DEBUG ) {
+        	    error_log("In G11nStartSession");
+                }
     		if(!session_id()) {
-        		session_start();
+        	    session_start();
     		}
-    		//error_log("Starting session, id=" . session_id());
+                if ( WP_TMY_G11N_DEBUG ) {
+        	    error_log("In G11nStartSession id=" . session_id());
+                }
     		if (isset($_SESSION['g11n_language'])) {
                     if ( WP_TMY_G11N_DEBUG ) {
         		error_log("Starting session, session lang=" . $_SESSION['g11n_language']);
                     }
     		}
-
     		if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');
                     if ( WP_TMY_G11N_DEBUG ) {
         		error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
                     }
     		}
-    		//error_log("Starting session, id=" . session_id() . "session lang=" . $_SESSION['g11n_language'] );
+                if ( WP_TMY_G11N_DEBUG ) {
+    		    error_log("Starting session, id=" . session_id() . "session lang=" . $_SESSION['g11n_language'] );
+                }
 	}
 
 	public function G11nEndSession() {
@@ -138,9 +143,10 @@ class TMY_G11n_Public {
 	}
 
 	public function g11n_setcookie() {
+
 	    	$lang_var = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
                 if ( WP_TMY_G11N_DEBUG ) {
-	    	    error_log('In g11n_setcookie SET COOKIE...');
+	    	    error_log("In g11n_setcookie , lang_var " . $lang_var);
                 }
     		if (!empty($lang_var)) {
         		setcookie('g11n_language', $lang_var, strtotime('+1 day'));

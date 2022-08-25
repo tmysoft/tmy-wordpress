@@ -417,13 +417,18 @@ class TMY_G11n_Translator {
 
 	public function get_preferred_language() {
 
+           
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In get_preferred_language, ".json_encode($_SESSION));
+                    error_log("In get_preferred_language, session id ".session_id());
+                }
                 if(!session_id()) {
                     session_start();
                 }
 
                 if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');
-                    //error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
+                    error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
                 } 
 
 		$lang_var_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
