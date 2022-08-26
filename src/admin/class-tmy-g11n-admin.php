@@ -1484,7 +1484,7 @@ class TMY_G11n_Admin {
 	public function tmy_plugin_option_update($value, $option, $old_value) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                //error_log("tmy_plugin_option_update:" . $value . " " . $option . " ".$old_value );
+                error_log("tmy_plugin_option_update:" . $value . " " . $option . " ".$old_value );
             } 
 
             if (((strcmp($option, "g11n_additional_lang")===0) && ($value != $old_value)) ||
@@ -1526,6 +1526,59 @@ class TMY_G11n_Admin {
 
                 error_log("tmy_plugin_option_update: " . $ret_msg);
 
+            }
+            if ((strcmp($option, "g11n_l10n_props_blogname")===0) && ($value != $old_value)) {
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("tmy_plugin_option_update blogname:" . $old_value. "->" . $value );
+                    error_log("tmy_plugin_option_update blogname:" . get_bloginfo('name') );
+                } 
+                if (strcmp($value,"Yes")==0){
+                    // creating placeholder of the blogname entry as private post type
+                    $title_post  = get_page_by_title('blogname',OBJECT,'post');
+
+                    if (is_null($title_post)) {
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogname',
+                                                            'post_content'  => get_bloginfo('name'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    } else {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID, 
+                                                            'post_title'    => 'blogname',
+                                                            'post_content'  => get_bloginfo('name'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    }
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("tmy_plugin_option_update_blogname, blogname post ID: :" . $new_post_id );
+                    } 
+                }
+
+            }
+            if ((strcmp($option, "g11n_l10n_props_desc")===0) && ($value != $old_value)) {
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("tmy_plugin_option_update description: " . $old_value. "->" . $value );
+                    error_log("tmy_plugin_option_update blog description:" . get_bloginfo('description') );
+                }
+                if (strcmp($value,"Yes")==0){
+                    // creating placeholder entry as private post type
+                    $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
+
+                    if (is_null($title_post)) {
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogdescription',
+                                                            'post_content'  => get_bloginfo('description'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    } else {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID,
+                                                            'post_title'    => 'blogdescription',
+                                                            'post_content'  => get_bloginfo('description'),
+                                                            'post_status'  => 'private',
+                                                            'post_type'  => "post"));
+                    }
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("tmy_plugin_option_update_description, blog description post ID: :" . $new_post_id );
+                    }
+                }
             }
             return $value;
 

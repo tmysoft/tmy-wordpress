@@ -16,7 +16,7 @@
  * Plugin Name:       TMY Globalization Plugin
  * Plugin URI:        https://github.com/tmysoft/tmy-wordpress
  * Description:       Translating your application into other languages.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            Yu Shao
  * Author URI:        https://github.com/tmysoft/tmy-wordpress
  * License:           GPL-2.0+
