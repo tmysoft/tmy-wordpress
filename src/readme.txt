@@ -1,5 +1,5 @@
 === TMY Globalization ===
-Contributors: Yu Shao
+Contributors: yushao
 Donate link: https://tmysoft.com/solutions.html
 Tags: i18n, l10n, translation, localization, globalization
 Requires at least: 4.7
