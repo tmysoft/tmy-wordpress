@@ -13,7 +13,7 @@
  * @package           TMY_G11n
  *
  * @wordpress-plugin
- * Plugin Name:       TMY Globalization Plugin
+ * Plugin Name:       TMY Globalization
  * Plugin URI:        https://github.com/tmysoft/tmy-wordpress
  * Description:       Translating your application into other languages.
  * Version:           1.2.0
