@@ -18,7 +18,7 @@
  * Description:       Translating your application into other languages.
  * Version:           1.2.0
  * Author:            Yu Shao
- * Author URI:        https://github.com/tmysoft/tmy-wordpress
+ * Author URI:        https://github.com/tmysoft
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       tmy-g11n
