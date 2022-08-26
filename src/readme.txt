@@ -113,3 +113,12 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 = 1.0.0 =
 * Initial Release.
 
+== Upgrade Notice ==
+
+= 1.2.0 =
+* Miscellaneous Improvement.
+
+= 1.1.0 =
+* Miscellaneous Improvement.
+* Machine translation integration
+
