@@ -369,6 +369,7 @@ class TMY_G11n_Translator {
 
 	public function get_language_switcher() {
 	
+                include 'lang2googlelan.php';
 		//$current_url = home_url();
 		//$current_url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$current_url = $_SERVER['REQUEST_URI'];
@@ -377,41 +378,86 @@ class TMY_G11n_Translator {
 
 
 		$language_options = get_option('g11n_additional_lang', array());
-		$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
+		//$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
+		//$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
+		//$language_switcher_html = '';
 		//$language_switcher_html = '';
 
-		foreach( $language_options as $value => $code) {
+		if (strcmp('Yes', get_option('g11n_using_google_tookit','Yes')) === 0) {
+
+                    $seq_n = mt_rand(100,999);
+
+                    $google_lang_list = "";                
+		    foreach( $language_options as $value => $code) {
+                        $google_lang_list .= $lang2googlelan[$code] . ",";                
+                    }
+                    $google_lang_list = rtrim($google_lang_list, ",");
+                    error_log("google_lang_list: " . json_encode($google_lang_list));                
+
+		    $language_switcher_html = '<script type="text/javascript">
+                        function googleTranslateElementInit() {
+                            new google.translate.TranslateElement({pageLanguage: "en",
+                                                                   includedLanguages:"' . $google_lang_list . '",
+                                                                   layout: google.translate.TranslateElement.InlineLayout.SIMPLE},
+                            "google_translate_element");
+                        }
+                    </script>
+                    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" type="text/javascript"></script>
+                    <style type="text/css">
+
+                        #google_translate_element select{
+                          background:#f6edfd;
+                          color:#383ffa;
+                          border: 3px;
+                          border-radius:3px;
+                          padding:6px 8px
+                        }
+
+                        #google_translate_element img
+                        { display: none !important; }
+                         .goog-te-banner-frame{
+                          display:none !important;
+                        }
+                    </style>';
+		    $language_switcher_html .= 'Languages: <div id="google_translate_element"></div>';
+		    return $language_switcher_html;
+
+                } else {
+
+		    $language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
+		    //$language_switcher_html = '<div style="border:1px solid;border-radius:5px;">';
+		    foreach( $language_options as $value => $code) {
 		    //<img src="./flags/24/CN.png" alt="CN">
 
-		    if (strcmp('Text', get_option('g11n_switcher_type','Text')) === 0) {
-			$href_text_ht = $value;
-			$href_text = $value;
-		    }
-		    if (strcmp('Flag', get_option('g11n_switcher_type','Text')) === 0) {
-			$href_text_ht = '<img style="display: inline-block; border: #FF0000 1px outset" src="' . 
+		        if (strcmp('Text', get_option('g11n_switcher_type','Text')) === 0) {
+			    $href_text_ht = $value;
+			    $href_text = $value;
+		        }
+		        if (strcmp('Flag', get_option('g11n_switcher_type','Text')) === 0) {
+			    $href_text_ht = '<img style="display: inline-block; border: #FF0000 1px outset" src="' . 
 				                 plugins_url('flags/', __FILE__ ) . "24/" . 
 				                 strtoupper($code) . '.png" title="'. 
 				                 $value .'" alt="' . 
-				                 strtoupper($code) . '">';
-			$href_text = '<img style="display: inline-block" src="' . 
+				                 strtoupper($code) . "\" >";
+			    $href_text = '<img style="display: inline-block" src="' . 
 				                 plugins_url('flags/', __FILE__ ) . "24/" . 
 				                 strtoupper($code) . '.png" title="'. 
 				                 $value .'" alt="' . 
-				                 strtoupper($code) . '">';
-		    }
-		    if (strcmp($value, $g11n_current_language) === 0) {
-			$language_switcher_html .= '<a href=' . 
+				                 strtoupper($code) . "\" >";
+		        }
+		        if (strcmp($value, $g11n_current_language) === 0) {
+			    $language_switcher_html .= '<a href=' . 
 				                   add_query_arg($query_variable_name, $value, $current_url) . '><b> ' .
 				                   $href_text_ht.'</b></a>';
-		    } else {
-			$language_switcher_html .= '<a href=' . 
+		        } else {
+			    $language_switcher_html .= '<a href=' . 
 				                   add_query_arg($query_variable_name, $value, $current_url) . '> ' .
 				                   $href_text.'</a>';
-		    }
+		        }
+                    }
+		    $language_switcher_html .= "</span>";
+		    return $language_switcher_html;
 		}
-		$language_switcher_html .= "</span>";
-
-		return $language_switcher_html;
 
         }
 

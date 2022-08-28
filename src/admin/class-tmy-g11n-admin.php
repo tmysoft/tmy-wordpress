@@ -131,6 +131,7 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_sidebar' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_floating' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_switcher_type' );
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_using_google_tookit' );
 
     		register_setting( 'tmy-g11n-settings-group', 'g11n_auto_pullpush_translation' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_resource_file_location' );
@@ -381,31 +382,113 @@ class TMY_G11n_Admin {
 		    	div.appendChild(cb);
 
 		}
+		function g11n_using_gtookit_change() {
+                    
+                    var element = document.getElementById("g11n_using_google_tookit"); 
+                    if (element.value=='Yes'){
+                        console.log("yes");
+                        document.getElementById("g11n_switcher_title").disabled=true;
+                        document.getElementById("g11n_switcher_tagline").disabled=true;
+                        document.getElementById("g11n_switcher_post").disabled=true;
+                        document.getElementById("g11n_switcher_sidebar").disabled=true;
+                        //document.getElementById("g11n_site_lang_cookie").disabled=true;
+                        //document.getElementById("g11n_site_lang_browser").disabled=true;
+                        //document.getElementById("g11n_server_url").disabled=true;
+                        //document.getElementById("g11n_server_user").disabled=true;
+                        //document.getElementById("g11n_server_token").disabled=true;
+                        //document.getElementById("g11n_server_project").disabled=true;
+                        //document.getElementById("g11n_server_version").disabled=true;
+                        //document.getElementById("g11n_create_project_button").disabled=true;
+                        //document.getElementById("g11n_server_trunksize").disabled=true;
+                        //document.getElementById("g11n_l10n_props_blogname").disabled=true;
+                        //document.getElementById("g11n_l10n_props_desc").disabled=true;
+                        //document.getElementById("g11n_l10n_props_posts").disabled=true;
+                        //document.getElementById("g11n_l10n_props_pages").disabled=true;
+                        //document.getElementById("g11n_switcher_type_Text").disabled=true;
+                        //document.getElementById("g11n_switcher_type_Flag").disabled=true;
+                    }
+                    if(element.value=='No'){
+                        console.log("no");
+                        document.getElementById("g11n_switcher_title").disabled=false;
+                        document.getElementById("g11n_switcher_tagline").disabled=false;
+                        document.getElementById("g11n_switcher_post").disabled=false;
+                        document.getElementById("g11n_switcher_sidebar").disabled=false;
+                        //document.getElementById("g11n_site_lang_cookie").disabled=false;
+                        //document.getElementById("g11n_site_lang_browser").disabled=false;
+                        //document.getElementById("g11n_server_url").disabled=false;
+                        //document.getElementById("g11n_server_user").disabled=false;
+                        //document.getElementById("g11n_server_token").disabled=false;
+                        //document.getElementById("g11n_server_project").disabled=false;
+                        //document.getElementById("g11n_server_version").disabled=false;
+                        //document.getElementById("g11n_create_project_button").disabled=false;
+                        //document.getElementById("g11n_server_trunksize").disabled=false;
+                        //document.getElementById("g11n_l10n_props_blogname").disabled=false;
+                        //document.getElementById("g11n_l10n_props_desc").disabled=false;
+                        //document.getElementById("g11n_l10n_props_posts").disabled=false;
+                        //document.getElementById("g11n_l10n_props_pages").disabled=false;
+                        //document.getElementById("g11n_switcher_type_Text").disabled=false;
+                        //document.getElementById("g11n_switcher_type_Flag").disabled=false;
+                    }
+                
+
+                }
 		</script>
 
 
 	       	</td>
 	        </tr>
 
+        	<tr valign="top">
+        	<th scope="row">Live Translation powered by Google Translate</th>
+        	<td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" onChange="javascript:g11n_using_gtookit_change();">
+        	<!-- <td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" > -->
+               		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_using_google_tookit','No')), 'Yes' ); ?>>Yes</option>
+               		<option value='No'  <?php selected( esc_attr(get_option('g11n_using_google_tookit','No')), 'No' ); ?>>No</option>
+            	</select>
+        	</td>
+        	</tr>
+
+                <?php 
+               	    if (strcmp(get_option('g11n_using_google_tookit','No'),'Yes' )===0) {
+                        $config_selected_disable = "disabled";
+                    } else {
+                        $config_selected_disable = "";
+                    }
+                    $config_disable = "";
+                ?>
+
+        	<tr valign="top">
+        	<th scope="row">Language Switcher Location</th>
+        	<td>
+            	<input type="checkbox" id="g11n_switcher_title" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Title <br>
+            	<input type="checkbox" id="g11n_switcher_tagline" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Tagline <br>
+            	<input type="checkbox" id="g11n_switcher_post" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Each Post <br>
+            	<input type="checkbox" id="g11n_switcher_sidebar" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?><?php echo $config_selected_disable; ?> /> Top of Sidebar <br>
+            	<input type="checkbox" id="g11n_switcher_floating" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
+                Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
+ 	    	</td>
+                </tr>
+ 
+
 	        <tr valign="top">
 	        <th scope="row">Get Visitor Language Preference From</th>
-	        <td>Cookie <input type="checkbox" name="g11n_site_lang_cookie" value="Yes" "<?php checked(esc_attr( get_option('g11n_site_lang_cookie')), "Yes"); ?> /><br>
-            		Browser Language Preference <input type="checkbox" name="g11n_site_lang_browser" 
-                                                           value="Yes" "<?php checked(esc_attr( get_option('g11n_site_lang_browser')), "Yes"); ?> />
+	        <td>Cookie <input type="checkbox" id="g11n_site_lang_cookie" name="g11n_site_lang_cookie" value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_cookie')), "Yes"); echo $config_disable; ?> /><br>
+            		Browser Language Preference <input type="checkbox" id="g11n_site_lang_browser" name="g11n_site_lang_browser" 
+                                                           value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_browser')), "Yes"); echo $config_disable; ?> />
         	</td>
         	</tr>
 
         	<tr valign="top">
         	<th scope="row">Translation Server(Optional)</th>
-        	<td>URL <input type="text" name="g11n_server_url" value="<?php echo esc_attr( get_option('g11n_server_url') ); ?>" /><br>
-            	User <input type="text" name="g11n_server_user" value="<?php echo esc_attr( get_option('g11n_server_user') ); ?>" />
-            	Token <input type="text" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" /> <br>
-            	Project Name <input type="text" id="g11n_server_project" name="g11n_server_project" value="<?php echo esc_attr( get_option('g11n_server_project') ); ?>" />
+        	<td>URL <input type="text" id="g11n_server_url" name="g11n_server_url" value="<?php echo esc_attr( get_option('g11n_server_url') ); ?>" <?php echo $config_disable; ?> /><br>
+            	User <input type="text" id="g11n_server_user" name="g11n_server_user" value="<?php echo esc_attr( get_option('g11n_server_user') ); ?>" <?php echo $config_disable; ?> />
+            	Token <input type="text" id="g11n_server_token" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" <?php echo $config_disable; ?> /> <br>
+            	Project Name <input type="text" id="g11n_server_project" name="g11n_server_project" value="<?php echo esc_attr( get_option('g11n_server_project') ); ?>" <?php echo $config_disable; ?>  />
             	<!-- <button onclick="g11ncreateproject('project')">Create Project on Translation Server</button> -->
                 <!-- <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"> -->
-            	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" />
-                <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"><br>
-            	Trunk Size <input type="text" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" />
+            	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" <?php echo $config_disable; ?>  />
+                <input type="button" id="g11n_create_project_button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')" <?php echo $config_disable; ?> ><br>
+            	Trunk Size <input type="text" id="g11n_server_trunksize" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" <?php echo $config_disable; ?>  />
         	</td>
 
 		<script>
@@ -454,25 +537,14 @@ class TMY_G11n_Admin {
         	<th scope="row">Enable Translation On</th>
         	<td>
             	<br>
-            	<input type="checkbox" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); ?> /> 
+            	<input type="checkbox" id="g11n_l10n_props_blogname" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); echo $config_disable; ?> /> 
                                                                                                             Site Title/Blog Name <br>
-            	<input type="checkbox" name="g11n_l10n_props_desc" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_desc')), "Yes" ); ?> /> Tagline<br>
-            	<input type="checkbox" name="g11n_l10n_props_posts" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_posts')), "Yes" ); ?> /> Posts<br>
-            	<input type="checkbox" name="g11n_l10n_props_pages" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_pages')), "Yes" ); ?> /> Pages 
+            	<input type="checkbox" id="g11n_l10n_props_desc" name="g11n_l10n_props_desc" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_desc')), "Yes" ); echo $config_disable; ?> /> Tagline<br>
+            	<input type="checkbox" id="g11n_l10n_props_posts" name="g11n_l10n_props_posts" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_posts')), "Yes" ); echo $config_disable; ?> /> Posts<br>
+            	<input type="checkbox" id="g11n_l10n_props_pages" name="g11n_l10n_props_pages" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_pages')), "Yes" ); echo $config_disable; ?> /> Pages 
         	</td>
         	</tr>             
 
-        	<tr valign="top">
-        	<th scope="row">Language Switcher Location</th>
-        	<td>
-            	<input type="checkbox" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> /> In Title <br>
-            	<input type="checkbox" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> /> In Tagline <br>
-            	<input type="checkbox" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> /> In Each Post <br>
-            	<input type="checkbox" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?> /> Top of Sidebar <br>
-            	<input type="checkbox" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
-                Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
- 	    	</td>
-                </tr>
             	<?php
 
          
@@ -485,8 +557,8 @@ class TMY_G11n_Admin {
 		);
 		
 		foreach ($g11n_switch_type as $key => $desc) :
-		          $selected = (get_option('g11n_switcher_type','Text') == $key) ? 'checked="checked"' : '';
-		          echo "\n\t<label><input type='radio' name='g11n_switcher_type' value='" . esc_attr($key) . "' $selected/> $desc</label><br />";
+		          $selected = (get_option('g11n_switcher_type','Flag') == $key) ? 'checked="checked"' : '';
+		          echo "\n\t<label><input type='radio' id='g11n_switcher_type_".esc_attr($key)."' name='g11n_switcher_type' value='" . esc_attr($key) . "' $selected $config_disable /> $desc</label><br />";
 	  	endforeach;
 		 
           	?>
@@ -496,8 +568,8 @@ class TMY_G11n_Admin {
         	<tr valign="top">
         	<th scope="row">Use Classic Editor</th>
         	<td><select name="g11n_editor_choice">
-               		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_editor_choice')), 'Yes' ); ?>>Yes</option>
-               		<option value='No'  <?php selected( esc_attr(get_option('g11n_editor_choice')), 'No' ); ?>>No</option>
+               		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_editor_choice','No')), 'Yes' ); ?>>Yes</option>
+               		<option value='No'  <?php selected( esc_attr(get_option('g11n_editor_choice','No')), 'No' ); ?>>No</option>
             	</select>
         	</td>
         	</tr>

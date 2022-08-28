@@ -9,83 +9,28 @@ Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Make your website multilingual ready with support of full translation cycle and machine translation integration.
+Make your website multilingual ready at ease with live translation or with support of full translation cycle, with machine translation integration.
 
 == Description ==
 
-TMY Globalization plugin adds internationalization, localization capabilities to your website by hosting your translations locally for proof reading, editing and final publication. Intutive setupFine controlled
-internationalization and localization features 
+TMY Globalization plugin could translate your site with live translation powered by Google Translate, simply configure the extra languages you want to support through the intutuive setup interface and save, then you are done.
 
-* Translation kept locally for proof read, edit and publish. 
+If you want more control and higher quality, TMY globalization plugin adds internationalization, localization capabilities to your website by hosting your translations locally for proof reading, editing and final publication. You can intergrate machine translation of your choice to prepare your contents, then leveraging fully featured translation editor with any 3rd party translation agencies.
+
+* Live Translation powered by Google Translate
+* Full cycle to keep translation locally for proof read, edit and publish. 
 * Support new block Gutenberg editor and classic editor.
-* Support Google Translate integration
-* language switcher based on
+* Support Google Translate integration with editing capability
+* Language switcher based on
 ** Draggable floating meanu
-** flags and language names text
-** detect browser language setting
-** support browser cookie
-** greater flexible g11n language switching widget 
-
+** Sidebar widget
+** Along with title or description
+** With any page or post
+* Language switcher is in language name or flags
+* Detect browser language setting
+* Support browser cookie
+* Premium service available
 * Live support community
-
-
-This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
-
-For backwards compatibility, if this section is missing, the full length of the short description will be used, and
-Markdown parsed.
-
-A few notes about the sections above:
-
-* "Contributors" is a comma separated list of wordpress.org usernames
-* "Tags" is a comma separated list of tags that apply to the plugin
-* "Requires at least" is the lowest version that the plugin will work on
-* "Tested up to" is the highest version that you've *successfully used to test the plugin*
-* Stable tag must indicate the Subversion "tag" of the latest stable version
-
-Note that the `readme.txt` value of stable tag is the one that is the defining one for the plugin.  If the `/trunk/readme.txt` file says that the stable tag is `4.3`, then it is `/tags/4.3/readme.txt` that'll be used for displaying information about the plugin.
-
-If you develop in trunk, you can update the trunk `readme.txt` to reflect changes in your in-development version, without having that information incorrectly disclosed about the current stable version that lacks those changes -- as long as the trunk's `readme.txt` points to the correct stable tag.
-
-If no stable tag is provided, your users may not get the correct version of your code.
-
-== A brief Markdown Example ==
-
-Markdown is what the parser uses to process much of the readme file.
-
-[markdown syntax]: https://daringfireball.net/projects/markdown/syntax
-
-Links require brackets and parenthesis:
-
-Here's a link to [WordPress](https://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax]. Link titles are optional, naturally.
-
-Blockquotes are email style:
-
-> Asterisks for *emphasis*. Double it up  for **strong**.
-
-And Backticks for code:
-
-`<?php code(); ?>`
-
-Ordered list:
-
-1. Some feature
-1. Another feature
-1. Something else about the plugin
-
-Unordered list:
-
-* something
-* something else
-* third thing
-
-Link to [WordPress](http://wordpress.org/ "Your favorite software") and one to [Markdown's Syntax Documentation][markdown syntax].
-
-Titles are optional, naturally.
-
-Asterisks for *emphasis*.
-
-Double it up  for **strong**.
-
 
 == Installation ==
 
@@ -117,6 +62,9 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 
 == Changelog ==
 
+= 1.3.0 =
+* Live Translation
+
 = 1.2.0 =
 * Miscellaneous Improvement.
 
@@ -129,10 +77,12 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 
 == Upgrade Notice ==
 
+= 1.3.0 =
+* Live Translation is added. It is powered by Google Translate
+
 = 1.2.0 =
 * Miscellaneous Improvement.
 
 = 1.1.0 =
 * Miscellaneous Improvement.
 * Machine translation integration
-
