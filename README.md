@@ -2,7 +2,7 @@
 
 ----
 
-TMY Globalization Plugin is an open source tool for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflow:
+TMY Globalization Plugin is an open source tool for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflows:
 
 * Live Translation workflow
 * Full Professional Translation workflow
