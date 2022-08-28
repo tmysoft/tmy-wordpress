@@ -2,8 +2,31 @@
 
 ----
 
-TMY Globalization Plugin is an open source software for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflow. One is **Live Translation** workflow which provides instant translation based on popular machine translation engine. Two, **Full Professional** workflow which involves extracting the text for translation, translating and integrating back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites with intuitive and easy to use interfaces.
+TMY Globalization Plugin is an open source tool for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflow:
 
+* Live Translation workflow
+* Full Professional Translation workflow
+
+Live translation workflow provides instant translation based on Google Translate engine. Simply configure the extra languages you want to support through the intutuive setup interface and save, then you are done.
+
+Full Professional workflow provides more control and higher translation quality, which involves extracting the text for translation, translating and integrating back into Wordpress. More specifically TMY plugin hosts your translations locally for proof reading, editing and final publication. You can intergrate machine translation of your choice to prepare your contents, then leveraging fully featured translation editor with any 3rd party translation agencies.
+
+TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites with intuitive and easy to use interfaces, some features include:
+
+* Live Translation powered by Google Translate
+* Full cycle to keep translation locally for proof read, edit and publish.
+* Support new block Gutenberg editor and classic editor.
+* Support Google Translate integration with editing capability
+* Language switcher based on
+  * Draggable floating meanu
+  * Sidebar widget
+  * Along with title or description
+  * With any page or post
+* Language switcher is in language name or flags
+* Detect browser language setting
+* Support browser cookie
+* Premium service available
+* Live support community
 
 ----
 
@@ -29,7 +52,7 @@ Key configuration:
 Press "Save Changes".
 
 Visting your website, switching between languages to see how your website is being translated live.
-<kbd><img src="doc/tmy-live-site.png" width="500"/></kbd>
+<kbd><img src="doc/tmy-live-site.png" width="600"/></kbd>
 
 ## Configure TMY Plugin for Full Professional Translation workflow
 
