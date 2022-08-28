@@ -1,8 +1,8 @@
-# TMY Plugin for Wordpress Getting Started & FAQ
+# TMY Globalization Plugin for Wordpress Getting Started & FAQ
 
 ----
 
-TMY Plugin is an open source software for internationalization and localization of Wordpress based websites. TMY Plugin could extract the text for translation, translate and integrate back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites.
+TMY Globalization Plugin is an open source software for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflow. One is **Live Translation** workflow which provides instant translation based on popular machine translation engine. Two, **Full Professional** workflow which involves extracting the text for translation, translating and integrating back into Wordpress. TMY Plugin provides multiple ways to handle different development phases of the Wordpress websites with intuitive and easy to use interfaces.
 
 
 ----
@@ -15,7 +15,23 @@ Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/relea
 
 Or, search the "TMY plugin", install and activate it.
 
-## Configure TMY Plugin
+## Configure TMY Plugin for Live Translation workflow
+
+From the Wordpress dashboard side menu, Settings -> TMY setup:
+
+<kbd><img src="doc/tmy-live-config.png" width="500"/></kbd>
+
+Key configuration:
+- Add the extra languages you want to support 
+- Make sure the Live Translation powered by Google Translate is set to "Yes"
+- Make sure Language Switcher Location is chose at "Draggable Floating Menu"
+
+Press "Save Changes".
+
+Visting your website, switching between languages to see how your website is being translated live.
+<kbd><img src="doc/tmy-live-site.png" width="500"/></kbd>
+
+## Configure TMY Plugin for Full Professional Translation workflow
 
 From the Wordpress dashboard side menu, Settings -> TMY setup:
 

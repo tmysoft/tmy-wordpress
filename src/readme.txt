@@ -9,13 +9,26 @@ Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+Make your website multilingual ready with support of full translation cycle and machine translation integration.
 
 == Description ==
 
-TMY Globalization plugin provides internationalization, localization capability to your 
-webistei by hosting your translations locally for proof reading and editing. Fine controlled
+TMY Globalization plugin adds internationalization, localization capabilities to your website by hosting your translations locally for proof reading, editing and final publication. Intutive setupFine controlled
 internationalization and localization features 
+
+* Translation kept locally for proof read, edit and publish. 
+* Support new block Gutenberg editor and classic editor.
+* Support Google Translate integration
+* language switcher based on
+** Draggable floating meanu
+** flags and language names text
+** detect browser language setting
+** support browser cookie
+** greater flexible g11n language switching widget 
+
+* Live support community
+
+
 This is the long description.  No limit, and you can use Markdown (as well as in the following sections).
 
 For backwards compatibility, if this section is missing, the full length of the short description will be used, and
@@ -76,9 +89,10 @@ Double it up  for **strong**.
 
 == Installation ==
 
-1. Upload "test-plugin.php" to the "/wp-content/plugins/" directory.
-1. Activate the plugin through the "Plugins" menu in WordPress.
-1. Place "do_action( 'plugin_name_hook' );" in your templates.
+1. Install and Activate "TMY Globalization" from Plugin directory.
+1. Setup the plugin from Settings-> TMY Setup.
+
+More information at [TMY Plugin for Wordpress Getting Started & FAQ](https://github.com/tmysoft/tmy-wordpress)
 
 == Frequently Asked Questions ==
 
