@@ -92,39 +92,40 @@ class TMY_G11n_Translator {
 	 */
 	public function rest_get_translation_server( $rest_url ) {
 
-		$ch = curl_init();
-		curl_reset($ch);
-               
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In rest_get_translation_server, " . $rest_url);
+                }
+
                 if (strpos($rest_url,'version') !== false) {
                     $accept_fmt="application/vnd.zanata.Version+json";
                 } else {
                     $accept_fmt="application/json";
                 }
 
-		curl_setopt($ch, CURLOPT_URL, $rest_url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-			'X-Auth-User: ' . get_option('g11n_server_user'),
-			'X-Auth-Token: ' . get_option('g11n_server_token'),
-			'Accept: ' . $accept_fmt
-
-		));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                 curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-		$output = curl_exec($ch);
-		$http_response_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $args = array(
+                    'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                       'X-Auth-Token' => get_option('g11n_server_token'),
+                                       'Accept' => $accept_fmt),
+                    'timeout' => 20
+                );
+                $response = wp_remote_get( $rest_url, $args );
+                $http_response_code = wp_remote_retrieve_response_code( $response );
 		$translation_server_log_messages = "Response Code: " . $http_response_code;
-		if(curl_errno($ch)){
-			$translation_server_log_messages .= ' Error: ' . curl_error($ch) . ' Code: ' . curl_errno($ch);
+
+                if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                    $output = $response['body'];
+		    $payload = json_decode($output);
+                } else {
+		    $translation_server_log_messages .= ' Error: ' . $response->get_error_message();
 		}
 
-		$payload = json_decode($output);
-		curl_close($ch);
-			    
 		$return_array = array('payload' => $payload,
 				 'server_msg' => $translation_server_log_messages,
 				 'http_code' => $http_response_code
 				);
-		curl_reset($ch);
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In rest_get_translation_server, return " . json_encode($return_array));
+                }
 		return $return_array;
 
 	}
@@ -150,23 +151,27 @@ class TMY_G11n_Translator {
 			    get_option('g11n_server_version') . "/r/";
 		$rest_url .= $name_prefex . $postid . "/translations/" . $language_name . "?ext=gettext&ext=comment";
 
-		curl_setopt($ch, CURLOPT_URL, $rest_url);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		    'X-Auth-User: ' . get_option('g11n_server_user'),
-		    'X-Auth-Token: ' . get_option('g11n_server_token'),
-		    'Accept: application/json'
-		    ));
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
-		$output = curl_exec($ch);     
-		error_log ("Finding Translation from Server URL: " . $rest_url);
-		error_log ("Response Code: " . curl_getinfo($ch, CURLINFO_HTTP_CODE));
-		error_log ("Post id: " . $postid);
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In sync_translation_from_server, " . $post_id);
+                }
 
-		if(curl_errno($ch)){
-		    error_log ('Request Error:' . curl_error($ch));
-		}
-		curl_close($ch);
+                $args = array(
+                    'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                       'X-Auth-Token' => get_option('g11n_server_token'),
+                                       'Accept' => 'application/json'),
+                    'timeout' => 10
+                );
+                $response = wp_remote_get( $rest_url, $args );
+                $http_response_code = wp_remote_retrieve_response_code( $response );
+
+                if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                    $output = $response['body'];
+                    //$payload = json_decode($output);
+                } else {
+                    error_log('In sync_translation_from_server, Error: ' . $response->get_error_message());
+                }
+
 		return $output;
 
 	}
@@ -205,25 +210,28 @@ class TMY_G11n_Translator {
 			    get_option('g11n_server_version') . "/r/";
 		    $rest_url .= $file_name;
 		    $rest_url .= "?ext=gettext";
-		    curl_reset($ch);
-		    curl_setopt($ch, CURLOPT_URL, $rest_url);
-		    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		        'X-Auth-User: ' . get_option('g11n_server_user'),
-		        'X-Auth-Token: ' . get_option('g11n_server_token'),
-		        'Content-Type: application/json' 
-		        ));
-		    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-		    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload_string);
 
-		    $output = curl_exec($ch);      
+                    /***********************************************************************/
+                    $args = array(
+                        'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                           'X-Auth-Token' => get_option('g11n_server_token'),
+                                           'Content-Type' => 'application/json'),
+                        'method' => 'PUT',
+                        'body' => $payload_string,
+                        'timeout' => 10
+                    );
+                    $response = wp_remote_post( $rest_url, $args );
+
+                    if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                        $output = $response['body'];
+                        $payload = json_decode($output);
+                    } else {
+                        error_log("In push_contents_to_translation_server, Error: " . $response->get_error_message());
+                    }
 		    $return_msg = "Sent for translation " . $rest_url;
-		    //$return_msg .= "\npayload : " . $payload_string;
-		    $return_msg .= " server return: " . curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		    $return_msg .= " server return: " . wp_remote_retrieve_response_code( $response );
 
-		    if(curl_errno($ch)){
-		        error_log ('Request Error:' . curl_error($ch));
-		    }
+
                     if (strcmp($output,'')===0 ) {
 		        $return_msg .= "  output : " . "Successful";
                         $output = "Successful";
@@ -372,9 +380,9 @@ class TMY_G11n_Translator {
                 include 'lang2googlelan.php';
 		//$current_url = home_url();
 		//$current_url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-		$current_url = $_SERVER['REQUEST_URI'];
+		$current_url = sanitize_url($_SERVER['REQUEST_URI']);
 		$query_variable_name = "g11n_tmy_lang";
-		$g11n_current_language = $_SESSION['g11n_language'];
+		$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 
 
 		$language_options = get_option('g11n_additional_lang', array());
@@ -493,7 +501,7 @@ class TMY_G11n_Translator {
                         error_log($seq_code . " Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
                     }
                 } 
-		$lang_var_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
+		$lang_var_from_query = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
                 if ( WP_TMY_G11N_DEBUG ) {
 		  error_log($seq_code . " In get_preferred_language query lang = ". $lang_var_from_query);
                 }
@@ -555,19 +563,19 @@ class TMY_G11n_Translator {
 		}
 
 		if ((isset($_COOKIE['g11n_language'])) and (strcmp(get_option('g11n_site_lang_cookie'),'Yes')===0)) {
-		   $_SESSION['g11n_language'] = $_COOKIE['g11n_language'];
-		   return $_COOKIE['g11n_language'];
+		   $_SESSION['g11n_language'] = tmy_g11n_lang_sanitize($_COOKIE['g11n_language']);
+		   return tmy_g11n_lang_sanitize($_COOKIE['g11n_language']);
 		}
 
 		if (isset($_SESSION['g11n_language'])) {
                    if ( WP_TMY_G11N_DEBUG ) {
-		      error_log($seq_code . " In get_preferred_language return _SESSION g11n_language = ". $_SESSION['g11n_language']);
+		      error_log($seq_code . " In get_preferred_language return _SESSION g11n_language = ". tmy_g11n_lang_sanitize($_SESSION['g11n_language']));
                    }
-		   return $_SESSION['g11n_language'];
+		   return tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 		}
 
 		$_SESSION['g11n_language'] = get_option('g11n_default_lang','English');
-		return $_SESSION['g11n_language'];
+		return tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 
 
 	}

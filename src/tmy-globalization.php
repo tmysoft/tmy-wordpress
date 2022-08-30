@@ -35,8 +35,8 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'ARETE_G11N_VERSION', '1.1.0' );
-define( 'WP_TMY_G11N_DEBUG', false );
+define( 'TMY_G11N_VERSION', '1.3.0' );
+define( 'WP_TMY_G11N_DEBUG', true );
 
 /**
  * The code that runs during plugin activation.
@@ -67,6 +67,8 @@ register_deactivation_hook( __FILE__, 'deactivate_tmy_g11n' );
 require plugin_dir_path( __FILE__ ) . 'includes/class-tmy-g11n-widget.php';
 
 require plugin_dir_path( __FILE__ ) . 'includes/class-tmy-g11n.php';
+
+require plugin_dir_path( __FILE__ ) . 'includes/tmy-g11n-plugin-globals.php';
 
 /**
  * Begins execution of the plugin.

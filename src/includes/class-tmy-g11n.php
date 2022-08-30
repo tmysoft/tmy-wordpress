@@ -68,8 +68,8 @@ class TMY_G11n {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'ARETE_G11N_VERSION' ) ) {
-			$this->version = ARETE_G11N_VERSION;
+		if ( defined( 'TMY_G11N_VERSION' ) ) {
+			$this->version = TMY_G11N_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
