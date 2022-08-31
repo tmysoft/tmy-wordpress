@@ -127,7 +127,7 @@ class TMY_G11n_Public {
                 }
     		if (isset($_SESSION['g11n_language'])) {
                     if ( WP_TMY_G11N_DEBUG ) {
-        		error_log("Starting session, session lang=" . $_SESSION['g11n_language']);
+        		error_log("Starting session, session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']));
                     }
                     if (strcmp('Yes', get_option('g11n_using_google_tookit','Yes')) === 0) {
                         $_SESSION['g11n_language'] = get_option('g11n_default_lang');
@@ -140,7 +140,7 @@ class TMY_G11n_Public {
                     }
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
-    		    error_log("Starting session, id=" . session_id() . "session lang=" . $_SESSION['g11n_language'] );
+    		    error_log("Starting session, id=" . session_id() . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
                 }
             }
 	}
@@ -152,7 +152,7 @@ class TMY_G11n_Public {
 	public function g11n_setcookie() {
 
             if (! is_admin()) {
-	    	$lang_var = filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS);
+	    	$lang_var = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
                 if ( WP_TMY_G11N_DEBUG ) {
 	    	    error_log("In g11n_setcookie , lang_var " . $lang_var);
                 }
@@ -275,9 +275,9 @@ public function g11n_add_floating_menu() {
                     }
 		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
 
-                    echo '<b>This is the ' . $trans_lang . ' translation page of <a href="' . 
-                         esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
-                       ' (ID:' . $original_id . ')</a>';
+                    echo '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                         esc_url( get_edit_post_link($original_id) ) . '">' . esc_attr($original_title) . 
+                       ' (ID:' . esc_attr($original_id) . ')</a>';
 
 		    if (strcmp($post_status,"publish")===0) {
 		        echo ' Status: Live</b></br>';
@@ -301,23 +301,23 @@ public function g11n_add_floating_menu() {
     		            //echo $code . ':' . $translation_id . '<br>'; 
 			    if (isset($translation_id)) {
                                 $translation_status = get_post_status($translation_id);
-                                echo $value . '-' . $code . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
-                                     '">ID ' . $translation_id . '</a>, status: ' . $translation_status . '</br>';
+                                echo esc_attr($value) . '-' . esc_attr($code) . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
+                                     '">ID ' . esc_attr($translation_id) . '</a>, status: ' . esc_attr($translation_status) . '</br>';
                             } else {
-                                echo $value . '-' . $code . ' Not Started Yet </br>';
+                                echo esc_attr($value) . '-' . esc_attr($code) . ' Not Started Yet </br>';
                             }
 
                          }
                     }
 
-                    echo '<br>Click <button type="button" onclick="create_sync_translation(' . $post_id . ', \'' . $post_type . '\')">Start or Sync Translation</button> to send this page to translation server';
+                    echo '<br>Click <button type="button" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . esc_attr($post_type) . '\')">Start or Sync Translation</button> to send this page to translation server';
                     //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
                     echo '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
                     echo '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
 
                     if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
     		        echo '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
-			    get_post_meta(get_the_ID(),'translation_push_status',true) . '</h5></div>';
+			    esc_attr(get_post_meta(get_the_ID(),'translation_push_status',true)) . '</h5></div>';
                     }
                     echo "</div>";
                     
@@ -443,6 +443,17 @@ public function g11n_add_floating_menu() {
 		);
 
 	}
+
+	public function g11n_post_saved_notification( $ID, $post ) {
+
+            error_log("In g11n_post_saved_notification, " . $ID);
+            error_log("In g11n_post_saved_notification, " . json_encode($post));
+
+            //do_action('do_meta_boxes', null, 'normal', $post);
+            //do_meta_boxes( null, 'normal', $post);
+            //do_meta_boxes( $screen, $context, $object )
+
+        }
 
 	public function g11n_post_published_notification( $ID, $post ) {
 
@@ -605,9 +616,9 @@ public function g11n_add_floating_menu() {
 		        global $wp_query; 
 
                         if ( WP_TMY_G11N_DEBUG ) {
-		            error_log("In g11n_content_filter filter, session_id=" . session_id() . "session lang=" . $_SESSION['g11n_language'] );
-		            error_log("In g11n_content_filter filter, session lang = [" . $_SESSION['g11n_language']. "]");
-		            error_log("In g11n_content_filter filter, cookie lang = [" . $_COOKIE['g11n_language'] . "]");
+		            error_log("In g11n_content_filter filter, session_id=" . session_id() . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
+		            error_log("In g11n_content_filter filter, session lang = [" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']). "]");
+		            error_log("In g11n_content_filter filter, cookie lang = [" . tmy_g11n_lang_sanitize($_COOKIE['g11n_language']) . "]");
 		            error_log("In g11n_content_filter filter, browser lang = [" . $_SERVER['HTTP_ACCEPT_LANGUAGE'] . "]");
                         }
 
@@ -633,7 +644,7 @@ public function g11n_add_floating_menu() {
 		        }
 
 		        $language_options = get_option('g11n_additional_lang');
-		        $g11n_current_language = $_SESSION['g11n_language'];
+		        $g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 		        $language_name = $language_options[$g11n_current_language];
 		        //$translation_post_id = $this->translator->get_translation_id($postid,$language_name,$posttype);
 
@@ -719,7 +730,7 @@ public function g11n_add_floating_menu() {
                     }
 		    if (strcmp($show,'description')==0) {
                         if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")==0){
-			     $g11n_current_language = $_SESSION['g11n_language'];
+			     $g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 			     $language_options = get_option('g11n_additional_lang');
 			     $language_name = $language_options[$g11n_current_language];
 
@@ -744,7 +755,7 @@ public function g11n_add_floating_menu() {
 
 		    if (strcmp($show,'name')==0) {
                         if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")==0){
-			    $g11n_current_language = $_SESSION['g11n_language'];
+			    $g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 			    $language_options = get_option('g11n_additional_lang');
 			    $language_name = $language_options[$g11n_current_language];
 

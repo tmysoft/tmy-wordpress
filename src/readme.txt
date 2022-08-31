@@ -2,9 +2,9 @@
 Contributors: yushao
 Donate link: https://tmysoft.com/solutions.html
 Tags: i18n, l10n, translation, localization, globalization
-Requires at least: 4.7
-Tested up to: 5.4
-Stable tag: 4.3
+Requires at least: 5.0
+Tested up to: 5.9
+Stable tag: 1.3.0
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@ Make your website multilingual ready at ease with live translation or with suppo
 
 == Description ==
 
-TMY Globalization Plugin is an open source tool for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflow:
+TMY Globalization Plugin is an open source tool for internationalization and localization of Wordpress based websites. TMY Plugin provides two translation workflows:
 
 * Live Translation workflow
 * Full Professional Translation workflow

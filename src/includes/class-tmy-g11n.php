@@ -68,8 +68,8 @@ class TMY_G11n {
 	 * @since    1.0.0
 	 */
 	public function __construct() {
-		if ( defined( 'ARETE_G11N_VERSION' ) ) {
-			$this->version = ARETE_G11N_VERSION;
+		if ( defined( 'TMY_G11N_VERSION' ) ) {
+			$this->version = TMY_G11N_VERSION;
 		} else {
 			$this->version = '1.0.0';
 		}
@@ -170,6 +170,7 @@ class TMY_G11n {
 		$this->loader->add_action( 'wp_ajax_tmy_get_project_status', $plugin_admin, 'tmy_g11n_get_project_status' );
 		$this->loader->add_action( 'wp_ajax_tmy_get_local_translation_status', $plugin_admin, 'tmy_g11n_get_local_translation_status' );
 		$this->loader->add_action( 'wp_ajax_tmy_create_sync_translation', $plugin_admin, 'tmy_create_sync_translation' );
+		$this->loader->add_action( 'wp_ajax_tmy_get_post_translation_status', $plugin_admin, 'tmy_get_post_translation_status' );
 
 		$this->loader->add_filter( 'views_edit-post', $plugin_admin, 'g11n_edit_posts_views' );
                 $this->loader->add_filter( 'pre_update_option', $plugin_admin,'tmy_plugin_option_update', 10, 3 );
@@ -202,6 +203,7 @@ class TMY_G11n {
 
 		$this->loader->add_action( 'publish_post', $plugin_public, 'g11n_post_published_notification', 10, 2 );
 		$this->loader->add_action( 'publish_page', $plugin_public, 'g11n_post_published_notification', 10, 2 );
+		$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
 
 		$this->loader->add_action( 'publish_product', $plugin_public, 'g11n_post_published_notification', 10, 2 );
 

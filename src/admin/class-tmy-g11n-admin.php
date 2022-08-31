@@ -162,7 +162,7 @@ class TMY_G11n_Admin {
                           	  array( $this,
                                          'tmy_support_manager_page') );
 	
-               	add_meta_box( 'trans_status', 
+               	add_meta_box( 'tmy_g11n_trans_status_box', 
 		                  'Translation Status', 
 		                  array( $this, 'tmy_translation_metabox_callback'), 
 		                  array('post','page','g11n_translation'),
@@ -172,11 +172,140 @@ class TMY_G11n_Admin {
 
 	}
 
+        public function _do_tmy_translation_status_box( $id ) {
+
+                $post_id = $id;
+                $post_type = get_post_type($post_id);
+                $post_status = get_post_status($post_id);
+               
+                $return_msg = '';
+
+	    	if (strcmp($post_type,"g11n_translation")===0) {
+
+                    $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
+                    $trans_info = $this->translator->get_translation_info($post_id);
+                    if (isset($trans_info[0])) {
+                        $original_id = $trans_info[0]->ID;
+                        $original_title = $trans_info[0]->post_title;
+                    }
+		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
+
+                    $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                         esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
+                       ' (ID:' . esc_attr($original_id) . ')</a>';
+             
+                    if (((strcmp($original_title,"blogname")===0)&&(strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0)) ||
+                        ((strcmp($original_title,"blogdescription")===0)&&(strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0)) ||
+                        ((strcmp(get_post_type($original_id),"post")===0)&&(strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0)) ||
+                        ((strcmp(get_post_type($original_id),"page")===0)&&(strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0))) {
+		        $return_msg .= ' Status: <button type="button" style="background-color:#C0C0C0;color:white;width:100px; height:25px;" >DISABLED</button> </b></br>';
+                    } else {
+                        if (strcmp($post_status,"publish")===0) {
+		            //echo ' Status: <button type="button" class="button button-secondary">LIVE</button> </b></br>';
+		            $return_msg .= ' Status: <button type="button" style="background-color:#4CAF50;color:white;width:50px; height:25px;" >LIVE</button> </b></br>';
+		        } else {
+		            $return_msg .= ' Status: <button type="button" style="background-color:#CD5C5C;color:white;width:100px; height:25px;" >Not LIVE</button></b></br>';
+	       	        }
+                    }
+                    $return_msg .= "</div>";
+
+                } elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
+
+                    $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
+                    //$return_msg .= '<table class="wp-list-table widefat fixed striped table-view-list pages">';
+                    $return_msg .= '<table class="wp-list-table striped table-view-list">';
+    		    $return_msg .= '<tr><td><b>Language</b></td> <td><b>Code</b></td> <td><b>Id</b></th> <td><b>Status</b></td></tr>';
+
+                    $all_langs = get_option('g11n_additional_lang');
+                    $default_lang = get_option('g11n_default_lang');
+                    unset($all_langs[$default_lang]);
+                    
+                    if (is_array($all_langs)) {
+                        foreach( $all_langs as $value => $code) {
+                            $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
+    		            //echo $code . ':' . $translation_id . '<br>'; 
+			    if (isset($translation_id)) {
+                                $translation_status = get_post_status($translation_id);
+                                //$return_msg .= esc_attr($value) . '-' . esc_attr($code) . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
+                                //     '">ID ' . esc_attr($translation_id) . '</a>, status: ' . esc_attr($translation_status) . '</br>';
+    		                $return_msg .= '<tr><td>' . esc_attr($value) . '</td>
+                                                    <td>' . esc_attr($code) . '</td>
+                                                    <td>' . '<a href="' . esc_url(get_edit_post_link($translation_id)) .'">'.esc_attr($translation_id). '</a></td>
+                                                    <td>' . esc_attr($translation_status) . '</td></tr>';
+                            } else {
+                                //$return_msg .= esc_attr($value) . '-' . esc_attr($code) . ' Not Started Yet </br>';
+    		                $return_msg .= '<tr><td>' . esc_attr($value) . '</td>
+                                                    <td>' . esc_attr($code) . '</td>
+                                                    <td> </td>
+                                                    <td> Not Started Yet</td></tr>';
+                            }
+
+                         }
+                    }
+                    $return_msg .= "</table>";
+
+                    $return_msg .= '<button type="button" aria-disabled="false" class="components-button editor-post-publish-button editor-post-publish-button__button is-primary" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . esc_attr($post_type) . '\')">Start or Sync Translation</button> Press to Start Translation Or Send To Translation Server';
+                    //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
+                    $return_msg .= '<br><br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
+                    $return_msg .= '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
+
+                    if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
+    		        $return_msg .= '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
+			    get_post_meta(get_the_ID(),'translation_push_status',true) . '</h5></div>';
+                    }
+                    $return_msg .= "</div>";
+                    
+                }
+                return $return_msg;
+
+        }
+
         public function tmy_translation_metabox_callback( $post ) {
 
 	    //echo 'hey: ' . $post->ID;
             ?>
                 <script>
+
+                   (function ($, window, document) {
+                      'use strict';
+                      // execute when the DOM is ready
+                      $(document).ready(function () {
+
+                          wp.data.subscribe(function () {
+                            var isSavingPost = wp.data.select('core/editor').isSavingPost();
+                            var isAutosavingPost = wp.data.select('core/editor').isAutosavingPost();
+
+                            if (isSavingPost && !isAutosavingPost) {
+                              // Here goes your AJAX code ......
+                                    console.log("all events");
+                                    var data = {
+                                            'action': 'tmy_get_post_translation_status',
+                                            'id': <?php echo $post->ID; ?>
+                                    };
+                                    $.ajax({
+                                        type:    "POST",
+                                        url:     ajaxurl,
+                                        data:    data,
+                                        success: function(response) {
+
+                                            var div = document.getElementById('tmy_translation_status_box_div');
+                                            div.innerHTML = response.slice(0, -1) ;
+
+                                            //alert('Server Reply: ' + response);
+                                        },
+                                        error:   function(jqXHR, textStatus, errorThrown ) {
+                                            alert("Error, status = " + jqXHR.status + ", " + "textStatus: " + textStatus + "ErrorThrown: " + errorThrown);
+                                        }
+                                    });
+                                    return;
+
+                          
+                            }
+                          })
+
+                    });
+                    }(jQuery, window, document));
+
                     function create_sync_translation(id, post_type) {
 
                         var r = confirm("This will create sync translation");
@@ -192,7 +321,11 @@ class TMY_G11n_Admin {
                                         url:     ajaxurl,
                                         data:    data,
                                         success: function(response) {
-                                            alert('Server Reply: ' + response);
+                                            var div = document.getElementById('tmy_translation_status_box_div');
+                                            var response_json = $.parseJSON(response);
+                                            div.innerHTML = response_json.div_status.slice(0, -1) ;
+                                            //window.location.reload();
+                                            alert('Server Reply: ' + response_json.message);
                                         },
                                         error:   function(jqXHR, textStatus, errorThrown ) {
                                             alert("Error, status = " + jqXHR.status + ", " + "textStatus: " + textStatus + "ErrorThrown: " + errorThrown);
@@ -205,75 +338,13 @@ class TMY_G11n_Admin {
                 </script>
                 <?php
 
-                $post_id = $post->ID;
-                $post_type = get_post_type($post_id);
-                $post_status = get_post_status($post_id);
+                //$post_id = $post->ID;
+                //$post_type = get_post_type($post_id);
+                //$post_status = get_post_status($post_id);
 
-	    	if (strcmp($post_type,"g11n_translation")===0) {
-
-                    echo '<div style="border:1px solid #A8A7A7;padding: 10px;">';
-                    $trans_info = $this->translator->get_translation_info($post_id);
-                    if (isset($trans_info[0])) {
-                        $original_id = $trans_info[0]->ID;
-                        $original_title = $trans_info[0]->post_title;
-                    }
-		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
-
-                    echo '<b>This is the ' . $trans_lang . ' translation page of <a href="' . 
-                         esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
-                       ' (ID:' . $original_id . ')</a>';
-             
-                    if (((strcmp($original_title,"blogname")===0)&&(strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0)) ||
-                        ((strcmp($original_title,"blogdescription")===0)&&(strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0)) ||
-                        ((strcmp(get_post_type($original_id),"post")===0)&&(strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0)) ||
-                        ((strcmp(get_post_type($original_id),"page")===0)&&(strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0))) {
-		        echo ' Status: <button type="button" style="background-color:#C0C0C0;color:white;width:100px; height:25px;" >DISABLED</button> </b></br>';
-                    } else {
-                        if (strcmp($post_status,"publish")===0) {
-		            //echo ' Status: <button type="button" class="button button-secondary">LIVE</button> </b></br>';
-		            echo ' Status: <button type="button" style="background-color:#4CAF50;color:white;width:50px; height:25px;" >LIVE</button> </b></br>';
-		        } else {
-		            echo ' Status: <button type="button" style="background-color:#CD5C5C;color:white;width:100px; height:25px;" >Not LIVE</button></b></br>';
-	       	        }
-                    }
-                    echo "</div>";
-
-                } elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
-
-                    echo '<div style="border:1px solid #A8A7A7;padding: 10px;">';
-    		    echo '<b>Translation Satus:</b><br><br>'; 
-
-                    $all_langs = get_option('g11n_additional_lang');
-                    $default_lang = get_option('g11n_default_lang');
-                    unset($all_langs[$default_lang]);
-                    
-                    if (is_array($all_langs)) {
-                        foreach( $all_langs as $value => $code) {
-                            $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
-    		            //echo $code . ':' . $translation_id . '<br>'; 
-			    if (isset($translation_id)) {
-                                $translation_status = get_post_status($translation_id);
-                                echo $value . '-' . $code . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
-                                     '">ID ' . $translation_id . '</a>, status: ' . $translation_status . '</br>';
-                            } else {
-                                echo $value . '-' . $code . ' Not Started Yet </br>';
-                            }
-
-                         }
-                    }
-
-                    echo '<br>Click <button type="button" onclick="create_sync_translation(' . $post_id . ', \'' . $post_type . '\')">Start or Sync Translation</button> to send this page to translation server';
-                    //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
-                    echo '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
-                    echo '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
-
-                    if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
-    		        echo '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
-			    get_post_meta(get_the_ID(),'translation_push_status',true) . '</h5></div>';
-                    }
-                    echo "</div>";
-                    
-                }
+                echo '<div id="tmy_translation_status_box_div">';
+                echo $this->_do_tmy_translation_status_box($post->ID);
+                echo '</div>';
 	
         }
 
@@ -313,8 +384,8 @@ class TMY_G11n_Admin {
           	}
 
           	foreach ($complete_lang_list as $lang => $code) :
-               		echo '<option value="' . $lang . '" ' . 
-                             selected($sys_default_lang, $lang) . ' >' . 
+               		echo '<option value="' . esc_attr($lang) . '" ' . 
+                             selected(esc_attr($sys_default_lang), esc_attr($lang)) . ' >' . 
                              $lang . '</option>';
           	endforeach;
 		
@@ -343,7 +414,7 @@ class TMY_G11n_Admin {
 
 		if (is_array($all_configed_langs)) {
 		    foreach( $all_configed_langs as $value => $code) {
-		        echo $value. '('.$code.') <input type="checkbox" name="g11n_additional_lang['.$value.']" value="'.$code.'" checked/><br>';
+		        echo esc_attr($value). '('.esc_attr($code).') <input type="checkbox" name="g11n_additional_lang['.$value.']" value="'.esc_attr($code).'" checked/><br>';
 		    }
 		}
 		
@@ -356,7 +427,7 @@ class TMY_G11n_Admin {
 		<?php
         
           	foreach ($complete_lang_list as $lang => $code) :
-               		echo '<option value="'.$code.'">'.$lang.'</option>';
+               		echo '<option value="'.esc_attr($code).'">'.esc_attr($lang).'</option>';
           	endforeach;
        
 
@@ -460,10 +531,10 @@ class TMY_G11n_Admin {
         	<tr valign="top">
         	<th scope="row">Language Switcher Location</th>
         	<td>
-            	<input type="checkbox" id="g11n_switcher_title" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Title <br>
-            	<input type="checkbox" id="g11n_switcher_tagline" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Tagline <br>
-            	<input type="checkbox" id="g11n_switcher_post" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> <?php echo $config_selected_disable; ?>/> In Each Post <br>
-            	<input type="checkbox" id="g11n_switcher_sidebar" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?><?php echo $config_selected_disable; ?> /> Top of Sidebar <br>
+            	<input type="checkbox" id="g11n_switcher_title" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Title <br>
+            	<input type="checkbox" id="g11n_switcher_tagline" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Tagline <br>
+            	<input type="checkbox" id="g11n_switcher_post" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Each Post <br>
+            	<input type="checkbox" id="g11n_switcher_sidebar" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?><?php echo esc_attr($config_selected_disable); ?> /> Top of Sidebar <br>
             	<input type="checkbox" id="g11n_switcher_floating" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
                 Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
  	    	</td>
@@ -472,23 +543,23 @@ class TMY_G11n_Admin {
 
 	        <tr valign="top">
 	        <th scope="row">Get Visitor Language Preference From</th>
-	        <td>Cookie <input type="checkbox" id="g11n_site_lang_cookie" name="g11n_site_lang_cookie" value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_cookie')), "Yes"); echo $config_disable; ?> /><br>
+	        <td>Cookie <input type="checkbox" id="g11n_site_lang_cookie" name="g11n_site_lang_cookie" value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_cookie')), "Yes"); echo esc_attr($config_disable); ?> /><br>
             		Browser Language Preference <input type="checkbox" id="g11n_site_lang_browser" name="g11n_site_lang_browser" 
-                                                           value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_browser')), "Yes"); echo $config_disable; ?> />
+                                                           value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_browser')), "Yes"); echo esc_attr($config_disable); ?> />
         	</td>
         	</tr>
 
         	<tr valign="top">
         	<th scope="row">Translation Server(Optional)</th>
-        	<td>URL <input type="text" id="g11n_server_url" name="g11n_server_url" value="<?php echo esc_attr( get_option('g11n_server_url') ); ?>" <?php echo $config_disable; ?> /><br>
-            	User <input type="text" id="g11n_server_user" name="g11n_server_user" value="<?php echo esc_attr( get_option('g11n_server_user') ); ?>" <?php echo $config_disable; ?> />
-            	Token <input type="text" id="g11n_server_token" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" <?php echo $config_disable; ?> /> <br>
-            	Project Name <input type="text" id="g11n_server_project" name="g11n_server_project" value="<?php echo esc_attr( get_option('g11n_server_project') ); ?>" <?php echo $config_disable; ?>  />
+        	<td>URL <input type="text" id="g11n_server_url" name="g11n_server_url" value="<?php echo esc_attr( get_option('g11n_server_url') ); ?>" <?php echo esc_attr($config_disable); ?> /><br>
+            	User <input type="text" id="g11n_server_user" name="g11n_server_user" value="<?php echo esc_attr( get_option('g11n_server_user') ); ?>" <?php echo esc_attr($config_disable); ?> />
+            	Token <input type="text" id="g11n_server_token" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" <?php echo esc_attr($config_disable); ?> /> <br>
+            	Project Name <input type="text" id="g11n_server_project" name="g11n_server_project" value="<?php echo esc_attr( get_option('g11n_server_project') ); ?>" <?php echo esc_attr($config_disable); ?>  />
             	<!-- <button onclick="g11ncreateproject('project')">Create Project on Translation Server</button> -->
                 <!-- <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"> -->
-            	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" <?php echo $config_disable; ?>  />
-                <input type="button" id="g11n_create_project_button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')" <?php echo $config_disable; ?> ><br>
-            	Trunk Size <input type="text" id="g11n_server_trunksize" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" <?php echo $config_disable; ?>  />
+            	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" <?php echo esc_attr($config_disable); ?>  />
+                <input type="button" id="g11n_create_project_button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')" <?php echo esc_attr($config_disable); ?> ><br>
+            	Trunk Size <input type="text" id="g11n_server_trunksize" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" <?php echo esc_attr($config_disable); ?>  />
         	</td>
 
 		<script>
@@ -537,11 +608,11 @@ class TMY_G11n_Admin {
         	<th scope="row">Enable Translation On</th>
         	<td>
             	<br>
-            	<input type="checkbox" id="g11n_l10n_props_blogname" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); echo $config_disable; ?> /> 
+            	<input type="checkbox" id="g11n_l10n_props_blogname" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); echo esc_attr($config_disable); ?> /> 
                                                                                                             Site Title/Blog Name <br>
-            	<input type="checkbox" id="g11n_l10n_props_desc" name="g11n_l10n_props_desc" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_desc')), "Yes" ); echo $config_disable; ?> /> Tagline<br>
-            	<input type="checkbox" id="g11n_l10n_props_posts" name="g11n_l10n_props_posts" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_posts')), "Yes" ); echo $config_disable; ?> /> Posts<br>
-            	<input type="checkbox" id="g11n_l10n_props_pages" name="g11n_l10n_props_pages" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_pages')), "Yes" ); echo $config_disable; ?> /> Pages 
+            	<input type="checkbox" id="g11n_l10n_props_desc" name="g11n_l10n_props_desc" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_desc')), "Yes" ); echo esc_attr($config_disable); ?> /> Tagline<br>
+            	<input type="checkbox" id="g11n_l10n_props_posts" name="g11n_l10n_props_posts" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_posts')), "Yes" ); echo esc_attr($config_disable); ?> /> Posts<br>
+            	<input type="checkbox" id="g11n_l10n_props_pages" name="g11n_l10n_props_pages" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_pages')), "Yes" ); echo esc_attr($config_disable); ?> /> Pages 
         	</td>
         	</tr>             
 
@@ -680,16 +751,16 @@ class TMY_G11n_Admin {
                 }
                 foreach ( $row_arr as $row ) {
                     $id_link = 'post.php?post=' . $row["ID"] . '&action=edit';
-                    $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . $row["ID"] . '</a>';
+                    $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($row["ID"]) . '</a>';
         
-                    $tid_link = 'post.php?post=' . $row["TID"] . '&action=edit';
+                    $tid_link = 'post.php?post=' . esc_attr($row["TID"]) . '&action=edit';
                     $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . $row["TID"] . '</a>';
                     //if (isset($post_info[0])) {
                         echo             '<tr><td>' . $tid_hyper . '</td><td>' .
                                                          $id_hyper . '</td><td>' .
-                                                         $row["post_title"] . '</td><td>' .
-                                                         $row["meta_value"] . '</td><td>' .
-                                                         $row["post_modified"] . '</td></tr>';
+                                                         esc_attr($row["post_title"]) . '</td><td>' .
+                                                         esc_attr($row["meta_value"]) . '</td><td>' .
+                                                         esc_attr($row["post_modified"]) . '</td></tr>';
                         if ( WP_TMY_G11N_DEBUG ) {
                             error_log("In tmy_l10n_manager_page trans post:" . $row["post_title"]);
                         }
@@ -772,8 +843,9 @@ class TMY_G11n_Admin {
     		$g11n_sys_info .= "*** home_path: " . var_export(get_home_path(),true) . "\n";
 
         	//$home_trans_list = get_available_languages(get_home_path() . "wp-content/languages");
-        	$home_trans_list = scandir(get_home_path() . "wp-content/languages");
-        	$g11n_sys_info .= "Translation in wp-content/languages: \n";
+        	//$home_trans_list = scandir(get_home_path() . "wp-content/languages");
+        	$home_trans_list = scandir(WP_CONTENT_DIR . "/languages");
+        	$g11n_sys_info .= "Translation in " . WP_CONTENT_DIR . "/languages: \n";
         	$g11n_sys_info .= var_export($home_trans_list,true) . "\n";
 
     		$g11n_sys_info .= "*** theme_roots: " . var_export(get_theme_roots(),true) . "\n";
@@ -904,7 +976,7 @@ class TMY_G11n_Admin {
                                                name="g11_sys_info_box" 	id="g11n_sys_info_box_id">';
 		<?php
 
-  		echo $g11n_sys_info;
+  		echo esc_attr($g11n_sys_info);
                 ?>
 
 		</textarea>
@@ -936,10 +1008,10 @@ class TMY_G11n_Admin {
 		<br><br><br>
 		<?php
 
-    		echo "There are ".$no_g11n_config[0]->count." config entries, ".
+    		echo esc_attr("There are ".$no_g11n_config[0]->count." config entries, ".
                       $no_g11n_trans[0]->count." translations, ".
                       $no_g11n_metas[0]->count." meta data entries in system.".
-                      "click clear button to clear configuration and translations.";
+                      "click clear button to clear configuration and translations.");
 
 		?>
 		<button onclick="g11ncleardata()">Clear Data</button>
@@ -948,10 +1020,14 @@ class TMY_G11n_Admin {
 	
         }
 
+	public function tmy_get_post_translation_status() {
+            echo $this->_do_tmy_translation_status_box($_POST['id']);
+            echo "  ";
+        }
 	public function tmy_create_sync_translation() {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_create_sync_translation,id:".$_POST['id'].",type:".$_POST['post_type']);
+                error_log("In tmy_create_sync_translation,id:".intval($_POST['id']).",type:".sanitize_text_field($_POST['post_type']));
             }
 
             $message = "Number of translation entries created: ";
@@ -961,13 +1037,13 @@ class TMY_G11n_Admin {
             unset($all_langs[$default_lang]);
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_create_sync_translation,title:".get_post_field('post_title', $_POST['id']));
-                error_log("In tmy_create_sync_translation,type:".get_post_field('post_type', $_POST['id']));
+                error_log("In tmy_create_sync_translation,title:".get_post_field('post_title', intval($_POST['id'])));
+                error_log("In tmy_create_sync_translation,type:".get_post_field('post_type', intval($_POST['id'])));
             }
 
-             if (strcmp($_POST['post_type'], "g11n_translation") !== 0) {
+             if (strcmp(sanitize_text_field($_POST['post_type']), "g11n_translation") !== 0) {
 
-                 if (strcmp($_POST['post_type'], "product") !== 0) {
+                 if (strcmp(sanitize_text_field($_POST['post_type']), "product") !== 0) {
                     
                      if ( WP_TMY_G11N_DEBUG ) { error_log("In tmy_create_sync_translation langs,".json_encode($all_langs));};
 
@@ -977,7 +1053,7 @@ class TMY_G11n_Admin {
                      if (is_array($all_langs)) {
                          $num_langs = count($all_langs);
                          foreach( $all_langs as $value => $code) {
-                             $translation_id = $this->translator->get_translation_id($_POST['id'],$code,$_POST['post_type']);
+                             $translation_id = $this->translator->get_translation_id(intval($_POST['id']),$code,sanitize_text_field($_POST['post_type']));
                              if ( WP_TMY_G11N_DEBUG ) { 
                                  error_log("In tmy_create_sync_translation, translation_id = " . $translation_id);
                              }
@@ -985,15 +1061,15 @@ class TMY_G11n_Admin {
                                  $num_success_entries += 1;
                                  //$message .= " $value($code)";
                                  //error_log("in create_sync_translation, no translation_id");
-                                 $translation_title = get_post_field('post_title', $_POST['id']);
-                                 $translation_contents = get_post_field('post_content', $_POST['id']);
+                                 $translation_title = get_post_field('post_title', intval($_POST['id']));
+                                 $translation_contents = get_post_field('post_content', intval($_POST['id']));
                                  $g11n_translation_post = array(
                                        'post_title'    => $translation_title,
                                        'post_content'  => $translation_contents,
                                        'post_type'  => "g11n_translation"
                                  );
                                  $new_translation_id = wp_insert_post( $g11n_translation_post );
-                                 add_post_meta( $new_translation_id, 'orig_post_id', $_POST['id'], true );
+                                 add_post_meta( $new_translation_id, 'orig_post_id', intval($_POST['id']), true );
                                  add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
                              }
                              if ( WP_TMY_G11N_DEBUG ) { 
@@ -1010,16 +1086,16 @@ class TMY_G11n_Admin {
                          (strcmp('', get_option('g11n_server_token','')) !== 0) &&
                          (strcmp('', get_option('g11n_server_url','')) !== 0)) {
 
-                         $content_title = get_post_field('post_title', $_POST['id']);
-                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $_POST['id']),-1, PREG_SPLIT_DELIM_CAPTURE);
+                         $content_title = get_post_field('post_title', intval($_POST['id']));
+                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', intval($_POST['id'])),-1, PREG_SPLIT_DELIM_CAPTURE);
                          $contents_array = array();
 
-                         if (strcmp(get_post_field('post_title', $_POST['id']),'blogname') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . $_POST['id'];
-                         } elseif (strcmp(get_post_field('post_title', $_POST['id']),'blogdescription') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . $_POST['id'];
+                         if (strcmp(get_post_field('post_title', intval($_POST['id'])),'blogname') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . intval($_POST['id']);
+                         } elseif (strcmp(get_post_field('post_title', intval($_POST['id'])),'blogdescription') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . intval($_POST['id']);
                          } else {
-                             $json_file_name = "WordpressG11nAret-" . $_POST['post_type'] . "-" . $_POST['id'];
+                             $json_file_name = "WordpressG11nAret-" . sanitize_text_field($_POST['post_type']) . "-" . intval($_POST['id']);
                              array_push($contents_array, $content_title);
                          }
 
@@ -1045,7 +1121,11 @@ class TMY_G11n_Admin {
                  }
              }
 
-             echo $message;
+             $return_msg = json_encode(array("message" => esc_attr($message),
+                                             "div_status" => $this->_do_tmy_translation_status_box($_POST['id'])
+                                      ));
+             //echo esc_attr($message);
+             echo $return_msg . "  ";
 
 	     wp_die();
         }
@@ -1075,18 +1155,23 @@ class TMY_G11n_Admin {
 	        error_log("REST URL" . $rest_url);
 	        error_log("REST PALOAD" . $payload);
 
-  	        curl_setopt($ch, CURLOPT_URL, $rest_url);
-	        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-		    'X-Auth-User: ' . get_option('g11n_server_user'),
-		    'X-Auth-Token: ' . get_option('g11n_server_token'),
-		    'Content-Type: application/json'
-		    ));
-	        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-	        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-	        curl_exec($ch);
-	        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $args = array(
+                    'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                       'X-Auth-Token' => get_option('g11n_server_token'),
+                                       'Content-Type' => 'application/json'),
+                    'method' => 'PUT',
+                    'body' => $payload,
+                    'timeout' => 10
+                );
+                $response = wp_remote_post( $rest_url, $args );
 
+                if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                    $output = $response['body'];
+                    $payload = json_decode($output);
+                } else {
+                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                }
+	        $http_code = wp_remote_retrieve_response_code( $response );
 	        $http_code_msg = array(
 		    200 => 'Already exists, read for use',
 		    201 => 'Created',
@@ -1111,18 +1196,24 @@ class TMY_G11n_Admin {
 			     "privateProject" => 0
 			    ));
 
-                curl_reset($ch);
-                curl_setopt($ch, CURLOPT_URL, $rest_url);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                    'X-Auth-User: ' . get_option('g11n_server_user'),
-                    'X-Auth-Token: ' . get_option('g11n_server_token'),
-                    'Content-Type: application/json'
-                    ));
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-                curl_exec($ch);
-                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                /*******************************************************************/
+                $args = array(
+                    'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                       'X-Auth-Token' => get_option('g11n_server_token'),
+                                       'Content-Type' => 'application/json'),
+                    'method' => 'PUT',
+                    'body' => $payload,
+                    'timeout' => 10
+                );
+                $response = wp_remote_post( $rest_url, $args );
+
+                if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                    $output = $response['body'];
+                    $payload = json_decode($output);
+                } else {
+                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                }
+	        $http_code = wp_remote_retrieve_response_code( $response );
 
                 $ret_msg .= "; " . $version_num . ": " . $http_code_msg[$http_code] . " (" . $http_code . ")";
 
@@ -1138,18 +1229,26 @@ class TMY_G11n_Admin {
 		error_log("create project optional lang list: " . json_encode($lang_list));
 
 		$rest_url = "https://tmysoft.com/api/project/" . $project_name . "/version/" . $version_num . "/locales";
-                curl_setopt($ch, CURLOPT_URL, $rest_url);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                        'X-Auth-User: ' . get_option('g11n_server_user'),
-                        'X-Auth-Token: ' . get_option('g11n_server_token'),
-                        'Content-Type: application/json'
-                        ));
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(array("data" => $lang_list)));
 
-                curl_exec($ch);
-                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                /*******************************************************************/
+                $args = array(
+                    'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
+                                       'X-Auth-Token' => get_option('g11n_server_token'),
+                                       'Content-Type' => 'application/json'),
+                    'method' => 'PUT',
+                    'body' => json_encode(array("data" => $lang_list)),
+                    'timeout' => 10
+                );
+                $response = wp_remote_post( $rest_url, $args );
+
+                if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+                    $output = $response['body'];
+                    $payload = json_decode($output);
+                } else {
+                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                }
+	        $http_code = wp_remote_retrieve_response_code( $response );
+
                 if ($http_code === 200) {
                     $ret_msg .= "; Language Setting Updated";
                 } else {
@@ -1162,15 +1261,15 @@ class TMY_G11n_Admin {
 	public function tmy_g11n_create_server_project() {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_g11n_create_server_project ".json_encode($_POST));
+                error_log("In tmy_g11n_create_server_project ".json_encode(sanitize_post($_POST)));
             }
 
-	    if (strcmp($_POST['action_type'],"project")!==0) {
+	    if (strcmp(sanitize_text_field($_POST['action_type']),"project")!==0) {
                 echo "Wrong Action";
  	        wp_die();
             }
 
-	    if ((strcmp(rtrim($_POST['proj_name']),"")===0) || (strcmp(rtrim($_POST['proj_ver']),"")===0)) {
+	    if ((strcmp(rtrim(sanitize_text_field($_POST['proj_name'])),"")===0) || (strcmp(rtrim(sanitize_text_field($_POST['proj_ver'])),"")===0)) {
                 echo "Please enter both project name and version";
             } else {
 
@@ -1183,10 +1282,10 @@ class TMY_G11n_Admin {
                 }
 		error_log("create project optional lang list: " . json_encode($selected_langs));
 
-	        $return_msg = $this->_tmy_g11n_create_server_project(rtrim($_POST['proj_name']),
-                                                       rtrim($_POST['proj_ver']),
+	        $return_msg = $this->_tmy_g11n_create_server_project(rtrim(sanitize_text_field($_POST['proj_name'])),
+                                                       rtrim(sanitize_text_field($_POST['proj_ver'])),
                                                        $selected_langs);
-                echo $return_msg;
+                echo esc_attr($return_msg);
             }
 
  	    wp_die();
@@ -1534,7 +1633,7 @@ class TMY_G11n_Admin {
 	public function tmy_g11n_clear_plugin_data() {
 
 		global $wpdb; 
-		$whatever = intval( $_POST['whatever'] );
+		$whatever = sanitize_text_field( $_POST['whatever'] );
 		if ($whatever == 8888) {
 
 		    $no_g11n_config = $wpdb->get_results( 'delete from '.$wpdb->prefix.'options where option_name like "g11n%"');
@@ -1556,7 +1655,7 @@ class TMY_G11n_Admin {
 	public function tmy_plugin_option_update($value, $option, $old_value) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("tmy_plugin_option_update:" . $value . " " . $option . " ".$old_value );
+                error_log("tmy_plugin_option_update:" . json_encode($value) . " " . json_encode($option) . " ".json_encode($old_value) );
             } 
 
             if (((strcmp($option, "g11n_additional_lang")===0) && ($value != $old_value)) ||
