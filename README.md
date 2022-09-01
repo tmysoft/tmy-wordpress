@@ -40,7 +40,7 @@ Or, search the "TMY plugin", install and activate it.
 
 ## Configure TMY Plugin for Live Translation workflow
 
-From the Wordpress dashboard side menu, Settings -> TMY setup:
+From the Wordpress dashboard side menu, TMY Globalization -> TMY setup:
 
 <kbd><img src="doc/tmy-live-config.png" width="500"/></kbd>
 

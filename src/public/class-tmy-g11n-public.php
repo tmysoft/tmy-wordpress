@@ -230,6 +230,9 @@ public function g11n_add_floating_menu() {
 
 
 	public function g11n_push_status_div() {
+        /***********************************************/
+        /* action for edit_form_after_editor obsoleted */
+        /***********************************************/
 
                 ?>
                 <script>
@@ -312,8 +315,8 @@ public function g11n_add_floating_menu() {
 
                     echo '<br>Click <button type="button" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . esc_attr($post_type) . '\')">Start or Sync Translation</button> to send this page to translation server';
                     //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
-                    echo '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
-                    echo '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
+                    echo '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">TMY Translations</a> page for all translations';
+                    echo '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/admin.php?page=tmy-g11n-dashboard-menu' . '">TMY Dashboard</a> for translation summary<br>';
 
                     if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
     		        echo '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
@@ -433,10 +436,15 @@ public function g11n_add_floating_menu() {
 		register_post_type( 'g11n_translation',
 		    array(
 		      'labels' => array(
-			'name' => __( 'G11n Plugin Translations' ),
+			'name' => __( 'TMY Translations' ),
 			'singular_name' => __( 'G11n Plugin Translation' )
 		      ),
 		      'public' => true,
+		      'show_ui' => true,
+		      'show_in_menu' => 'tmy-g11n-main-menu',
+		      'menu_position' => '3',
+		      //'show_in_menu' => 'admin.php?page=tmy-g11n-setup-menu',
+		      //'show_in_menu' => 'edit.php?post_type=g11n_translation',
                       'show_in_rest' => true,
 		      'has_archive' => true,
 		    )

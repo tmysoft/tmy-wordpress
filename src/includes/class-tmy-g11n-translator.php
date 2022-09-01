@@ -432,7 +432,7 @@ class TMY_G11n_Translator {
 
                 } else {
 
-		    $language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
+		    $language_switcher_html = '<center><span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
 		    //$language_switcher_html = '<div style="border:1px solid;border-radius:5px;">';
 		    foreach( $language_options as $value => $code) {
 		    //<img src="./flags/24/CN.png" alt="CN">
@@ -463,7 +463,7 @@ class TMY_G11n_Translator {
 				                   $href_text.'</a>';
 		        }
                     }
-		    $language_switcher_html .= "</span>";
+		    $language_switcher_html .= "</span></center>";
 		    return $language_switcher_html;
 		}
 

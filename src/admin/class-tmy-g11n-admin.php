@@ -141,26 +141,43 @@ class TMY_G11n_Admin {
 
 	public function tmy_plugin_register_admin_menu() {
 
-		add_options_page( 'TMY Setup', 
+
+                $tmy_logo_svg = file_get_contents( plugin_dir_path( __FILE__ ) . 'include/tmy.svg', false);
+                $tmy_menu_icon = 'data:image/svg+xml;base64,' . base64_encode( $tmy_logo_svg );
+
+                add_menu_page('TMY Globalization',
+                              'TMY Globalization',
+                              'manage_options',
+                              'tmy-g11n-main-menu',
+                              false,
+                              $tmy_menu_icon);
+
+		add_submenu_page( 'tmy-g11n-main-menu',
+                                  'TMY Setup', 
                           	  'TMY Setup', 
                             	  'manage_options', 
-                          	  'my-unique-identifier', 
+                          	  'tmy-g11n-setup-menu', 
                           	  array( $this,
-                                         'tmy_admin_options_page') );
+                                         'tmy_admin_options_page'),
+                                  1 );
 
-        	add_options_page( 'TMY Dashboard',
+        	add_submenu_page( 'tmy-g11n-main-menu',
+                                  'TMY Dashboard',
                           	  'TMY Dashboard',
                           	  'manage_options',
-                          	  'tmy-l10n-manager',
+                          	  'tmy-g11n-dashboard-menu',
                           	  array( $this,
                                          'tmy_l10n_manager_page') );
 	
-        	add_options_page( 'TMY Diagnosis',
+        	add_submenu_page( 'tmy-g11n-main-menu',
+                                  'TMY Diagnosis',
                           	  'TMY Diagnosis',
                           	  'manage_options',
                           	  'tmy-support-manager',
                           	  array( $this,
                                          'tmy_support_manager_page') );
+
+                remove_submenu_page( 'tmy-g11n-main-menu', 'tmy-g11n-main-menu' );
 	
                	add_meta_box( 'tmy_g11n_trans_status_box', 
 		                  'Translation Status', 
@@ -246,8 +263,8 @@ class TMY_G11n_Admin {
 
                     $return_msg .= '<button type="button" aria-disabled="false" class="components-button editor-post-publish-button editor-post-publish-button__button is-primary" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . esc_attr($post_type) . '\')">Start or Sync Translation</button> Press to Start Translation Or Send To Translation Server';
                     //echo '<br><input type="button" value="Start or Sync Translation" onclick="start_sync_translation('project')"><br>';
-                    $return_msg .= '<br><br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">G11n Translation Page</a> for all translations';
-                    $return_msg .= '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/options-general.php?page=tmy-l10n-manager' . '">TMY Dashboard</a> for translation summary<br>';
+                    $return_msg .= '<br><br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">TMY Translations</a> for all translations';
+                    $return_msg .= '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/admin.php?page=tmy-g11n-dashboard-menu' . '">TMY Dashboard</a> for translation summary<br>';
 
                     if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
     		        $return_msg .= '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
@@ -361,7 +378,7 @@ class TMY_G11n_Admin {
 
 		?>		
 
-		<div class="wrap"> <h1>Globalization Options</h1>
+		<div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Options</h1>
 		<form method="post" action="options.php">
 		
 		<?php
@@ -702,7 +719,7 @@ class TMY_G11n_Admin {
                         });
                     }
                     </script>
-
+                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Dashboard</h1>
 		<h2>Translation Status:</h2>
                 <button type="button" onclick="G11nGetLocalTranslationStatus()">Refresh Translation Status</button>
 		<div class="wrap">
@@ -795,7 +812,7 @@ class TMY_G11n_Admin {
 
 		?>
 		<div class="wrap">
-		<h1>G11n Plugin Diagnosis</h1>
+                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Diagnosis</h1>
 		<h3>
 		This Diagnosis tool is providing advanced system information of how your site is running, it is 			  
 		colloecking following information: Base system(phpinfo), G11n Plugin, Default theme and some system 			  
