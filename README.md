@@ -36,7 +36,11 @@ TMY Plugin provides multiple ways to handle different development phases of the 
 
 Download the plugin zip file from https://github.com/tmysoft/tmy-wordpress/releases, e.g. tmy-globalization-1.0.0.zip 
 
-Or, search the "TMY plugin", install and activate it.
+Or, search the "TMY Globalization", install it, after successful installation, TMY Globalizaition main menu should appear in the Wordpress Dashboard as following:
+
+<kbd><img src="doc/tmy-after-install.png" width="600"/></kbd>
+
+Then, activate it.
 
 ## Configure TMY Plugin for Live Translation workflow
 
@@ -56,7 +60,7 @@ Visting your website, switching between languages to see how your website is bei
 
 ## Configure TMY Plugin for Full Professional Translation workflow
 
-From the Wordpress dashboard side menu, Settings -> TMY setup:
+From the Wordpress dashboard side menu, TMY Globalization -> TMY setup:
 
 <kbd><img src="doc/tmy-setup.png" width="500"/></kbd>
 
@@ -88,7 +92,7 @@ Site title is also called blogname at some places, similarly, tage line is often
 
 <kbd><img src="doc/tmy-blogname-setup.png" width="350"/></kbd>
 
-To start translating them, enable the translation to them from Setting -> TMY Setup:
+To start translating them, enable the translation to them from TMY Globalization -> TMY Setup:
 
 <kbd><img src="doc/tmy-blogname-enable.png" width="350"/></kbd>
 
@@ -100,7 +104,7 @@ Following the same way to translate the page or post to complete the translation
 
 ## Configure the language swither location 
 
-The language switcher could be placed at multiple places, in Settings -> TMY Setup, you can put it in:
+The language switcher could be placed at multiple places, in TMY Globalization -> TMY Setup, you can put it in:
 
 1. In Title
 2. In Tagline
@@ -112,9 +116,19 @@ Here is the illustration:
 
 <kbd><img src="doc/tmy-lang-switcher.png" width="800"/></kbd>
 
-## Using TMY Dashboard
+## Using "TMY Translatiaon" & "TMY Dashboard"
 
-The plugin also provides a dashboard for your convenience to show the translation work in a nice summary:
+"TMY Translation" page lists all the local translations, it lists:
+- Title
+- ID, the post id of the translation 
+- Lanaguge
+- Original ID, the post id of the original post/pages
+- Translation Status, is the translation live viewable publicly
+- Date, Last modified time
+
+<kbd><img src="doc/tmy-trans.png" width="600"/></kbd>
+
+"TMY Dashboard" provides a similar information along with others:
 
 <kbd><img src="doc/tmy-dashboard-free.png" width="600"/></kbd>
 
