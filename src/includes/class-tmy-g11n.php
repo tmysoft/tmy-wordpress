@@ -175,10 +175,16 @@ class TMY_G11n {
 		$this->loader->add_filter( 'views_edit-post', $plugin_admin, 'g11n_edit_posts_views' );
                 $this->loader->add_filter( 'pre_update_option', $plugin_admin,'tmy_plugin_option_update', 10, 3 );
 
-		//$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_description', 10, 2 );
-		//$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_blogname', 10, 2 );
+		$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		$this->loader->add_filter( 'update_option_g11n_l10n_props_posts', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		$this->loader->add_filter( 'update_option_g11n_l10n_props_pages', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
 
-
+                $this->loader->add_filter( 'manage_g11n_translation_posts_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_columns');
+                $this->loader->add_filter( 'manage_edit-g11n_translation_sortable_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_sortable');
+                $this->loader->add_action( 'manage_g11n_translation_posts_custom_column', $plugin_admin,'tmy_plugin_g11n_translation_set_columns_value',10,2);
+                $this->loader->add_action( 'pre_get_posts', $plugin_admin,'tmy_plugin_g11n_translation_set_columns_orderby');
+                //$this->loader->add_action( 'edit_form_top', $plugin_admin,'tmy_plugin_g11n_edit_form_top');
 	}
 
 	/**
@@ -203,7 +209,7 @@ class TMY_G11n {
 
 		$this->loader->add_action( 'publish_post', $plugin_public, 'g11n_post_published_notification', 10, 2 );
 		$this->loader->add_action( 'publish_page', $plugin_public, 'g11n_post_published_notification', 10, 2 );
-		$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
+		//$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
 
 		$this->loader->add_action( 'publish_product', $plugin_public, 'g11n_post_published_notification', 10, 2 );
 

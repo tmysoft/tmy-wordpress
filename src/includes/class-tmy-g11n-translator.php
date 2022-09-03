@@ -375,8 +375,16 @@ class TMY_G11n_Translator {
 	}
 
 
-	public function get_language_switcher() {
-	
+	public function get_language_switcher($position = 'default') {
+
+                // position possible values: 'widget' 'floating' 'sidebar' 'content' 'description' 'blogname'
+                // 
+           
+                if (strcmp(get_option('g11n_using_google_tookit','No'),'Yes' )===0) {
+                    if (strcmp($position,'floating' )!==0) {
+                        return '';
+                    }
+                }	
                 include 'lang2googlelan.php';
 		//$current_url = home_url();
 		//$current_url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
@@ -400,7 +408,7 @@ class TMY_G11n_Translator {
                         $google_lang_list .= $lang2googlelan[$code] . ",";                
                     }
                     $google_lang_list = rtrim($google_lang_list, ",");
-                    error_log("google_lang_list: " . json_encode($google_lang_list));                
+                    //error_log("google_lang_list: " . json_encode($google_lang_list));                
 
 		    $language_switcher_html = '<script type="text/javascript">
                         function googleTranslateElementInit() {

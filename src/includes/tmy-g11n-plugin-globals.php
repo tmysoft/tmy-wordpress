@@ -12,12 +12,14 @@
 
 function tmy_g11n_lang_sanitize( $lang ) {
 
-    $all_langs = get_option('g11n_additional_lang');
-    $default_lang = get_option('g11n_default_lang');
-    if (array_key_exists($lang, $all_langs)) {
-        return $lang;
-    } else {
-        error_log("Warning tmy_g11n_language_escape, invalid:" . $lang . " reset to: " . $default_lang);
-        return $default_lang;
+    if (strcmp($lang,'')!==0) {
+        $all_langs = get_option('g11n_additional_lang');
+        $default_lang = get_option('g11n_default_lang');
+        if (array_key_exists($lang, $all_langs)) {
+            return $lang;
+        } else {
+            error_log("Warning tmy_g11n_language_escape, invalid:" . $lang . " reset to: " . $default_lang);
+            return $default_lang;
+        }
     }
 }

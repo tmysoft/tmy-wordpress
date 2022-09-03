@@ -13,13 +13,13 @@ class G11n_Language_Widget extends WP_Widget {
                 }
 
     public function widget( $args, $instance ) {
-                    $switcher =  $this->translator->get_language_switcher();
+                    $switcher =  $this->translator->get_language_switcher('widget');
                     echo $switcher;
                     //echo $args['before_widget'], wpautop( $instance['text'] ), $args['after_widget'];
                 }
 
     public function form( $instance ) {
-                    $switcher =  $this->translator->get_language_switcher();
+                    $switcher =  $this->translator->get_language_switcher('widget');
                     $text = $switcher;
 
                     //printf('<textarea class="widefat" rows="7" cols="20" id="%1$s" name="%2$s">%3$s</textarea>',

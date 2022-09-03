@@ -173,7 +173,7 @@ class TMY_G11n_Public {
 public function g11n_add_floating_menu() {
 
             if(strcmp(get_option('g11n_switcher_floating'),"Yes")==0){
-               echo '<div id="tmyfloatmenu" style="position:fixed;z-index:10001;bottom:3rem;left:3rem;"> <div style="border:1px solid;border-radius:5px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 15px 0 rgba(0,0,0,.4);padding:0.4rem 0.4rem;margin:0rem 0;right:1rem;font-size:1rem;">' . $this->translator->get_language_switcher() . '</div></div>';
+               echo '<div id="tmyfloatmenu" style="position:fixed;z-index:10001;bottom:3rem;left:3rem;"> <div style="border:1px solid;border-radius:5px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 15px 0 rgba(0,0,0,.4);padding:0.4rem 0.4rem;margin:0rem 0;right:1rem;font-size:1rem;">' . $this->translator->get_language_switcher('floating') . '</div></div>';
               ?>
                 <script>
                 //Make the DIV element draggagle:
@@ -346,7 +346,7 @@ public function g11n_add_floating_menu() {
                 //$success_switch = $WP_Sys_Locale_Switcher->switch_to_locale($locale);
 
 		if(strcmp(get_option('g11n_switcher_sidebar'),"Yes")==0){
-			echo '<div align="center">' . $this->translator->get_language_switcher(). '</div>';
+			echo '<div align="center">' . $this->translator->get_language_switcher('sidebar'). '</div>';
 		}
 
 	}
@@ -437,7 +437,7 @@ public function g11n_add_floating_menu() {
 		    array(
 		      'labels' => array(
 			'name' => __( 'TMY Translations' ),
-			'singular_name' => __( 'G11n Plugin Translation' )
+			'singular_name' => __( 'TMY Translation' )
 		      ),
 		      'public' => true,
 		      'show_ui' => true,
@@ -446,6 +446,11 @@ public function g11n_add_floating_menu() {
 		      //'show_in_menu' => 'admin.php?page=tmy-g11n-setup-menu',
 		      //'show_in_menu' => 'edit.php?post_type=g11n_translation',
                       'show_in_rest' => true,
+                      'capabilities' => array(
+                          'create_posts' => 'do_not_allow', 
+                       // Removes support for the "Add New" function ( use 'do_not_allow' instead of false for multisite set ups )
+                       ),
+                      'map_meta_cap' => true, 
 		      'has_archive' => true,
 		    )
 		);
@@ -666,7 +671,7 @@ public function g11n_add_floating_menu() {
                         }
 
 		        if(strcmp(get_option('g11n_switcher_post'),"Yes")==0){
-			    $switcher_html = $this->translator->get_language_switcher();
+			    $switcher_html = $this->translator->get_language_switcher('content');
 		        } else {
 			        $switcher_html = "";
 		        }
@@ -682,6 +687,9 @@ public function g11n_add_floating_menu() {
 	public function g11n_title_filter( $title, $id ) {
 
                     if ( is_admin() ) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("g11n_title_filter: " . $title);
+                        }
                         return $title;
                     }
 		    global $wp_query; 
@@ -754,7 +762,7 @@ public function g11n_add_floating_menu() {
 		             }
                         }
 			if(strcmp(get_option('g11n_switcher_tagline'),"Yes")==0){
-			    $switcher_html = $this->translator->get_language_switcher();
+			    $switcher_html = $this->translator->get_language_switcher('description');
 			} else {
 			    $switcher_html = "";
 			}
@@ -782,7 +790,7 @@ public function g11n_add_floating_menu() {
                             error_log("In g11n_wp_title_filter, g11n_switcher_title,".get_option('g11n_switcher_title'));
                         }
 			if(strcmp(get_option('g11n_switcher_title'),"Yes")==0){
-			    $switcher_html = $this->translator->get_language_switcher();
+			    $switcher_html = $this->translator->get_language_switcher('blogname');
 			} else {
 			    $switcher_html = "";
 			}
