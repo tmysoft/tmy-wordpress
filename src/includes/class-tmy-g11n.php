@@ -183,8 +183,26 @@ class TMY_G11n {
                 $this->loader->add_filter( 'manage_g11n_translation_posts_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_columns');
                 $this->loader->add_filter( 'manage_edit-g11n_translation_sortable_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_sortable');
                 $this->loader->add_action( 'manage_g11n_translation_posts_custom_column', $plugin_admin,'tmy_plugin_g11n_translation_set_columns_value',10,2);
+
+                $this->loader->add_filter( 'manage_pages_columns', $plugin_admin,'tmy_plugin_post_set_columns');
+                $this->loader->add_action( 'manage_pages_custom_column', $plugin_admin,'tmy_plugin_post_set_columns_value',10,2);
+
+                $this->loader->add_filter( 'manage_posts_columns', $plugin_admin,'tmy_plugin_post_set_columns');
+                $this->loader->add_action( 'manage_posts_custom_column', $plugin_admin,'tmy_plugin_post_set_columns_value',10,2);
+                //$this->loader->add_filter( 'manage_edit-post_sortable_columns', $plugin_admin,'tmy_plugin_post_set_sortable');
+
                 $this->loader->add_action( 'pre_get_posts', $plugin_admin,'tmy_plugin_g11n_translation_set_columns_orderby');
                 //$this->loader->add_action( 'edit_form_top', $plugin_admin,'tmy_plugin_g11n_edit_form_top');
+
+                $this->loader->add_filter( 'bulk_actions-edit-post', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
+                $this->loader->add_filter( 'handle_bulk_actions-edit-post', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
+
+                $this->loader->add_filter( 'bulk_actions-edit-page', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
+                $this->loader->add_filter( 'handle_bulk_actions-edit-page', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
+
+                $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
+ 
+ 
 	}
 
 	/**

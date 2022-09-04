@@ -74,7 +74,18 @@ Remember to save your changes
 
 ## Use TMY Plugin to translate a Post or Page
 
-Log into the admin panel of wordpress, navigate to the post page you want to translate, click button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button")
+There are two ways to start creating the translation page of a post or page.
+
+### 1. From the main listing page of the Page of Post
+From Admin Main Menu->"Pages" or "Posts", as in the following screenshot, select the post or posts, then select "Start or Sync translation" in the Bulk Action meanu, then click "Apply":
+
+<kbd><img src="doc/tmy-start-trans-main.png" width="600"/></kbd>
+
+You could check which page or post has started translation from the "Translation Started" column.
+
+### 2. From the Edit page of individual Page or Post
+
+Log into the Admin panel of wordpress, navigate to the post page you want to translate, click button ![TMY Translate Button](doc/tmy-translatebutton.png "TMY Translate Button")
 
 <kbd><img src="doc/tmy-page.png" width="600"/></kbd>
 

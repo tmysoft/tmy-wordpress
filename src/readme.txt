@@ -69,9 +69,6 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 
 == Changelog ==
 
-= 1.4.0 =
-* Improved TMY Translations page
-
 = 1.3.0 =
 * Live Translation
 
@@ -86,9 +83,6 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 * Initial Release.
 
 == Upgrade Notice ==
-
-= 1.4.0 =
-* Improved TMY Translations page
 
 = 1.3.0 =
 * Live Translation is added. It is powered by Google Translate

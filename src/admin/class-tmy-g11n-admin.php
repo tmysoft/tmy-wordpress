@@ -1127,26 +1127,31 @@ class TMY_G11n_Admin {
             echo $this->_get_tmy_g11n_metabox($_POST['id']);
             echo "  ";
         }
+
 	public function tmy_create_sync_translation() {
 
             if ( WP_TMY_G11N_DEBUG ) {
                 error_log("In tmy_create_sync_translation,id:".intval($_POST['id']).",type:".sanitize_text_field($_POST['post_type']));
             }
+            $post_id = intval($_POST['id']);
+            $post_title = sanitize_text_field($_POST['post_type']);
 
-            $message = "Number of translation entries created: ";
+	    echo($this->_tmy_create_sync_translation($post_id, $post_type));
+	    wp_die();
+
+        }
+
+	public function _tmy_create_sync_translation($post_id, $post_type) {
+
+            $message = "Number of translation entries created for " . $post_id . ": ";
 
             $all_langs = get_option('g11n_additional_lang');
             $default_lang = get_option('g11n_default_lang');
             unset($all_langs[$default_lang]);
 
-            if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_create_sync_translation,title:".get_post_field('post_title', intval($_POST['id'])));
-                error_log("In tmy_create_sync_translation,type:".get_post_field('post_type', intval($_POST['id'])));
-            }
+             if (strcmp($post_type, "g11n_translation") !== 0) {
 
-             if (strcmp(sanitize_text_field($_POST['post_type']), "g11n_translation") !== 0) {
-
-                 if (strcmp(sanitize_text_field($_POST['post_type']), "product") !== 0) {
+                 if (strcmp($post_type, "product") !== 0) {
                     
                      if ( WP_TMY_G11N_DEBUG ) { error_log("In tmy_create_sync_translation langs,".json_encode($all_langs));};
 
@@ -1156,7 +1161,7 @@ class TMY_G11n_Admin {
                      if (is_array($all_langs)) {
                          $num_langs = count($all_langs);
                          foreach( $all_langs as $value => $code) {
-                             $translation_id = $this->translator->get_translation_id(intval($_POST['id']),$code,sanitize_text_field($_POST['post_type']));
+                             $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
                              if ( WP_TMY_G11N_DEBUG ) { 
                                  error_log("In tmy_create_sync_translation, translation_id = " . $translation_id);
                              }
@@ -1164,15 +1169,15 @@ class TMY_G11n_Admin {
                                  $num_success_entries += 1;
                                  //$message .= " $value($code)";
                                  //error_log("in create_sync_translation, no translation_id");
-                                 $translation_title = get_post_field('post_title', intval($_POST['id']));
-                                 $translation_contents = get_post_field('post_content', intval($_POST['id']));
+                                 $translation_title = get_post_field('post_title', $post_id);
+                                 $translation_contents = get_post_field('post_content', $post_id);
                                  $g11n_translation_post = array(
                                        'post_title'    => $translation_title,
                                        'post_content'  => $translation_contents,
                                        'post_type'  => "g11n_translation"
                                  );
                                  $new_translation_id = wp_insert_post( $g11n_translation_post );
-                                 add_post_meta( $new_translation_id, 'orig_post_id', intval($_POST['id']), true );
+                                 add_post_meta( $new_translation_id, 'orig_post_id', $post_id, true );
                                  add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
                              }
                              $this->_update_g11n_translation_status($new_translation_id);
@@ -1190,16 +1195,16 @@ class TMY_G11n_Admin {
                          (strcmp('', get_option('g11n_server_token','')) !== 0) &&
                          (strcmp('', get_option('g11n_server_url','')) !== 0)) {
 
-                         $content_title = get_post_field('post_title', intval($_POST['id']));
-                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', intval($_POST['id'])),-1, PREG_SPLIT_DELIM_CAPTURE);
+                         $content_title = get_post_field('post_title', $post_id);
+                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
                          $contents_array = array();
 
-                         if (strcmp(get_post_field('post_title', intval($_POST['id'])),'blogname') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . intval($_POST['id']);
-                         } elseif (strcmp(get_post_field('post_title', intval($_POST['id'])),'blogdescription') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . intval($_POST['id']);
+                         if (strcmp(get_post_field('post_title', $post_id),'blogname') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . $post_id;
+                         } elseif (strcmp(get_post_field('post_title', $post_id),'blogdescription') === 0){
+                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . $post_id;
                          } else {
-                             $json_file_name = "WordpressG11nAret-" . sanitize_text_field($_POST['post_type']) . "-" . intval($_POST['id']);
+                             $json_file_name = "WordpressG11nAret-" . $post_type . "-" . $post_id;
                              array_push($contents_array, $content_title);
                          }
 
@@ -1226,12 +1231,11 @@ class TMY_G11n_Admin {
              }
 
              $return_msg = json_encode(array("message" => esc_attr($message),
-                                             "div_status" => $this->_get_tmy_g11n_metabox($_POST['id'])
+                                             "div_status" => $this->_get_tmy_g11n_metabox($post_id)
                                       ));
              //echo esc_attr($message);
-             echo $return_msg . "  ";
+             return $return_msg . "  ";
 
-	     wp_die();
         }
 
 	public function _tmy_g11n_create_server_project($project_name,$version_num,$lang_list) {
@@ -1907,6 +1911,13 @@ class TMY_G11n_Admin {
     	   return $views;
         }
 
+        function tmy_plugin_post_set_columns( $columns ){
+            unset($columns['date']);
+            $columns['translation_started']     = 'Translation Started';
+            $columns['date']     = 'Date';
+            return $columns;
+        }
+
         function tmy_plugin_g11n_translation_set_columns( $columns ){
 
             unset($columns['date']);
@@ -1920,6 +1931,11 @@ class TMY_G11n_Admin {
 
         }
 
+        function tmy_plugin_post_set_sortable( $columns ) {
+
+            $columns['translation_started']     = 'translation_started';
+            return $columns;
+        }
         function tmy_plugin_g11n_translation_set_sortable( $columns ) {
 
             $columns['post_id']     = 'post_id';
@@ -1951,6 +1967,21 @@ class TMY_G11n_Admin {
                 $query->set( 'orderby', 'meta_value' );
             }
         }
+        function tmy_plugin_post_set_columns_value( $column, $post_id ) {
+            switch ( $column ) {
+                case 'translation_started'     :
+                    global $wpdb;
+                    $result = $wpdb->get_results("select post_id from {$wpdb->prefix}postmeta where meta_key = 'orig_post_id' and meta_value = " . $post_id);
+                    if (isset($result[0]->post_id)) {
+                        echo 'Yes';
+                    } else {
+                        echo '';
+                    }
+
+                break;
+            }
+        }
+
         function tmy_plugin_g11n_translation_set_columns_value( $column, $post_id ) {
 
             switch ( $column ) {
@@ -1988,4 +2019,38 @@ class TMY_G11n_Admin {
         function tmy_plugin_g11n_edit_form_top() {
             echo "TMY Glolbalization";
         }
+
+        function tmy_plugin_g11n_register_bulk_actions( $bulk_actions ) {
+            $bulk_actions['start_sync_tranlations'] = __( 'Start or Sync Translation', 'tmy_globalization');
+            return $bulk_actions;
+        }
+
+        function tmy_plugin_g11n_bulk_action_handler( $redirect_to, $doaction, $post_ids ) {
+            if ( $doaction !== 'start_sync_tranlations' ) {
+                return $redirect_to;
+            }
+            $result = '';
+            foreach ( $post_ids as $post_id ) {
+               $post_type = get_post_type($post_id);
+	       $post_result = $this->_tmy_create_sync_translation($post_id, $post_type);
+	       $post_result_var = json_decode($post_result);
+               $result .= $post_result_var->message . '<br>';
+               //error_log($post_result);
+            }
+            //$redirect_to = add_query_arg( 'start_sync_tranlations', count( $post_ids ), $redirect_to );
+            $redirect_to = add_query_arg( 'start_sync_tranlations', $result, $redirect_to );
+            return $redirect_to;
+        }
+
+        function tmy_plugin_g11n_admin_notice() {
+
+	    if( ! empty( $_REQUEST[ 'start_sync_tranlations' ] ) ) {
+                $message = $_REQUEST[ 'start_sync_tranlations' ];
+	        ?>
+			    <div class="updated notice is-dismissible">
+				    <p><?php echo $message ?></p>
+			    </div>
+	        <?php
+	    }
+       }
 }
