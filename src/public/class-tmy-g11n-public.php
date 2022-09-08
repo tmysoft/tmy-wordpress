@@ -777,7 +777,7 @@ public function g11n_add_floating_menu() {
 
 	public function g11n_content_filter($input) {
 
-                    if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+                    if (! ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST )) {
 
 		        global $wp_query; 
 
@@ -975,6 +975,27 @@ public function g11n_add_floating_menu() {
 
 		    return $output;
 	}
+
+	public function tmy_g11n_blocks_init() {
+
+            wp_enqueue_script(
+              'tmy-lang-block',
+              plugin_dir_url(__DIR__) . 'includes/tmy-block-language-switcher.js',
+              array('wp-blocks','wp-editor','wp-server-side-render'),
+              true
+            );
+
+            $return = register_block_type('tmy/tmy-chooser-box', array(
+                    'render_callback' => array($this,'tmy_lang_switcher_block_dynamic_render_cb')
+            ));
+
+        }
+
+        function tmy_lang_switcher_block_dynamic_render_cb ( $att ) {
+
+            $html = '<div>' . tmy_g11n_switcher_esc($this->translator->get_language_switcher('block')) . '</div>';
+            return $html;
+        }
 
 
 }

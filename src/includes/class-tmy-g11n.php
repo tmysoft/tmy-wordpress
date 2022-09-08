@@ -257,6 +257,8 @@ class TMY_G11n {
 
                 $this->loader->add_filter( 'use_block_editor_for_post', $plugin_public, 'g11n_option_editor_change', 10, 1);
 
+		$this->loader->add_action( 'init', $plugin_public, 'tmy_g11n_blocks_init');
+
 	}
 
 	/**
