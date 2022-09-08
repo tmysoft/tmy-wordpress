@@ -233,6 +233,9 @@ class TMY_G11n {
 
 		$this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
 		$this->loader->add_action( 'get_sidebar', $plugin_public, 'add_before_my_siderbar' );
+		//$this->loader->add_action( 'before_sidebar', $plugin_public, 'add_before_my_siderbar' );
+		$this->loader->add_action( 'dynamic_sidebar', $plugin_public, 'add_before_dynamic_siderbar' );
+		//$this->loader->add_action( 'dynamic_sidebar_params', $plugin_public, 'add_before_my_siderbar' );
 		$this->loader->add_action( 'edit_form_after_title', $plugin_public, 'myprefix_edit_form_after_title' );
 		//$this->loader->add_action( 'edit_form_after_editor', $plugin_public, 'g11n_push_status_div' );
 		$this->loader->add_filter( 'widget_title', $plugin_public, 'g11n_widget_title', 10, 2 );
@@ -244,8 +247,12 @@ class TMY_G11n {
 		$this->loader->add_filter( 'the_excerpt', $plugin_public, 'g11n_excerpt_filter' );
 		$this->loader->add_filter( 'the_posts', $plugin_public, 'g11n_the_posts_filter' );
 
+		$this->loader->add_filter( 'pre_option_blogname', $plugin_public, 'g11n_pre_get_option_blogname',10, 2);
+		$this->loader->add_filter( 'pre_option_blogdescription', $plugin_public, 'g11n_pre_get_option_blogdescription',10, 2);
+
 		$this->loader->add_filter( 'pre_update_option_blogname', $plugin_public, 'g11n_pre_option_blogname');
 		$this->loader->add_filter( 'pre_update_option_blogdescription', $plugin_public, 'g11n_pre_option_blogdescription'); 
+
                 $this->loader->add_filter( 'locale', $plugin_public, 'g11n_locale_filter', 10);
 
                 $this->loader->add_filter( 'use_block_editor_for_post', $plugin_public, 'g11n_option_editor_change', 10, 1);

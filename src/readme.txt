@@ -3,7 +3,7 @@ Contributors: yushao
 Donate link: https://tmysoft.com/solutions.html
 Tags: i18n, l10n, translation, localization, globalization
 Requires at least: 5.0
-Tested up to: 5.9
+Tested up to: 6.0.2
 Stable tag: 1.3.0
 Requires PHP: 7.0
 License: GPLv2 or later
@@ -69,6 +69,12 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 
 == Changelog ==
 
+= 1.5.0 =
+* added bulk action for Page and Post and other UI improvement
+
+= 1.4.0 =
+* "g11n_translation" listing page add columns
+
 = 1.3.0 =
 * Live Translation
 
@@ -83,6 +89,12 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 * Initial Release.
 
 == Upgrade Notice ==
+
+= 1.5.0 =
+* added bulk action for Page and Post and other UI improvement
+
+= 1.4.0 =
+* "g11n_translation" listing page add columns
 
 = 1.3.0 =
 * Live Translation is added. It is powered by Google Translate

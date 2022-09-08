@@ -327,7 +327,6 @@ class TMY_G11n_Admin {
                     if (is_array($all_langs)) {
                         foreach( $all_langs as $value => $code) {
                             $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
-    		            //echo $code . ':' . $translation_id . '<br>'; 
 			    if (isset($translation_id)) {
                                 $translation_status = get_post_status($translation_id);
                                 //$return_msg .= esc_attr($value) . '-' . esc_attr($code) . ' Translation page is at <a href="' . esc_url( get_edit_post_link($translation_id) ) . 
@@ -364,7 +363,6 @@ class TMY_G11n_Admin {
 
         public function tmy_translation_metabox_callback( $post ) {
 
-	    //echo 'hey: ' . $post->ID;
             ?>
                 <script>
 
@@ -382,7 +380,7 @@ class TMY_G11n_Admin {
                                     console.log("all events");
                                     var data = {
                                             'action': 'tmy_get_post_translation_status',
-                                            'id': <?php echo $post->ID; ?>
+                                            'id': <?php echo intval($post->ID); ?>
                                     };
                                     $.ajax({
                                         type:    "POST",
@@ -613,8 +611,8 @@ class TMY_G11n_Admin {
 
         	<tr valign="top">
         	<th scope="row">Live Translation powered by Google Translate</th>
-        	<!-- <td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" onChange="javascript:g11n_using_gtookit_change();"> -->
-        	 <td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" > 
+        	<td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" onChange="javascript:g11n_using_gtookit_change();"> 
+        	<!-- <td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" > -->
                		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_using_google_tookit','No')), 'Yes' ); ?>>Yes</option>
                		<option value='No'  <?php selected( esc_attr(get_option('g11n_using_google_tookit','No')), 'No' ); ?>>No</option>
             	</select>
@@ -1124,7 +1122,7 @@ class TMY_G11n_Admin {
         }
 
 	public function tmy_get_post_translation_status() {
-            echo $this->_get_tmy_g11n_metabox($_POST['id']);
+            echo $this->_get_tmy_g11n_metabox(intval($_POST['id']));
             echo "  ";
         }
 
@@ -1260,8 +1258,10 @@ class TMY_G11n_Admin {
 
  	        curl_reset($ch);
 
-	        error_log("REST URL" . $rest_url);
-	        error_log("REST PALOAD" . $payload);
+                if ( WP_TMY_G11N_DEBUG ) {
+	            error_log("REST URL" . $rest_url);
+	            error_log("REST PALOAD" . $payload);
+                }
 
                 $args = array(
                     'headers' => array('X-Auth-User' => get_option('g11n_server_user'),
@@ -1277,7 +1277,9 @@ class TMY_G11n_Admin {
                     $output = $response['body'];
                     $payload = json_decode($output);
                 } else {
-                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
 	        $http_code_msg = array(
@@ -1319,7 +1321,9 @@ class TMY_G11n_Admin {
                     $output = $response['body'];
                     $payload = json_decode($output);
                 } else {
-                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
 
@@ -1334,7 +1338,7 @@ class TMY_G11n_Admin {
                 //
 
 		curl_reset($ch);
-		error_log("create project optional lang list: " . json_encode($lang_list));
+		//error_log("create project optional lang list: " . json_encode($lang_list));
 
 		$rest_url = "https://tmysoft.com/api/project/" . $project_name . "/version/" . $version_num . "/locales";
 
@@ -1353,7 +1357,9 @@ class TMY_G11n_Admin {
                     $output = $response['body'];
                     $payload = json_decode($output);
                 } else {
-                    error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    if ( WP_TMY_G11N_DEBUG ) {
+                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                    }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
 
@@ -1388,7 +1394,7 @@ class TMY_G11n_Admin {
                 foreach ($selected_langs as &$value) {
                         $value = str_replace("_", "-", $value);
                 }
-		error_log("create project optional lang list: " . json_encode($selected_langs));
+		//error_log("create project optional lang list: " . json_encode($selected_langs));
 
 	        $return_msg = $this->_tmy_g11n_create_server_project(rtrim(sanitize_text_field($_POST['proj_name'])),
                                                        rtrim(sanitize_text_field($_POST['proj_ver'])),
@@ -1752,7 +1758,7 @@ class TMY_G11n_Admin {
 		    $no_g11n_trans = $wpdb->get_results( 'delete from '.$wpdb->prefix.'posts where post_type="g11n_translation" or post_title="blogname" or post_title="blogdescription"');
 		    $no_g11n_metas = $wpdb->get_results( 'delete from '.$wpdb->prefix.'postmeta where meta_key="g11n_tmy_lang" or meta_key="g11n_tmy_lang_status" or meta_key="orig_post_id" or meta_key="translation_push_status"');
 		    //error_log(var_export($no_g11n_config,true));
-		    error_log(var_export($no_g11n_trans,true));
+		    //error_log(var_export($no_g11n_trans,true));
 		    //error_log(var_export($no_g11n_metas,true));
 		    echo "Cleared Data";
 		    wp_die();
@@ -1812,7 +1818,8 @@ class TMY_G11n_Admin {
                 }
 
             }
-            if ((strcmp($option, "g11n_l10n_props_blogname")===0) && ($value != $old_value)) {
+            //if ((strcmp($option, "g11n_l10n_props_blogname")===0) && ($value != $old_value)) {
+            if ((strcmp($option, "g11n_l10n_props_blogname")===0)) {
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("tmy_plugin_option_update blogname:" . $old_value. "->" . $value );
                     error_log("tmy_plugin_option_update blogname:" . get_bloginfo('name') );
@@ -1821,14 +1828,14 @@ class TMY_G11n_Admin {
                     // creating placeholder of the blogname entry as private post type
                     $title_post  = get_page_by_title('blogname',OBJECT,'post');
 
-                    if (is_null($title_post)) {
-                        $new_post_id = wp_insert_post(array('post_title'    => 'blogname',
+                    if (! is_null($title_post) && (strcmp($title_post->post_status,'trash')!==0)) {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID, 
+                                                            'post_title'    => 'blogname',
                                                             'post_content'  => get_bloginfo('name'),
                                                             'post_status'  => 'private',
                                                             'post_type'  => "post"));
                     } else {
-                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID, 
-                                                            'post_title'    => 'blogname',
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogname',
                                                             'post_content'  => get_bloginfo('name'),
                                                             'post_status'  => 'private',
                                                             'post_type'  => "post"));
@@ -1840,7 +1847,8 @@ class TMY_G11n_Admin {
 
 
             }
-            if ((strcmp($option, "g11n_l10n_props_desc")===0) && ($value != $old_value)) {
+            //if ((strcmp($option, "g11n_l10n_props_desc")===0) && ($value != $old_value)) {
+            if ((strcmp($option, "g11n_l10n_props_desc")===0)) {
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("tmy_plugin_option_update description: " . $old_value. "->" . $value );
                     error_log("tmy_plugin_option_update blog description:" . get_bloginfo('description') );
@@ -1849,14 +1857,14 @@ class TMY_G11n_Admin {
                     // creating placeholder entry as private post type
                     $title_post  = get_page_by_title('blogdescription',OBJECT,'post');
 
-                    if (is_null($title_post)) {
-                        $new_post_id = wp_insert_post(array('post_title'    => 'blogdescription',
+                    if (! is_null($title_post) && (strcmp($title_post->post_status,'trash')!==0)) {
+                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID,
+                                                            'post_title'    => 'blogdescription',
                                                             'post_content'  => get_bloginfo('description'),
                                                             'post_status'  => 'private',
                                                             'post_type'  => "post"));
                     } else {
-                        $new_post_id = wp_insert_post(array('ID' => $title_post->ID,
-                                                            'post_title'    => 'blogdescription',
+                        $new_post_id = wp_insert_post(array('post_title'    => 'blogdescription',
                                                             'post_content'  => get_bloginfo('description'),
                                                             'post_status'  => 'private',
                                                             'post_type'  => "post"));
@@ -1903,7 +1911,7 @@ class TMY_G11n_Admin {
     		foreach ( $views as $index => $view ) {
         		//$views[ $index ] = preg_replace( '/ <span class="count">\([0-9]+\)<\/span>/', '', $view );
         		//$views[ $index ] = "AAAAA";
-		        error_log("edit_posts_views = " . $views[ $index ]);
+		        //error_log("edit_posts_views = " . $views[ $index ]);
     		}
         	array_push($views, "Sent for Translation (XX)");
         	array_push($views, "Translation Completed (XX)");
@@ -2048,9 +2056,11 @@ class TMY_G11n_Admin {
                 $message = $_REQUEST[ 'start_sync_tranlations' ];
 	        ?>
 			    <div class="updated notice is-dismissible">
-				    <p><?php echo $message ?></p>
+				    <p><?php echo esc_attr($message) ?></p>
 			    </div>
 	        <?php
+	        //$redirect_to = remove_query_arg( 'start_sync_tranlations' );
+		//return $redirect_to;
 	    }
        }
 }

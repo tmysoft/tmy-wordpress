@@ -14,7 +14,7 @@ class G11n_Language_Widget extends WP_Widget {
 
     public function widget( $args, $instance ) {
                     $switcher =  $this->translator->get_language_switcher('widget');
-                    echo $switcher;
+                    echo tmy_g11n_switcher_esc($switcher);
                     //echo $args['before_widget'], wpautop( $instance['text'] ), $args['after_widget'];
                 }
 
@@ -36,18 +36,18 @@ function g11n_language_chooser_widget() {
         register_widget( 'G11n_Language_Widget' );
 
         // Register two sidebars.
-        $sidebars = array ( 'a' => 'top-widget', 'b' => 'bottom-widget' );
-        foreach ( $sidebars as $sidebar )
-        {
-                register_sidebar(
-                    array (
-                        'name'          => $sidebar,
-                        'id'            => $sidebar,
-                        'before_widget' => '',
-                        'after_widget'  => ''
-                    )
-                );
-        }
+        //$sidebars = array ( 'a' => 'top-widget', 'b' => 'bottom-widget' );
+        //foreach ( $sidebars as $sidebar )
+        //{
+        //        register_sidebar(
+        //            array (
+        //                'name'          => $sidebar,
+        //                'id'            => $sidebar,
+        //                'before_widget' => '',
+        //                'after_widget'  => ''
+        //            )
+        //        );
+        //}
 }
 
 add_action( 'widgets_init', 'g11n_language_chooser_widget' );

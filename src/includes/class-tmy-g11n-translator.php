@@ -169,7 +169,9 @@ class TMY_G11n_Translator {
                     $output = $response['body'];
                     //$payload = json_decode($output);
                 } else {
-                    error_log('In sync_translation_from_server, Error: ' . $response->get_error_message());
+                    if ( WP_TMY_G11N_DEBUG ) {
+                         error_log('In sync_translation_from_server, Error: ' . $response->get_error_message());
+                    }
                 }
 
 		return $output;
@@ -245,7 +247,7 @@ class TMY_G11n_Translator {
 		    //$return_msg .= "  id : " . get_the_ID();
 		    $return_msg .= "  id : " . $default_post_id;
     
-		    error_log("Server Push: " . $return_msg);
+		    //error_log("Server Push: " . $return_msg);
 		    update_post_meta( $default_post_id, 'translation_push_status', $return_msg);
 
 		    curl_close($ch);
@@ -386,8 +388,6 @@ class TMY_G11n_Translator {
                     }
                 }	
                 include 'lang2googlelan.php';
-		//$current_url = home_url();
-		//$current_url = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 		$current_url = sanitize_url($_SERVER['REQUEST_URI']);
 		$query_variable_name = "g11n_tmy_lang";
 		$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
@@ -440,7 +440,7 @@ class TMY_G11n_Translator {
 
                 } else {
 
-		    $language_switcher_html = '<center><span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
+		    $language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
 		    //$language_switcher_html = '<div style="border:1px solid;border-radius:5px;">';
 		    foreach( $language_options as $value => $code) {
 		    //<img src="./flags/24/CN.png" alt="CN">
@@ -471,7 +471,7 @@ class TMY_G11n_Translator {
 				                   $href_text.'</a>';
 		        }
                     }
-		    $language_switcher_html .= "</span></center>";
+		    $language_switcher_html .= "</span>";
 		    return $language_switcher_html;
 		}
 
@@ -485,9 +485,8 @@ class TMY_G11n_Translator {
                 }
                 $seq_code = mt_rand(1000,9999);
                 if ( WP_TMY_G11N_DEBUG ) {
-                    //error_log($seq_code . " In get_preferred_language, ".$_SESSION['g11n_language']);
                     if (isset($_SESSION)) {
-                        error_log($seq_code . " In get_preferred_language, ".json_encode($_SESSION));
+                        error_log($seq_code . " In get_preferred_language, ". sanitize_textarea_field(json_encode($_SESSION)));
                     } else {
                         error_log($seq_code . " In get_preferred_language, _SESSION is not set");
                     }
@@ -496,7 +495,7 @@ class TMY_G11n_Translator {
                 if(!session_id()) {
                     if ( WP_TMY_G11N_DEBUG ) {
                         if (isset($_SESSION)) {
-                            error_log($seq_code . " In get_preferred_language, ".json_encode($_SESSION));
+                            error_log($seq_code . " In get_preferred_language, ".sanitize_textarea_field(json_encode($_SESSION)));
                         } else {
                             error_log($seq_code . " In get_preferred_language, _SESSION is not set");
                         }
@@ -524,11 +523,11 @@ class TMY_G11n_Translator {
 		if ((isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) and (strcmp(get_option('g11n_site_lang_browser'),'Yes')===0)) {
 
                    if ( WP_TMY_G11N_DEBUG ) {
-		       error_log($seq_code . " In get_preferred_language checking browser setting: ". $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		       error_log($seq_code . " In get_preferred_language checking browser setting: ". sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']));
 		       error_log($seq_code . " In get_preferred_language checking browser setting: ". get_option('g11n_site_lang_browser'));
                    }
 
-		    $languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+		    $languages = explode(',', sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']));
 		    $prefLocales = array();
 		    foreach ($languages as $language) {
 			$lang = explode(';q=', $language);
@@ -538,7 +537,7 @@ class TMY_G11n_Translator {
 		    arsort($prefLocales);
 
 		    //$prefLocales = array_reduce(
-		    //    explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']),
+		    //    explode(',', sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE'])),
 		    //    function ($res, $el) {
 		    //        list($l, $q) = array_merge(explode(';q=', $el), [1]);
 		    //        $res[$l] = (float) $q;
