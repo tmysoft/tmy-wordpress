@@ -113,17 +113,27 @@ Then the plugin will automatically create the place holder post corresponding to
 
 Following the same way to translate the page or post to complete the translation.
 
-## Configure the language swither location 
+## Configure the Language Swither
 
-The language switcher could be placed at multiple places, in TMY Globalization -> TMY Setup, you can put it in:
+The plugin provides one language switcher widget and one switcher block so you can put the language switcher in a highly configurable fashion on your website.
 
+- TMY Language Switcher Block
+
+  <kbd><img src="doc/tmy-switcher-block.png" width="200"/></kbd>
+
+
+- TMY Language Switcher Widget
+
+  <kbd><img src="doc/tmy-switcher-widget.png" width="200"/></kbd>
+
+The language switcher could be placed at predefined locations, in TMY Globalization -> TMY Setup, you can put it in:
 1. In Title
 2. In Tagline
 3. Top of Sidebar
 4. In Each Post
 5. Draggable Floating Menu 
 
-Here is the illustration:
+You might try to try to see which location is best fit in your website, here is the reference:
 
 <kbd><img src="doc/tmy-lang-switcher.png" width="800"/></kbd>
 

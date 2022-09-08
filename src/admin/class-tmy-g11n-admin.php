@@ -855,7 +855,7 @@ class TMY_G11n_Admin {
                     $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($row["ID"]) . '</a>';
         
                     $tid_link = 'post.php?post=' . esc_attr($row["TID"]) . '&action=edit';
-                    $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . $row["TID"] . '</a>';
+                    $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . esc_attr($row["TID"]) . '</a>';
                     //if (isset($post_info[0])) {
                         echo             '<tr><td>' . $tid_hyper . '</td><td>' .
                                                          $id_hyper . '</td><td>' .
@@ -1567,17 +1567,17 @@ class TMY_G11n_Admin {
                 error_log("In tmy_g11n_get_local_translation_status, rows:".json_encode($row_arr));
             }
             foreach ( $row_arr as $row ) {
-                $id_link = 'post.php?post=' . $row["ID"] . '&action=edit';
-                $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . $row["ID"] . '</a>';
+                $id_link = 'post.php?post=' . esc_attr($row["ID"]) . '&action=edit';
+                $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($row["ID"]) . '</a>';
 
-                $tid_link = 'post.php?post=' . $row["TID"] . '&action=edit';
-                $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . $row["TID"] . '</a>';
+                $tid_link = 'post.php?post=' . esc_attr($row["TID"]) . '&action=edit';
+                $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . esc_attr($row["TID"]) . '</a>';
                 //if (isset($post_info[0])) {
                     $ret_msg .=  '<tr><td>' . $tid_hyper . '</td><td>' .
                                                          $id_hyper . '</td><td>' .
-                                                         $row["post_title"] . '</td><td>' .
-                                                         $row["meta_value"] . '</td><td>' .
-                                                         $row["post_modified"] . '</td></tr>';
+                                                         esc_attr($row["post_title"]) . '</td><td>' .
+                                                         esc_attr($row["meta_value"]) . '</td><td>' .
+                                                         esc_attr($row["post_modified"]) . '</td></tr>';
                 //}
             }
             $ret_msg .= "<tr><td>". time() ."</td></tr>";
@@ -1599,15 +1599,15 @@ class TMY_G11n_Admin {
                         );
 
                 $return_msg = '';
-		$return_msg .= "<br>Translation Server URL: ". get_option('g11n_server_url') . ' ';
+		$return_msg .= "<br>Translation Server URL: ". esc_attr(get_option('g11n_server_url')) . ' ';
 
       	        $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/version";
     		$server_reply = $this->translator->rest_get_translation_server($rest_url);
 
     	        if ($server_reply["http_code"] == 200) {
-                    $return_msg .= "Sever Version: " . $server_reply["payload"]->versionNo . "<br>";
-                    $return_msg .= "Project Name: <b>" . get_option('g11n_server_project'). "</b> ";
-                    $return_msg .= "Project Version: <b>" . get_option('g11n_server_version') . "</b><br>";
+                    $return_msg .= "Sever Version: " . esc_attr($server_reply["payload"]->versionNo) . "<br>";
+                    $return_msg .= "Project Name: <b>" . esc_attr(get_option('g11n_server_project')). "</b> ";
+                    $return_msg .= "Project Version: <b>" . esc_attr(get_option('g11n_server_version')) . "</b><br>";
                     $return_msg .= "<br>Translations Hosted on the Server: <br>";
 
                     $translation_server_status = True;
@@ -1622,7 +1622,7 @@ class TMY_G11n_Admin {
                     if (! is_null($payload)){
                         if (is_array($payload->stats)){
                             foreach ( $payload->stats as $row ) {
-                                $return_msg .= $row->locale . ": ". $row->translated . "/" . $row->total . " ";
+                                $return_msg .= esc_attr($row->locale) . ": ". esc_attr($row->translated) . "/" . esc_attr($row->total) . " ";
                             }
                             $return_msg .=  "<br>";
                         }
@@ -1647,7 +1647,7 @@ class TMY_G11n_Admin {
                                              // otherwise ignore it
 
                                     if( is_null(get_post($default_lang_post_id))){
-                                        $return_msg .= "<tr><td><b>" . $row->id ."</b></td><td colspan=\"".count($row->stats)."\"> No local post/page found for id ". $default_lang_post_id . "</td></tr>";
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats))."\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
 
                                     } else {
 
@@ -1690,9 +1690,9 @@ class TMY_G11n_Admin {
 
 		                                 $translation_id = $this->translator->get_translation_id($default_lang_post_id,$stat_row->locale,$payload_post_type);
                                                  if ( WP_TMY_G11N_DEBUG ) {
-                                                     error_log("In tmy_g11n_get_project_status, id:".$default_lang_post_id." locale:".
-                                                                                         $stat_row->locale." type: ".$payload_post_type);
-                                                     error_log("In tmy_g11n_get_project_status, translation id:".$translation_id);
+                                                     error_log("In tmy_g11n_get_project_status, id:".esc_attr($default_lang_post_id)." locale:".
+                                                                                         esc_attr($stat_row->locale)." type: ".esc_attr($payload_post_type));
+                                                     error_log("In tmy_g11n_get_project_status, translation id:".esc_attr($translation_id));
                                                  }
                                                  if (strcmp($payload_post_type,'blogname') === 0){
 		                                     $translation_contents = $translation_title . $translation_contents;
@@ -1721,17 +1721,17 @@ class TMY_G11n_Admin {
 	                                         //tmy_g11n_pull_translation($stat_row->id, $stat_row->locale);
                                                  //finish fully translated, need to pull the translation down to local WP database
 
-                                                 $id_link = 'post.php?post=' . $translation_id . '&action=edit';
-                                                 $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . $translation_id . '</a>';
-                                                 $doc_lang_str .= "<td><b>" . $stat_row->locale . ": ". 
-                                                   $stat_row->translated . "/" . $stat_row->total . "(ID:".$id_hyper.")</b></td> ";
+                                                 $id_link = 'post.php?post=' . esc_attr($translation_id) . '&action=edit';
+                                                 $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($translation_id) . '</a>';
+                                                 $doc_lang_str .= "<td><b>" . esc_attr($stat_row->locale) . ": ". 
+                                                   esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "(ID:".$id_hyper.")</b></td> ";
 
                                              } else {
-                                                 $doc_lang_str .= "<td>" . $stat_row->locale . ": ". 
-                                                       $stat_row->translated . "/" . $stat_row->total . "</td> ";
+                                                 $doc_lang_str .= "<td>" . esc_attr($stat_row->locale) . ": ". 
+                                                       esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "</td> ";
                                              }
                                         }//foreach language
-                                        $return_msg .= "<tr><td><b>" . $row->id ."</b></td>". $doc_lang_str . "</tr>";
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td>". $doc_lang_str . "</tr>";
                                     }
 
                                 }// if (is_array($row->stats))
@@ -1741,10 +1741,11 @@ class TMY_G11n_Admin {
                     } // if (! is_null($payload))
                 } else {
                     $return_msg .= "Sever is not reachable: <br>";
-                    $return_msg .= var_export($server_reply,true);
+                    $return_msg .= esc_attr(var_export($server_reply,true));
                 }
 
                 echo $return_msg;
+                error_log( $return_msg );
 		wp_die();
 
         }
@@ -1996,8 +1997,7 @@ class TMY_G11n_Admin {
                 case 'post_id'     :
                     //echo $post_id;
                     $edit_link = 'post.php?post=' . esc_attr($post_id) . '&action=edit';
-                    $hyper_link = '<a href="' . admin_url($edit_link) . '" target="_blank">' . $post_id . '</a>';
-                    echo $hyper_link;
+                    echo '<a href="' . admin_url($edit_link) . '" target="_blank">' . esc_attr($post_id) . '</a>';
 
                 break;
                 case 'Language'     :
@@ -2010,8 +2010,7 @@ class TMY_G11n_Admin {
                 case 'original_id'     :
                     $original_id = get_post_meta($post_id, 'orig_post_id', true );
                     $edit_link = 'post.php?post=' . esc_attr($original_id) . '&action=edit';
-                    $hyper_link = '<a href="' . admin_url($edit_link) . '" target="_blank">' . $original_id . '</a>';
-                    echo $hyper_link;
+                    echo '<a href="' . admin_url($edit_link) . '" target="_blank">' . esc_attr($original_id) . '</a>';
                 break;
                 case 'post_status'     :
                     //echo get_post_meta( $post_id, 'g11n_tmy_lang_status', true );
