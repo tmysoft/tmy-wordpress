@@ -182,7 +182,7 @@ class TMY_G11n_Admin {
                	add_meta_box( 'tmy_g11n_trans_status_box', 
 		                  'Translation Status', 
 		                  array( $this, 'tmy_translation_metabox_callback'), 
-		                  array('post','page','g11n_translation'),
+		                  array('post','page','g11n_translation','product'),
 		                  'normal', // (normal, side, advanced)
 		                  'default' // (default, low, high, core) 
                             );

@@ -72,7 +72,11 @@ Key configuration:
 
 Remember to save your changes
 
-## Use TMY Plugin to translate a Post or Page
+## Use TMY Plugin to translate Post, Page or other Custom Type
+
+In addition to "Page" and "Post" two main native document types, TMY plugin can auto detect any custom build type of document on Wordpress, for example, for Woo Commerce, "product" is the main custom type. Visit the TMY Setup page, you should see "product" is listed, select the ones you want to translate, and click save to continue. 
+
+<kbd><img src="doc/tmy-custom-types.png" width="300"/></kbd>
 
 There are two ways to start creating the translation page of a post or page.
 
@@ -112,6 +116,12 @@ Then the plugin will automatically create the place holder post corresponding to
 <kbd><img src="doc/tmy-blogname-placeholder.png" width="600"/></kbd>
 
 Following the same way to translate the page or post to complete the translation.
+
+## Translate Excerpt of Woo Commerce Product
+
+Excerpt of a Woo Commerce product is used as brief introduction of the product, reference following screenshot to get it translated.
+
+<kbd><img src="doc/tmy-excerpt.png" width="600"/></kbd>
 
 ## Configure the Language Swither
 
@@ -202,6 +212,14 @@ Ask questions, submit PRs.
 ## There is no translation after I setup everything 
 
 Make sure translation is enabled in TMY Setup page:
+
+## The Wordpress site is not fully translated
+
+Some of the translation are coming from the themem or the plugin, you will need to install the completed translation PO files and install it correctly. Reference here for more information:
+
+https://developer.wordpress.org/plugins/internationalization/localization/
+
+Or come to TMY online chat channel.
 
 <kbd>![TMY Enable Translation](https://github.com/tmysoft/tmy-wordpress/blob/master/doc/tmy-enabletranslation.png "TMY Enable Translation")</kbd>
 
