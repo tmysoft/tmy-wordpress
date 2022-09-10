@@ -12,9 +12,9 @@
 
 function tmy_g11n_lang_sanitize( $lang ) {
 
-    $default_lang = get_option('g11n_default_lang');
+    $default_lang = get_option('g11n_default_lang', 'English');
     if (strcmp($lang,'')!==0) {
-        $all_langs = get_option('g11n_additional_lang');
+        $all_langs = get_option('g11n_additional_lang',array());
         if (array_key_exists($lang, $all_langs)) {
             return $lang;
         } else {
@@ -22,25 +22,71 @@ function tmy_g11n_lang_sanitize( $lang ) {
             return $default_lang;
         }
     } else {
-        return $default_lang;
+        return $lang;
     }
 }
 
 
 function tmy_g11n_switcher_esc( $html ) {
 
-    $allowed_html = array('span' => array('style' => array('display' => array())),
-                                'a' => array('href' => array()),
-                                'script' => array('src' => array(),
-                                                  'type' => array()),
-                                'style' => array('type' => array()),
-                                'div' => array('id' => array()),
-                                'img' => array('style' => array(),
-                                               'src' => array(),
-                                               'title'=> array(),
-                                               'alt' => array()
+    // '<div style="border:1px solid;background-color:#d7dbdd;color:#21618c;font-size:1rem;">';
+
+
+    $allowed_html = array('span' => array('style' => array('border' => array())),
+                          'div' => array('style' => array('border' => array(),
+                                                          'background-color' => array(),
+                                                          'color' => array())),
+                          'a' => array('href' => array()),
+                          'script' => array('src' => array(),
+                                            'type' => array()),
+                          'style' => array('type' => array()),
+                          'div' => array('id' => array()),
+                          'img' => array('style' => array(),
+                                         'src' => array(),
+                                         'title'=> array(),
+                                         'alt' => array()
                                               )
                                );
     return wp_kses($html,$allowed_html);
+
+}
+function tmy_g11n_available_post_types() {
+ 
+    $post_types = get_post_types( array( 'public' => true ));
+    unset($post_types['g11n_translation']); 
+    return $post_types;
+
+}
+
+function tmy_g11n_available_post_type_options() {
+
+    $ret_array = array();
+ 
+    $post_types = get_post_types( array( 'public' => true ));
+    unset($post_types['g11n_translation']); 
+
+    foreach ( $post_types  as $post_type ) {
+        $ret_array['g11n_l10n_props_' . $post_type] = 'g11n_l10n_props_' . $post_type;
+    }
+    $ret_array['g11n_l10n_props_blogname'] = 'g11n_l10n_props_blogname';
+    $ret_array['g11n_l10n_props_blogdescription'] = 'g11n_l10n_props_blogdescription';
+    return $ret_array;
+
+}
+
+function tmy_g11n_post_type_enabled($post_id, $post_title) {
+
+    if ((strcmp($post_title,"blogname")===0) || (strcmp($post_title,"blogdescription")===0)) {
+        $option_name = "g11n_l10n_props_" . $post_title;
+    } else {
+        $post_type = get_post_type($post_id);
+        $option_name = "g11n_l10n_props_" . $post_type;
+    }
+
+    if (strcmp(get_option($option_name),"Yes")===0) {
+        return true;
+    } else {
+        return false;
+    }
 
 }

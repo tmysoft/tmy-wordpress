@@ -116,9 +116,14 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_server_trunksize' );
 
     		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_blogname' );
-    		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_desc' );
-    		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_posts' );
-    		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_pages' );
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_blogdescription' );
+
+                $all_post_types = tmy_g11n_available_post_types();
+                foreach ( $all_post_types  as $post_type ) {
+    		    register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_'.$post_type );
+                }
+    		//register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_posts' );
+    		//register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_pages' );
 	
     		register_setting( 'tmy-g11n-settings-group', 'g11n_site_lang_cookie' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_site_lang_session' );
@@ -178,11 +183,15 @@ class TMY_G11n_Admin {
                                          'tmy_support_manager_page') );
 
                 remove_submenu_page( 'tmy-g11n-main-menu', 'tmy-g11n-main-menu' );
+
+                $all_post_types = tmy_g11n_available_post_types();
+                $all_post_types['g11n_translation'] = 'g11n_translation';
 	
                	add_meta_box( 'tmy_g11n_trans_status_box', 
 		                  'Translation Status', 
 		                  array( $this, 'tmy_translation_metabox_callback'), 
-		                  array('post','page','g11n_translation','product'),
+		                  array_values($all_post_types),
+		                  //array('post','page','g11n_translation','product'),
 		                  'normal', // (normal, side, advanced)
 		                  'default' // (default, low, high, core) 
                             );
@@ -206,87 +215,37 @@ class TMY_G11n_Admin {
 	    	if (strcmp($post_type,"g11n_translation")===0) {
                     $original_id = get_post_meta($post_id, 'orig_post_id', true);
                     $original_title = get_the_title($original_id);
-                    if (strcmp($original_title,"blogname")===0) {
-                        if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'DISABLED-LIVE'; 
-                            } else {
-                                $translation_entry_status = 'DISABLED-PROGRESS'; 
+
+                    if ( tmy_g11n_post_type_enabled($original_id, $original_title) ) {
+                        if (strcmp($post_status,"publish")===0) {
+                            $translation_entry_status = 'LIVE'; 
+                            update_post_meta( $post_id, 'g11n_tmy_lang_status', 'LIVE');
+                            if ( $html_flag ) {
+                                $translation_entry_status = '<button type="button" style="background-color:#4CAF50;color:white; height:25px;" >LIVE</button>';
                             }
                         } else {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'LIVE'; 
-                            } else {
-                                $translation_entry_status = 'PROGRESS'; 
+                            $translation_entry_status = 'PROGRESS'; 
+                            update_post_meta( $post_id, 'g11n_tmy_lang_status', 'PROGRESS');
+                            if ( $html_flag ) {
+                                $translation_entry_status = '<button type="button" style="background-color:#EE9A4D;color:white; height:25px;" >IN PROGRESS</button>';
                             }
                         }
-                    } elseif (strcmp($original_title,"blogdescription")===0) {
-                        if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'DISABLED-LIVE'; 
-                            } else {
-                                $translation_entry_status = 'DISABLED-PROGRESS'; 
+                    } else {
+                        if (strcmp($post_status,"publish")===0) {
+                            $translation_entry_status = 'DISABLED-LIVE'; 
+                            update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-LIVE');
+                            if ( $html_flag ) {
+                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
                             }
                         } else {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'LIVE'; 
-                            } else {
-                                $translation_entry_status = 'PROGRESS'; 
-                            }
-                        }
-                    } elseif (strcmp(get_post_type($original_id),"post")===0) {
-                        if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'DISABLED-LIVE'; 
-                            } else {
-                                $translation_entry_status = 'DISABLED-PROGRESS'; 
-                            }
-                        } else {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'LIVE'; 
-                            } else {
-                                $translation_entry_status = 'PROGRESS'; 
-                            }
-                        }
-                    } elseif (strcmp(get_post_type($original_id),"page")===0) {
-                        if (strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0) {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'DISABLED-LIVE'; 
-                            } else {
-                                $translation_entry_status = 'DISABLED-PROGRESS'; 
-                            }
-                        } else {
-                            if (strcmp($post_status,"publish")===0) {
-                                $translation_entry_status = 'LIVE'; 
-                            } else {
-                                $translation_entry_status = 'PROGRESS'; 
+                            $translation_entry_status = 'DISABLED-PROGRESS'; 
+                            update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-PROGRESS');
+                            if ( $html_flag ) {
+                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
                             }
                         }
                     }
-                    if (strcmp($translation_entry_status,"LIVE")===0) {
-                        update_post_meta( $post_id, 'g11n_tmy_lang_status', 'LIVE');
-                        if ( $html_flag ) {
-                            $translation_entry_status = '<button type="button" style="background-color:#4CAF50;color:white; height:25px;" >LIVE</button>';
-                        }
 
-                    } elseif (strcmp($translation_entry_status,"PROGRESS")===0) {
-                        update_post_meta( $post_id, 'g11n_tmy_lang_status', 'PROGRESS');
-                        if ( $html_flag ) {
-                            $translation_entry_status = '<button type="button" style="background-color:#EE9A4D;color:white; height:25px;" >IN PROGRESS</button>';
-                        }
-
-                    } elseif (strcmp($translation_entry_status,"DISABLED-LIVE")===0) {
-                        update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-LIVE');
-                        if ( $html_flag ) {
-                            $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
-                        }
-
-                    } elseif (strcmp($translation_entry_status,"DISABLED-PROGRESS")===0) {
-                        update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-PROGRESS');
-                        if ( $html_flag ) {
-                            $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
-                        }
-                    }
                     return $translation_entry_status;
                 }
         }
@@ -298,7 +257,9 @@ class TMY_G11n_Admin {
                 $post_type = get_post_type($post_id);
                 $post_status = get_post_status($post_id);
                 $return_msg = '';
-               
+
+                $all_post_types = tmy_g11n_available_post_types();
+     error_log("all_post_types: " . $all_post_types);          
 	    	if (strcmp($post_type,"g11n_translation")===0) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $trans_info = $this->translator->get_translation_info($post_id);
@@ -315,7 +276,9 @@ class TMY_G11n_Admin {
 		    $return_msg .= ' Status: ' . $this->_update_g11n_translation_status($post_id, true) . '</br>';
                     //$return_msg .= "</div>";
 
-                } elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
+                } elseif (array_key_exists($post_type, $all_post_types)) {
+     error_log("yes all_post_types: " . $all_post_types);          
+                //} elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $return_msg .= '<table class="wp-list-table striped table-view-list">';
     		    $return_msg .= '<tr><td><b>Language</b></td> <td><b>Code</b></td> <td><b>Id</b></th> <td><b>Status</b></td></tr>';
@@ -562,21 +525,6 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=true;
                         document.getElementById("g11n_switcher_post").disabled=true;
                         document.getElementById("g11n_switcher_sidebar").disabled=true;
-                        //document.getElementById("g11n_site_lang_cookie").disabled=true;
-                        //document.getElementById("g11n_site_lang_browser").disabled=true;
-                        //document.getElementById("g11n_server_url").disabled=true;
-                        //document.getElementById("g11n_server_user").disabled=true;
-                        //document.getElementById("g11n_server_token").disabled=true;
-                        //document.getElementById("g11n_server_project").disabled=true;
-                        //document.getElementById("g11n_server_version").disabled=true;
-                        //document.getElementById("g11n_create_project_button").disabled=true;
-                        //document.getElementById("g11n_server_trunksize").disabled=true;
-                        //document.getElementById("g11n_l10n_props_blogname").disabled=true;
-                        //document.getElementById("g11n_l10n_props_desc").disabled=true;
-                        //document.getElementById("g11n_l10n_props_posts").disabled=true;
-                        //document.getElementById("g11n_l10n_props_pages").disabled=true;
-                        //document.getElementById("g11n_switcher_type_Text").disabled=true;
-                        //document.getElementById("g11n_switcher_type_Flag").disabled=true;
                     }
                     if(element.value=='No'){
                         console.log("no");
@@ -584,21 +532,6 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=false;
                         document.getElementById("g11n_switcher_post").disabled=false;
                         document.getElementById("g11n_switcher_sidebar").disabled=false;
-                        //document.getElementById("g11n_site_lang_cookie").disabled=false;
-                        //document.getElementById("g11n_site_lang_browser").disabled=false;
-                        //document.getElementById("g11n_server_url").disabled=false;
-                        //document.getElementById("g11n_server_user").disabled=false;
-                        //document.getElementById("g11n_server_token").disabled=false;
-                        //document.getElementById("g11n_server_project").disabled=false;
-                        //document.getElementById("g11n_server_version").disabled=false;
-                        //document.getElementById("g11n_create_project_button").disabled=false;
-                        //document.getElementById("g11n_server_trunksize").disabled=false;
-                        //document.getElementById("g11n_l10n_props_blogname").disabled=false;
-                        //document.getElementById("g11n_l10n_props_desc").disabled=false;
-                        //document.getElementById("g11n_l10n_props_posts").disabled=false;
-                        //document.getElementById("g11n_l10n_props_pages").disabled=false;
-                        //document.getElementById("g11n_switcher_type_Text").disabled=false;
-                        //document.getElementById("g11n_switcher_type_Flag").disabled=false;
                     }
                 
 
@@ -711,9 +644,23 @@ class TMY_G11n_Admin {
             	<br>
             	<input type="checkbox" id="g11n_l10n_props_blogname" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); echo esc_attr($config_disable); ?> /> 
                                                                                                             Site Title/Blog Name <br>
-            	<input type="checkbox" id="g11n_l10n_props_desc" name="g11n_l10n_props_desc" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_desc')), "Yes" ); echo esc_attr($config_disable); ?> /> Tagline<br>
+            	<input type="checkbox" id="g11n_l10n_props_blogdescription" name="g11n_l10n_props_blogdescription" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogdescription')), "Yes" ); echo esc_attr($config_disable); ?> /> Tagline<br><br>
+
+                <?php
+                $all_post_types = tmy_g11n_available_post_types();
+                foreach ( $all_post_types  as $post_type ) {
+                    $option_name = 'g11n_l10n_props_' . $post_type;
+                    ?>
+            	    <input type="checkbox" id="<?php echo $option_name; ?>" name="<?php echo $option_name; ?>" value="Yes" <?php checked( esc_attr(get_option("$option_name")), "Yes" ); echo esc_attr($config_disable); ?> /> <?php echo $post_type; ?><br>
+                    <?php
+                }
+
+                ?>
+                <!--
             	<input type="checkbox" id="g11n_l10n_props_posts" name="g11n_l10n_props_posts" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_posts')), "Yes" ); echo esc_attr($config_disable); ?> /> Posts<br>
             	<input type="checkbox" id="g11n_l10n_props_pages" name="g11n_l10n_props_pages" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_pages')), "Yes" ); echo esc_attr($config_disable); ?> /> Pages 
+                -->
+
         	</td>
         	</tr>             
 
@@ -908,7 +855,7 @@ class TMY_G11n_Admin {
 		  <br></h3>
 		<?php
 
-		date_default_timezone_set('America/New_York');
+                echo date_default_timezone_get();
 		$g11n_sys_info = "\n***** G11n Plugin Diagnosis *****\n" . date("F d, Y l H:s e") . "\n";
     		//$g11n_sys_info .= phpversion() . "\n";
     		//$g11n_sys_info .= var_export(get_loaded_extensions(),true) . "\n";
@@ -976,9 +923,9 @@ class TMY_G11n_Admin {
                              'g11n_server_project',
                              'g11n_server_version',
                              'g11n_l10n_props_blogname',
-                             'g11n_l10n_props_desc',
-                             'g11n_l10n_props_posts',
-                             'g11n_l10n_props_pages',
+                             'g11n_l10n_props_blogdescription',
+                             'g11n_l10n_props_post',
+                             'g11n_l10n_props_page',
                              'g11n_site_lang_cookie',
                              'g11n_site_lang_session',
                              'g11n_site_lang_query_string',
@@ -1169,9 +1116,11 @@ class TMY_G11n_Admin {
                                  //error_log("in create_sync_translation, no translation_id");
                                  $translation_title = get_post_field('post_title', $post_id);
                                  $translation_contents = get_post_field('post_content', $post_id);
+                                 $translation_excerpt = get_post_field('post_excerpt', $post_id);
                                  $g11n_translation_post = array(
                                        'post_title'    => $translation_title,
                                        'post_content'  => $translation_contents,
+                                       'post_excerpt'  => $translation_excerpt,
                                        'post_type'  => "g11n_translation"
                                  );
                                  $new_translation_id = wp_insert_post( $g11n_translation_post );
@@ -1452,7 +1401,10 @@ class TMY_G11n_Admin {
 
             $translation_id = $this->translator->get_translation_id($default_lang_post_id,$locale,$payload_post_type);
 
-            if ((strcmp($payload_post_type,"post") === 0)||(strcmp($payload_post_type,"page") === 0)) {
+            $all_post_types = tmy_g11n_available_post_types();
+
+            if (array_key_exists($payload_post_type, $all_post_types)) {
+            //if ((strcmp($payload_post_type,"post") === 0)||(strcmp($payload_post_type,"page") === 0)) {
                      if (isset($translation_id)) {
                         //$debug_log .= " Found local item,id=".$translation_id." ".$payload_post_type;
                          $g11n_translation_post = array(
@@ -1774,7 +1726,7 @@ class TMY_G11n_Admin {
 	public function tmy_plugin_option_update($value, $option, $old_value) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("tmy_plugin_option_update:" . json_encode($value) . " " . json_encode($option) . " ".json_encode($old_value) );
+                error_log("tmy_plugin_option_update:" . json_encode($option) );
             } 
 
             if (((strcmp($option, "g11n_additional_lang")===0) && ($value != $old_value)) ||
@@ -1848,8 +1800,8 @@ class TMY_G11n_Admin {
 
 
             }
-            //if ((strcmp($option, "g11n_l10n_props_desc")===0) && ($value != $old_value)) {
-            if ((strcmp($option, "g11n_l10n_props_desc")===0)) {
+            //if ((strcmp($option, "g11n_l10n_props_blogdescription")===0) && ($value != $old_value)) {
+            if ((strcmp($option, "g11n_l10n_props_blogdescription")===0)) {
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("tmy_plugin_option_update description: " . $old_value. "->" . $value );
                     error_log("tmy_plugin_option_update blog description:" . get_bloginfo('description') );
@@ -1886,10 +1838,15 @@ class TMY_G11n_Admin {
                 error_log("In tmy_plugin_option_update_after " . $old . " " . $new . " " . $option . "(" . get_option($option) . ")");
             }
 
-            if (((strcmp($option, "g11n_l10n_props_blogname")===0) && ($new != $old)) ||
-                ((strcmp($option, "g11n_l10n_props_desc")===0) && ($new != $old)) ||
-                ((strcmp($option, "g11n_l10n_props_pages")===0) && ($new != $old)) ||
-                ((strcmp($option, "g11n_l10n_props_posts")===0) && ($new != $old))) {
+            $all_post_type_options = tmy_g11n_available_post_type_options();
+            error_log("all_post_type_options: " . json_encode($all_post_type_options));
+
+            if ((array_key_exists($option, $all_post_type_options))  && ($new != $old)) {
+
+            //if (((strcmp($option, "g11n_l10n_props_blogname")===0) && ($new != $old)) ||
+            //    ((strcmp($option, "g11n_l10n_props_blogdescription")===0) && ($new != $old)) ||
+            //    ((strcmp($option, "g11n_l10n_props_pages")===0) && ($new != $old)) ||
+            //    ((strcmp($option, "g11n_l10n_props_posts")===0) && ($new != $old))) {
 
                 $selected_posts = new WP_Query(array(
                                                'post_type' => 'g11n_translation',
@@ -1922,7 +1879,9 @@ class TMY_G11n_Admin {
 
         function tmy_plugin_post_set_columns( $columns ){
             unset($columns['date']);
+            unset($columns['featured']);
             $columns['translation_started']     = 'Translation Started';
+            $columns['featured']     = 'featured';
             $columns['date']     = 'Date';
             return $columns;
         }
@@ -1984,7 +1943,7 @@ class TMY_G11n_Admin {
                     if (isset($result[0]->post_id)) {
                         echo 'Yes';
                     } else {
-                        echo '';
+                         echo '';
                     }
 
                 break;

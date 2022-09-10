@@ -292,35 +292,44 @@ class TMY_G11n_Translator {
                 }
 
                 if ( ! $admin_user ) {
-                    if  (strcmp(get_post_field("post_title", $post_id),'blogname')===0) {
-                        if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
-                            if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In get_translation_id, g11n_l10n_props_blogname is disabled");
-                            }
-                            return null;
+
+                    $post_title = get_post_field("post_title", $post_id);
+                    if (! tmy_g11n_post_type_enabled($post_id, $post_title) ) {
+                        if ( WP_TMY_G11N_DEBUG ) {
+                            error_log("In get_translation_id, translation is disabled");
                         }
-                    } elseif (strcmp(get_post_field("post_title", $post_id),'blogdescription')===0) {
-                        if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
-                            if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In get_translation_id, g11n_l10n_props_desc is disabled");
-                            }
-                            return null;
-                        }
-                    } elseif (strcmp($post_type,'post') === 0) {
-                        if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
-                            if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In get_translation_id, g11n_l10n_props_posts is disabled");
-                            }
-                            return null;
-                        }
-                    } elseif (strcmp($post_type,'page') === 0) {
-                        if (strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0) {
-                            if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In get_translation_id, g11n_l10n_props_page is disabled: " . get_option('g11n_l10n_props_pages'));
-                            }
-                            return null;
-                        }
+                        return null;
                     }
+
+                    //if  (strcmp(get_post_field("post_title", $post_id),'blogname')===0) {
+                    //    if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")!==0) {
+                    //        if ( WP_TMY_G11N_DEBUG ) {
+                    //            error_log("In get_translation_id, g11n_l10n_props_blogname is disabled");
+                    //        }
+                    //        return null;
+                    //    }
+                    //} elseif (strcmp(get_post_field("post_title", $post_id),'blogdescription')===0) {
+                    //    if (strcmp(get_option('g11n_l10n_props_desc'),"Yes")!==0) {
+                    //        if ( WP_TMY_G11N_DEBUG ) {
+                    //            error_log("In get_translation_id, g11n_l10n_props_desc is disabled");
+                    //        }
+                    //        return null;
+                    //    }
+                    //} elseif (strcmp($post_type,'post') === 0) {
+                    //    if (strcmp(get_option('g11n_l10n_props_posts'),"Yes")!==0) {
+                    //        if ( WP_TMY_G11N_DEBUG ) {
+                    //            error_log("In get_translation_id, g11n_l10n_props_posts is disabled");
+                    //        }
+                    //        return null;
+                    //    }
+                    //} elseif (strcmp($post_type,'page') === 0) {
+                    //    if (strcmp(get_option('g11n_l10n_props_pages'),"Yes")!==0) {
+                    //        if ( WP_TMY_G11N_DEBUG ) {
+                    //            error_log("In get_translation_id, g11n_l10n_props_page is disabled: " . get_option('g11n_l10n_props_pages'));
+                    //        }
+                    //        return null;
+                    //    }
+                    //}
                     $admin_query = "{$wpdb->prefix}posts.post_status = 'publish' and ";
                 } else {
                     $admin_query = "{$wpdb->prefix}posts.post_status != 'trash' and ";
@@ -395,9 +404,6 @@ class TMY_G11n_Translator {
 
 		$language_options = get_option('g11n_additional_lang', array());
 		//$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
-		//$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
-		//$language_switcher_html = '';
-		//$language_switcher_html = '';
 
 		if (strcmp('Yes', get_option('g11n_using_google_tookit','Yes')) === 0) {
 
@@ -440,6 +446,10 @@ class TMY_G11n_Translator {
 
                 } else {
 
+		    //$language_switcher_html = 
+                    //'<div style="border:1px solid;background-color:#d7dbdd;color:#21618c;font-size:1rem;">';
+                    //'<div style="border:1px solid;border-radius:2px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 0px 0 rgba(0,0,0,.4);padding:0.1rem 0.4rem;margin:0rem 0;right:1rem;font-size:1rem;">';
+
 		    $language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
 		    //$language_switcher_html = '<div style="border:1px solid;border-radius:5px;">';
 		    foreach( $language_options as $value => $code) {
@@ -463,15 +473,16 @@ class TMY_G11n_Translator {
 		        }
 		        if (strcmp($value, $g11n_current_language) === 0) {
 			    $language_switcher_html .= '<a href=' . 
-				                   add_query_arg($query_variable_name, $value, $current_url) . '><b> ' .
+				                   add_query_arg($query_variable_name, $value, $current_url) . '><b>' .
 				                   $href_text_ht.'</b></a>';
 		        } else {
 			    $language_switcher_html .= '<a href=' . 
-				                   add_query_arg($query_variable_name, $value, $current_url) . '> ' .
+				                   add_query_arg($query_variable_name, $value, $current_url) . '>' .
 				                   $href_text.'</a>';
 		        }
                     }
 		    $language_switcher_html .= "</span>";
+		    //$language_switcher_html .= "</div>";
 		    return $language_switcher_html;
 		}
 
@@ -480,10 +491,14 @@ class TMY_G11n_Translator {
 	public function get_preferred_language() {
 
            
+                session_start();
                 if (is_admin()) {
                     return get_option('g11n_default_lang');
                 }
                 $seq_code = mt_rand(1000,9999);
+
+                error_log($seq_code . " In get_preferred_language, SHAO ". json_encode($_SESSION));
+
                 if ( WP_TMY_G11N_DEBUG ) {
                     if (isset($_SESSION)) {
                         error_log($seq_code . " In get_preferred_language, ". sanitize_textarea_field(json_encode($_SESSION)));
@@ -501,6 +516,7 @@ class TMY_G11n_Translator {
                         }
                     }
                     session_start();
+                error_log($seq_code . " In get_preferred_language, SHAO after session_start ". json_encode($_SESSION));
                 }
                 if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');

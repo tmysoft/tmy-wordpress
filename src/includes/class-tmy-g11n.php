@@ -175,10 +175,16 @@ class TMY_G11n {
 		$this->loader->add_filter( 'views_edit-post', $plugin_admin, 'g11n_edit_posts_views' );
                 $this->loader->add_filter( 'pre_update_option', $plugin_admin,'tmy_plugin_option_update', 10, 3 );
 
-		$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
-		$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
-		$this->loader->add_filter( 'update_option_g11n_l10n_props_posts', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
-		$this->loader->add_filter( 'update_option_g11n_l10n_props_pages', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+                $all_post_type_options = tmy_g11n_available_post_type_options();
+                error_log("all_post_type_options: " . json_encode($all_post_type_options));
+                foreach ( $all_post_type_options  as $option_name ) {
+		    $this->loader->add_filter( $option_name, $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+                }
+
+		//$this->loader->add_filter( 'update_option_g11n_l10n_props_desc', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		//$this->loader->add_filter( 'update_option_g11n_l10n_props_blogname', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		//$this->loader->add_filter( 'update_option_g11n_l10n_props_posts', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
+		//$this->loader->add_filter( 'update_option_g11n_l10n_props_pages', $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
 
                 $this->loader->add_filter( 'manage_g11n_translation_posts_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_columns');
                 $this->loader->add_filter( 'manage_edit-g11n_translation_sortable_columns', $plugin_admin,'tmy_plugin_g11n_translation_set_sortable');
@@ -244,7 +250,8 @@ class TMY_G11n {
                 $this->loader->add_filter( 'bloginfo', $plugin_public, 'g11n_wp_title_filter', 10, 2 );
 		$this->loader->add_filter( 'the_title', $plugin_public, 'g11n_title_filter', 10, 2 );
 		$this->loader->add_filter( 'the_content', $plugin_public, 'g11n_content_filter' );
-		$this->loader->add_filter( 'the_excerpt', $plugin_public, 'g11n_excerpt_filter' );
+		//$this->loader->add_filter( 'the_excerpt', $plugin_public, 'g11n_excerpt_filter' );
+		//$this->loader->add_filter( 'get_the_excerpt', $plugin_public, 'g11n_excerpt_filter' );
 		$this->loader->add_filter( 'the_posts', $plugin_public, 'g11n_the_posts_filter' );
 
 		$this->loader->add_filter( 'pre_option_blogname', $plugin_public, 'g11n_pre_get_option_blogname',10, 2);
