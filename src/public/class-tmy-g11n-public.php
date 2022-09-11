@@ -121,12 +121,14 @@ class TMY_G11n_Public {
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession");
                 }
+
     		if(!session_id()) {
         	    session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession id=" . session_id());
                 }
+
     		if (isset($_SESSION['g11n_language'])) {
                     if ( WP_TMY_G11N_DEBUG ) {
         		error_log("Starting session, session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']));
@@ -187,7 +189,7 @@ public function g11n_add_floating_menu() {
                                               )
                                );
            if(strcmp(get_option('g11n_switcher_floating'),"Yes")==0){
-               echo '<div id="tmyfloatmenu" style="position:fixed;z-index:10001;bottom:5rem;left:3rem;"> <div style="border:1px solid;border-radius:2px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 0px 0 rgba(0,0,0,.4);padding:0.1rem 0.4rem;margin:0rem 0;right:1rem;font-size:1rem;">' . tmy_g11n_switcher_esc($this->translator->get_language_switcher('floating')) . '</div></div>';
+               echo '<div id="tmyfloatmenu" style="position:fixed;z-index:10001;bottom:5rem;left:3rem;"> <div style="border:1px solid;border-radius:2px;background-color:#d7dbdd;color:#21618c;z-index:10000;box-shadow: 0 0 0px 0 rgba(0,0,0,.4);padding:0.1rem 0.4rem;margin:0rem 0;right:1rem;font-size:1rem;">' . tmy_g11n_html_kses_esc($this->translator->get_language_switcher('floating')) . '</div></div>';
 
               ?>
                 <script>
@@ -386,7 +388,7 @@ public function g11n_add_floating_menu() {
 
 	    // Now echo something awesome at the top of each sidebar!
 	    if(strcmp(get_option('g11n_switcher_sidebar'),"Yes")==0){
-		echo '<div align="center">' . tmy_g11n_switcher_esc($this->translator->get_language_switcher('sidebar')). '</div>';
+		echo '<div align="center">' . tmy_g11n_html_kses_esc($this->translator->get_language_switcher('sidebar')). '</div>';
             }
 
 
@@ -746,8 +748,12 @@ public function g11n_add_floating_menu() {
                         if ( WP_TMY_G11N_DEBUG ) {
                             error_log("In g11n_the_posts_filter, post_id: " . $post->ID . " excerpt: " . $post->post_excerpt);
                         }
-		        if ((strcmp($post->post_type, "product") === 0) && (! empty($post->post_excerpt))) {
-                            $g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
+                        if ( tmy_g11n_is_valid_post_type($post->post_type) && (! empty($post->post_excerpt))) {
+		        //if ((strcmp($post->post_type, "product") === 0) && (! empty($post->post_excerpt))) {
+
+		            $g11n_current_language = $this->translator->get_preferred_language();
+
+                            //$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
                             $language_options = get_option('g11n_additional_lang');
                             $language_name = $language_options[$g11n_current_language];
 		            $translation_post_id = $this->translator->get_translation_id($post->ID,
@@ -757,6 +763,7 @@ public function g11n_add_floating_menu() {
                             if ( WP_TMY_G11N_DEBUG ) {
                                 error_log("In g11n_the_posts_filter, excerpt post_id: " . $post->ID . " language: " . $language_name);
                                 error_log("In g11n_the_posts_filter, translation_id:  " . $translation_post_id);
+                                error_log("In g11n_the_posts_filter, SESSION:  " . $_SESSION['g11n_language']);
                             }
 		            if (isset($translation_post_id)) {
                                 $post->post_excerpt=get_the_excerpt($translation_post_id);
@@ -1016,9 +1023,42 @@ public function g11n_add_floating_menu() {
 
         function tmy_lang_switcher_block_dynamic_render_cb ( $att ) {
 
-            $html = '<div>' . tmy_g11n_switcher_esc($this->translator->get_language_switcher('block')) . '</div>';
+            $html = '<div>' . tmy_g11n_html_kses_esc($this->translator->get_language_switcher('block')) . '</div>';
             return $html;
         }
 
+	public function tmy_g11n_template_redirect() {
+
+            session_start();
+            if (! is_admin()) {
+                if ( WP_TMY_G11N_DEBUG ) {
+                    if (isset($_SESSION)) {
+                        error_log("In tmy_g11n_template_redirect, ". sanitize_textarea_field(json_encode($_SESSION)));
+                    } else {
+                        error_log("In tmy_g11n_template_redirect, _SESSION is not set");
+                    }
+                    error_log("In tmy_g11n_template_redirect, session id ".session_id());
+                }
+            }
+
+            if (! is_admin()) {
+                $lang_var = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
+                if ( WP_TMY_G11N_DEBUG ) {
+                    error_log("In g11n_setcookie , lang_var " . $lang_var);
+                }
+                if (!empty($lang_var)) {
+                        setcookie('g11n_language', $lang_var, strtotime('+1 day'));
+                        if ( WP_TMY_G11N_DEBUG ) {
+                             error_log("In g11n_setcookie SET COOKIE from query string - " . $lang_var);
+                        }
+                } else {
+                        setcookie('g11n_language', get_option('g11n_default_lang'), strtotime('+1 day'));
+                        if ( WP_TMY_G11N_DEBUG ) {
+                             error_log("In g11n_setcookie SET COOKIE from wp language option - " .  get_option('g11n_default_lang'));
+                        }
+                }
+            }
+
+        }
 
 }

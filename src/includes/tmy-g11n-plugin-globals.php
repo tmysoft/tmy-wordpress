@@ -27,7 +27,7 @@ function tmy_g11n_lang_sanitize( $lang ) {
 }
 
 
-function tmy_g11n_switcher_esc( $html ) {
+function tmy_g11n_html_kses_esc( $html ) {
 
     // '<div style="border:1px solid;background-color:#d7dbdd;color:#21618c;font-size:1rem;">';
 
@@ -36,11 +36,23 @@ function tmy_g11n_switcher_esc( $html ) {
                           'div' => array('style' => array('border' => array(),
                                                           'background-color' => array(),
                                                           'color' => array())),
-                          'a' => array('href' => array()),
+                          'a' => array('href' => array(array()),
+                                       'target' => array()
+                                      ),
                           'script' => array('src' => array(),
                                             'type' => array()),
                           'style' => array('type' => array()),
                           'div' => array('id' => array()),
+                          'tr' => array(),
+                          'table' => array(),
+                          'button' => array('class' => array(),
+                                            'style' => array(),
+                                            'onclick' => array(),
+                                            'aria-disabled' => array(),
+                                            'type' => array()),
+                          'td' => array(),
+                          'br' => array(),
+                          'b' => array(),
                           'img' => array('style' => array(),
                                          'src' => array(),
                                          'title'=> array(),
@@ -50,11 +62,20 @@ function tmy_g11n_switcher_esc( $html ) {
     return wp_kses($html,$allowed_html);
 
 }
+
 function tmy_g11n_available_post_types() {
  
     $post_types = get_post_types( array( 'public' => true ));
     unset($post_types['g11n_translation']); 
     return $post_types;
+
+}
+
+function tmy_g11n_is_valid_post_type($post_type) {
+ 
+    $post_types = get_post_types( array( 'public' => true ));
+    unset($post_types['g11n_translation']); 
+    return array_key_exists($post_type,$post_types);
 
 }
 

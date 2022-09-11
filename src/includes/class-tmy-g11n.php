@@ -176,7 +176,6 @@ class TMY_G11n {
                 $this->loader->add_filter( 'pre_update_option', $plugin_admin,'tmy_plugin_option_update', 10, 3 );
 
                 $all_post_type_options = tmy_g11n_available_post_type_options();
-                error_log("all_post_type_options: " . json_encode($all_post_type_options));
                 foreach ( $all_post_type_options  as $option_name ) {
 		    $this->loader->add_filter( $option_name, $plugin_admin, 'tmy_plugin_option_update_after', 10, 3 );
                 }
@@ -200,13 +199,13 @@ class TMY_G11n {
                 $this->loader->add_action( 'pre_get_posts', $plugin_admin,'tmy_plugin_g11n_translation_set_columns_orderby');
                 //$this->loader->add_action( 'edit_form_top', $plugin_admin,'tmy_plugin_g11n_edit_form_top');
 
-                $this->loader->add_filter( 'bulk_actions-edit-post', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
-                $this->loader->add_filter( 'handle_bulk_actions-edit-post', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
-
-                $this->loader->add_filter( 'bulk_actions-edit-page', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
-                $this->loader->add_filter( 'handle_bulk_actions-edit-page', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
+                //$this->loader->add_filter( 'bulk_actions-edit-post', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
+                //$this->loader->add_filter( 'handle_bulk_actions-edit-post', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
+                //$this->loader->add_filter( 'bulk_actions-edit-page', $plugin_admin,'tmy_plugin_g11n_register_bulk_actions');
+                //$this->loader->add_filter( 'handle_bulk_actions-edit-page', $plugin_admin, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 );
 
                 $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
+                $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
  
  
 	}
@@ -227,15 +226,17 @@ class TMY_G11n {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
 		$this->loader->add_action( 'init', $plugin_public, 'G11nStartSession', 1 );
-		$this->loader->add_action( 'init', $plugin_public, 'g11n_setcookie' );
+		//$this->loader->add_action( 'init', $plugin_public, 'g11n_setcookie' );
 		$this->loader->add_action( 'wp_login', $plugin_public, 'G11nEndSession' );
 		$this->loader->add_action( 'wp_logout', $plugin_public, 'G11nEndSession' );
 
-		$this->loader->add_action( 'publish_post', $plugin_public, 'g11n_post_published_notification', 10, 2 );
-		$this->loader->add_action( 'publish_page', $plugin_public, 'g11n_post_published_notification', 10, 2 );
+                // Sep 2022
+		//$this->loader->add_action( 'publish_post', $plugin_public, 'g11n_post_published_notification', 10, 2 );
+		//$this->loader->add_action( 'publish_page', $plugin_public, 'g11n_post_published_notification', 10, 2 );
+		//$this->loader->add_action( 'publish_product', $plugin_public, 'g11n_post_published_notification', 10, 2 );
+
 		//$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
 
-		$this->loader->add_action( 'publish_product', $plugin_public, 'g11n_post_published_notification', 10, 2 );
 
 		$this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
 		$this->loader->add_action( 'get_sidebar', $plugin_public, 'add_before_my_siderbar' );
@@ -265,6 +266,7 @@ class TMY_G11n {
                 $this->loader->add_filter( 'use_block_editor_for_post', $plugin_public, 'g11n_option_editor_change', 10, 1);
 
 		$this->loader->add_action( 'init', $plugin_public, 'tmy_g11n_blocks_init');
+		$this->loader->add_action( 'template_redirect', $plugin_public, 'tmy_g11n_template_redirect');
 
 	}
 

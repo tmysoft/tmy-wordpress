@@ -119,6 +119,7 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_blogdescription' );
 
                 $all_post_types = tmy_g11n_available_post_types();
+
                 foreach ( $all_post_types  as $post_type ) {
     		    register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_'.$post_type );
                 }
@@ -142,6 +143,13 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_resource_file_location' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_editor_choice' );
 	
+
+                $all_post_types = tmy_g11n_available_post_types();
+                foreach ( $all_post_types  as $post_type ) {
+                    add_filter( 'bulk_actions-edit-' . $post_type, array($this, 'tmy_plugin_g11n_register_bulk_actions'));
+                    add_filter( 'handle_bulk_actions-edit-' . $post_type, array($this, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 ));
+                }
+
 	}
 
 	public function tmy_plugin_register_admin_menu() {
@@ -191,7 +199,7 @@ class TMY_G11n_Admin {
 		                  'Translation Status', 
 		                  array( $this, 'tmy_translation_metabox_callback'), 
 		                  array_values($all_post_types),
-		                  //array('post','page','g11n_translation','product'),
+		                  //format: array('post','page','g11n_translation','product'),
 		                  'normal', // (normal, side, advanced)
 		                  'default' // (default, low, high, core) 
                             );
@@ -259,7 +267,6 @@ class TMY_G11n_Admin {
                 $return_msg = '';
 
                 $all_post_types = tmy_g11n_available_post_types();
-     error_log("all_post_types: " . $all_post_types);          
 	    	if (strcmp($post_type,"g11n_translation")===0) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $trans_info = $this->translator->get_translation_info($post_id);
@@ -277,7 +284,6 @@ class TMY_G11n_Admin {
                     //$return_msg .= "</div>";
 
                 } elseif (array_key_exists($post_type, $all_post_types)) {
-     error_log("yes all_post_types: " . $all_post_types);          
                 //} elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $return_msg .= '<table class="wp-list-table striped table-view-list">';
@@ -384,11 +390,21 @@ class TMY_G11n_Admin {
                                         url:     ajaxurl,
                                         data:    data,
                                         success: function(response) {
-                                            var div = document.getElementById('tmy_translation_status_box_div');
-                                            var response_json = $.parseJSON(response);
-                                            div.innerHTML = response_json.div_status.slice(0, -1) ;
-                                            //window.location.reload();
-                                            alert('Server Reply: ' + response_json.message);
+                                            if (response === undefined) {
+                                                alert('No Server Reply, talk to system admininstrator.');
+                                            } else {
+                                                var response_json = $.parseJSON(response);
+                                                if (response_json.message === undefined) {
+                                                    alert('No Server Reply, talk to system admininstrator.');
+                                                } else {
+                                                    if (response_json.div_status !== undefined) {
+                                                        var div = document.getElementById('tmy_translation_status_box_div');
+                                                        div.innerHTML = response_json.div_status.slice(0, -1) ;
+                                                    }
+                                                    alert('Server Reply: ' + response_json.message);
+                                                }
+                                                //window.location.reload();
+                                            }
                                         },
                                         error:   function(jqXHR, textStatus, errorThrown ) {
                                             alert("Error, status = " + jqXHR.status + ", " + "textStatus: " + textStatus + "ErrorThrown: " + errorThrown);
@@ -406,7 +422,7 @@ class TMY_G11n_Admin {
                 //$post_status = get_post_status($post_id);
 
                 echo '<div id="tmy_translation_status_box_div">';
-                echo $this->_get_tmy_g11n_metabox($post->ID);
+                echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($post->ID));
                 echo '</div>';
 	
         }
@@ -449,7 +465,7 @@ class TMY_G11n_Admin {
           	foreach ($complete_lang_list as $lang => $code) :
                		echo '<option value="' . esc_attr($lang) . '" ' . 
                              selected(esc_attr($sys_default_lang), esc_attr($lang)) . ' >' . 
-                             $lang . '</option>';
+                             esc_attr($lang) . '</option>';
           	endforeach;
 		
 		?>   
@@ -477,7 +493,9 @@ class TMY_G11n_Admin {
 
 		if (is_array($all_configed_langs)) {
 		    foreach( $all_configed_langs as $value => $code) {
-		        echo esc_attr($value). '('.esc_attr($code).') <input type="checkbox" name="g11n_additional_lang['.$value.']" value="'.esc_attr($code).'" checked/><br>';
+		        echo esc_attr($value). 
+                        '('.esc_attr($code).
+                        ') <input type="checkbox" name="g11n_additional_lang['.esc_attr($value).']" value="'.esc_attr($code).'" checked/><br>';
 		    }
 		}
 		
@@ -570,7 +588,8 @@ class TMY_G11n_Admin {
             	<input type="checkbox" id="g11n_switcher_post" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Each Post <br>
             	<input type="checkbox" id="g11n_switcher_sidebar" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?><?php echo esc_attr($config_selected_disable); ?> /> Top of Sidebar <br>
             	<input type="checkbox" id="g11n_switcher_floating" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
-                Language Switcher is also available in "G11n Language Widget" from "Appearance-> Widgets".
+                Language Switchers could be added to different locations via widget "TMY Language Switcher Widget" from "Appearance-> Widgets",<br>
+                                                         or Gutenberg block(block) titled "TMY Language Switcher Block". 
  	    	</td>
                 </tr>
  
@@ -651,7 +670,7 @@ class TMY_G11n_Admin {
                 foreach ( $all_post_types  as $post_type ) {
                     $option_name = 'g11n_l10n_props_' . $post_type;
                     ?>
-            	    <input type="checkbox" id="<?php echo $option_name; ?>" name="<?php echo $option_name; ?>" value="Yes" <?php checked( esc_attr(get_option("$option_name")), "Yes" ); echo esc_attr($config_disable); ?> /> <?php echo $post_type; ?><br>
+            	    <input type="checkbox" id="<?php echo esc_attr($option_name); ?>" name="<?php echo esc_attr($option_name); ?>" value="Yes" <?php checked( esc_attr(get_option("$option_name")), "Yes" ); echo esc_attr($config_disable); ?> /> <?php echo esc_attr($post_type); ?><br>
                     <?php
                 }
 
@@ -677,7 +696,9 @@ class TMY_G11n_Admin {
 		
 		foreach ($g11n_switch_type as $key => $desc) :
 		          $selected = (get_option('g11n_switcher_type','Flag') == $key) ? 'checked="checked"' : '';
-		          echo "\n\t<label><input type='radio' id='g11n_switcher_type_".esc_attr($key)."' name='g11n_switcher_type' value='" . esc_attr($key) . "' $selected $config_disable /> $desc</label><br />";
+		          echo "\n\t<label><input type='radio' id='g11n_switcher_type_".esc_attr($key).
+                               "' name='g11n_switcher_type' value='" . esc_attr($key) . 
+                               "' " . esc_attr($selected) . esc_attr($config_disable) . " /> " . esc_attr($desc) . "</label><br />";
 	  	endforeach;
 		 
           	?>
@@ -770,51 +791,8 @@ class TMY_G11n_Admin {
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("In tmy_l10n_manager_page sql:" . json_encode($rows));
                 }
-                echo "<table>";
-                echo    '<tr><td><b>Orig. ID</b></td>' .
-                                        '<td><b>Trans. ID</b></td>' .
-                                        '<td><b>Title</b></td>' .
-                                        '<td><b>Lang</b></td>' .
-                                        '<td><b>Last Modified</b></td></tr>';
 
-                $row_arr = array();
-                foreach ( $rows as $row ) {
-                    $post_info = $this->translator->get_translation_info($row->ID);
-                    if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("In tmy_l10n_manager_page trans post:" . json_encode($post_info));
-                    }
-                    if (isset($post_info[0])) {
-                        $row_arr[] = array("TID" => $post_info[0]->ID,
-                                               "ID" => $row->ID,
-                                               "post_title" => $row->post_title,
-                                               "meta_value" => $row->meta_value,
-                                           "post_modified" => $row->post_modified);
-                    }
-                }
-                sort($row_arr);
-                echo "<br>";
-
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In tmy_l10n_manager_page trans post:" . json_encode($row_arr));
-                }
-                foreach ( $row_arr as $row ) {
-                    $id_link = 'post.php?post=' . $row["ID"] . '&action=edit';
-                    $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($row["ID"]) . '</a>';
-        
-                    $tid_link = 'post.php?post=' . esc_attr($row["TID"]) . '&action=edit';
-                    $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . esc_attr($row["TID"]) . '</a>';
-                    //if (isset($post_info[0])) {
-                        echo             '<tr><td>' . $tid_hyper . '</td><td>' .
-                                                         $id_hyper . '</td><td>' .
-                                                         esc_attr($row["post_title"]) . '</td><td>' .
-                                                         esc_attr($row["meta_value"]) . '</td><td>' .
-                                                         esc_attr($row["post_modified"]) . '</td></tr>';
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In tmy_l10n_manager_page trans post:" . $row["post_title"]);
-                        }
-                    //}
-                }
-                echo "</table>";
+                $this->tmy_g11n_get_local_translation_status();
 
                 echo "</div>";
            
@@ -843,19 +821,20 @@ class TMY_G11n_Admin {
 
 		?>
 		<div class="wrap">
-                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Diagnosis</h1>
-		<h3>
-		This Diagnosis tool is providing advanced system information of how your site is running, it is 			  
-		colloecking following information: Base system(phpinfo), G11n Plugin, Default theme and some system 			  
-		options, if you need further assitance to trouble shoot your site, please review there is no sensive 			  
-		information included, click copy and send to <a href="mailto:yu.shao.gm@gmail.com">yu.shao.gm@gmail.com</a> in email.
+                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Diagnosis</h1><br>
+                This Diagnosis tool provides advanced system information on how your site is running and collects the following information:<br><br>
+                 - Base system(phpinfo)<br>
+                 - TMYSoft plugin version<br>
+                 - Default theme<br>
+                 - Some system options that can impact how the plugin may be functioning<br><br>
+                 If you need further assistance to trouble shoot your site, please review the below diagnostic information to ensure there is no sensitive information included, click copy and email it to <a href="mailto:yu.shao.gm@gmail.com">yu.shao.gm@gmail.com</a> in email.
 		  <br>
 		  <br>
 		    <button onclick="g11ncopysysteminfotext()">Copy Text</button>
-		  <br></h3>
+		  <br>
 		<?php
 
-                echo date_default_timezone_get();
+                //echo date_default_timezone_get();
 		$g11n_sys_info = "\n***** G11n Plugin Diagnosis *****\n" . date("F d, Y l H:s e") . "\n";
     		//$g11n_sys_info .= phpversion() . "\n";
     		//$g11n_sys_info .= var_export(get_loaded_extensions(),true) . "\n";
@@ -864,6 +843,24 @@ class TMY_G11n_Admin {
     		//$g11n_sys_info .= var_export($_ENV,true) . "\n";
     		//$g11n_sys_info .= var_export(ini_get_all(),true) . "\n";
     		//$g11n_sys_info .= json_encode(ini_get_all(),true) . "\n";
+    		$g11n_sys_info .= "*** Wordpress version: " . get_bloginfo('version') . "\n";
+    		$g11n_sys_info .= "*** Wordpress name: " . get_bloginfo('name') . "\n";
+    		$g11n_sys_info .= "*** Wordpress description: " . get_bloginfo('description') . "\n";
+    		$g11n_sys_info .= "*** Wordpress wpurl: " . get_bloginfo('wpurl') . "\n";
+    		$g11n_sys_info .= "*** Wordpress url: " . get_bloginfo('url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress charset " . get_bloginfo('charset') . "\n";
+    		$g11n_sys_info .= "*** Wordpress html_type: " . get_bloginfo('html_type') . "\n";
+    		$g11n_sys_info .= "*** Wordpress text_direction: " . get_bloginfo('text_direction') . "\n";
+    		$g11n_sys_info .= "*** Wordpress language: " . get_bloginfo('language') . "\n";
+    		$g11n_sys_info .= "*** Wordpress stylesheet_directory: " . get_bloginfo('stylesheet_directory') . "\n";
+    		$g11n_sys_info .= "*** Wordpress stylesheet_url: " . get_bloginfo('stylesheet_url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress template_url: " . get_bloginfo('template_url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress template_directory: " . get_bloginfo('template_directory') . "\n";
+    		$g11n_sys_info .= "*** Wordpress pingback_url: " . get_bloginfo('pingback_url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress atom_url: " . get_bloginfo('atom_url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress rdf_url: " . get_bloginfo('rdf_url') . "\n";
+    		$g11n_sys_info .= "*** Wordpress rss_url: " . get_bloginfo('rss_url') . "\n";
+
     		$g11n_sys_info .= "*** G11n Plugin Info: \n" . var_export(get_plugin_data( __FILE__ ),true) . "\n";
 
 
@@ -892,9 +889,14 @@ class TMY_G11n_Admin {
 
         	//$home_trans_list = get_available_languages(get_home_path() . "wp-content/languages");
         	//$home_trans_list = scandir(get_home_path() . "wp-content/languages");
-        	$home_trans_list = scandir(WP_CONTENT_DIR . "/languages");
-        	$g11n_sys_info .= "Translation in " . WP_CONTENT_DIR . "/languages: \n";
-        	$g11n_sys_info .= var_export($home_trans_list,true) . "\n";
+
+                if (is_dir(WP_CONTENT_DIR . "/languages")){
+        	    $home_trans_list = scandir(WP_CONTENT_DIR . "/languages");
+        	    $g11n_sys_info .= "Translation in " . WP_CONTENT_DIR . "/languages: \n";
+        	    $g11n_sys_info .= var_export($home_trans_list,true) . "\n";
+                } else {
+        	    $g11n_sys_info .= "No direcotory in system: " . WP_CONTENT_DIR . "/languages: \n";
+                }
 
     		$g11n_sys_info .= "*** theme_roots: " . var_export(get_theme_roots(),true) . "\n";
     		$g11n_sys_info .= "*** theme_root: " . var_export(get_theme_root(),true) . "\n";
@@ -904,12 +906,13 @@ class TMY_G11n_Admin {
     		//$g11n_sys_info .= "WP plugin_basename: " . var_export(plugin_basename(__FILE__),true) . "\n";
 
     		$theme_list = search_theme_directories();
-    		$g11n_sys_info .= "*** Themes List: " . var_export($theme_list,true) . "\n";
+    		//$g11n_sys_info .= "*** Themes List: " . var_export($theme_list,true) . "\n";
+    		$g11n_sys_info .= "*** Themes List: " . json_encode($theme_list,true) . "\n";
 
     		foreach ($theme_list as $name => $locs) {
         		$trans_list = get_available_languages($locs['theme_root'] . "/" . $name);
         		$g11n_sys_info .= "*** Themes Translation in: " .$locs['theme_root']."/". $name . "\n";
-        		$g11n_sys_info .= var_export($trans_list,true) . "\n";
+        		$g11n_sys_info .= json_encode($trans_list,true) . "\n";
     		}
     
 		//$g11n_sys_info .= "Wordpress Root: " . var_export(get_theme_roots(),true) . "\n";
@@ -924,8 +927,6 @@ class TMY_G11n_Admin {
                              'g11n_server_version',
                              'g11n_l10n_props_blogname',
                              'g11n_l10n_props_blogdescription',
-                             'g11n_l10n_props_post',
-                             'g11n_l10n_props_page',
                              'g11n_site_lang_cookie',
                              'g11n_site_lang_session',
                              'g11n_site_lang_query_string',
@@ -933,6 +934,9 @@ class TMY_G11n_Admin {
                              'g11n_switcher_tagline',
                              'WP_LANG_DIR',
                              'g11n_switcher_post');
+
+		$options_array = array_merge($options_array, 
+                                             array_values(tmy_g11n_available_post_type_options()));
 
     		foreach ( $options_array as $op_row ) {
         		$g11n_sys_info .= "*** Wordpress Options: ". 
@@ -964,7 +968,7 @@ class TMY_G11n_Admin {
                                                           $wpdb->prefix.'postmeta.post_id and '.
                                                           $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang"');
 
-    		$g11n_sys_info .= "*** Local Translations: ". var_export($testing_local_rows,true) . "\n";
+    		$g11n_sys_info .= "*** Local Translations: ". json_encode($testing_local_rows,JSON_UNESCAPED_UNICODE) . "\n";
 
     		$entitiesToUtf8 = function($input) {
         	// http://php.net/manual/en/function.html-entity-decode.php#104617
@@ -1014,18 +1018,17 @@ class TMY_G11n_Admin {
 		    }
 
     		$g11n_sys_info .= "*** PHPINFO \n ";
-    		$g11n_sys_info .= var_export($phpinfo,true) . "\n";
+    		//$g11n_sys_info .= var_export($phpinfo,true) . "\n";
+    		$g11n_sys_info .= json_encode($phpinfo,JSON_UNESCAPED_UNICODE) . "\n";
 
 
 
     		//echo "<pre>".$g11n_sys_info."</pre>";
-		?>
+		?><br>
 		<textarea rows="30" cols="100" class="scrollabletextbox" spellcheck="false" 
-                                               name="g11_sys_info_box" 	id="g11n_sys_info_box_id">';
-		<?php
+                                               name="g11_sys_info_box" 	id="g11n_sys_info_box_id">
 
-  		echo esc_attr($g11n_sys_info);
-                ?>
+		<?php echo esc_attr($g11n_sys_info); ?>
 
 		</textarea>
 		<script>
@@ -1069,7 +1072,7 @@ class TMY_G11n_Admin {
         }
 
 	public function tmy_get_post_translation_status() {
-            echo $this->_get_tmy_g11n_metabox(intval($_POST['id']));
+            echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox(intval($_POST['id'])));
             echo "  ";
         }
 
@@ -1079,9 +1082,13 @@ class TMY_G11n_Admin {
                 error_log("In tmy_create_sync_translation,id:".intval($_POST['id']).",type:".sanitize_text_field($_POST['post_type']));
             }
             $post_id = intval($_POST['id']);
-            $post_title = sanitize_text_field($_POST['post_type']);
+            $post_type = sanitize_text_field($_POST['post_type']);
 
-	    echo($this->_tmy_create_sync_translation($post_id, $post_type));
+	    $response = json_decode($this->_tmy_create_sync_translation($post_id, $post_type));
+
+	    echo json_encode(array("message" => esc_html($response->message),
+                                   "div_status" => tmy_g11n_html_kses_esc($response->div_status))
+                            );
 	    wp_die();
 
         }
@@ -1096,7 +1103,7 @@ class TMY_G11n_Admin {
 
              if (strcmp($post_type, "g11n_translation") !== 0) {
 
-                 if (strcmp($post_type, "product") !== 0) {
+                 //if (strcmp($post_type, "product") !== 0) {
                     
                      if ( WP_TMY_G11N_DEBUG ) { error_log("In tmy_create_sync_translation langs,".json_encode($all_langs));};
 
@@ -1106,11 +1113,11 @@ class TMY_G11n_Admin {
                      if (is_array($all_langs)) {
                          $num_langs = count($all_langs);
                          foreach( $all_langs as $value => $code) {
-                             $translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
+                             $new_translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
                              if ( WP_TMY_G11N_DEBUG ) { 
-                                 error_log("In tmy_create_sync_translation, translation_id = " . $translation_id);
+                                 error_log("In tmy_create_sync_translation, translation_id = " . $new_translation_id);
                              }
-                             if (! isset($translation_id)) {
+                             if (! isset($new_translation_id)) {
                                  $num_success_entries += 1;
                                  //$message .= " $value($code)";
                                  //error_log("in create_sync_translation, no translation_id");
@@ -1174,7 +1181,7 @@ class TMY_G11n_Admin {
                         $message .= " No translation server setup.";
                      }
                      // push to translation if all setup
-                 }
+                 //}  // post_type check
              }
 
              $return_msg = json_encode(array("message" => esc_attr($message),
@@ -1519,14 +1526,9 @@ class TMY_G11n_Admin {
                 error_log("In tmy_g11n_get_local_translation_status, rows:".json_encode($row_arr));
             }
             foreach ( $row_arr as $row ) {
-                $id_link = 'post.php?post=' . esc_attr($row["ID"]) . '&action=edit';
-                $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($row["ID"]) . '</a>';
-
-                $tid_link = 'post.php?post=' . esc_attr($row["TID"]) . '&action=edit';
-                $tid_hyper = '<a href="' . admin_url($tid_link) . '" target="_blank">' . esc_attr($row["TID"]) . '</a>';
                 //if (isset($post_info[0])) {
-                    $ret_msg .=  '<tr><td>' . $tid_hyper . '</td><td>' .
-                                                         $id_hyper . '</td><td>' .
+                $ret_msg .=  '<tr><td><a href="' . esc_url(get_edit_post_link(esc_attr($row["TID"]))) . '" target="_blank">'.esc_attr($row["TID"]) . '</td><td>' .
+                                     '<a href="' . esc_url(get_edit_post_link(esc_attr($row["ID"]))) . '" target="_blank">'.esc_attr($row["ID"]) . '</td><td>' .
                                                          esc_attr($row["post_title"]) . '</td><td>' .
                                                          esc_attr($row["meta_value"]) . '</td><td>' .
                                                          esc_attr($row["post_modified"]) . '</td></tr>';
@@ -1534,7 +1536,8 @@ class TMY_G11n_Admin {
             }
             $ret_msg .= "<tr><td>". time() ."</td></tr>";
             $ret_msg .= "</table>  ";
-            echo $ret_msg;
+            //echo $ret_msg;
+            echo tmy_g11n_html_kses_esc($ret_msg);
             if ( WP_TMY_G11N_DEBUG ) {
                 error_log("In tmy_g11n_get_local_translation_status, ret:".json_encode($ret_msg));
             }
@@ -1599,7 +1602,8 @@ class TMY_G11n_Admin {
                                              // otherwise ignore it
 
                                     if( is_null(get_post($default_lang_post_id))){
-                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats))."\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats)).
+                                                       "\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
 
                                     } else {
 
@@ -1673,17 +1677,19 @@ class TMY_G11n_Admin {
 	                                         //tmy_g11n_pull_translation($stat_row->id, $stat_row->locale);
                                                  //finish fully translated, need to pull the translation down to local WP database
 
-                                                 $id_link = 'post.php?post=' . esc_attr($translation_id) . '&action=edit';
-                                                 $id_hyper = '<a href="' . admin_url($id_link) . '" target="_blank">' . esc_attr($translation_id) . '</a>';
                                                  $doc_lang_str .= "<td><b>" . esc_attr($stat_row->locale) . ": ". 
-                                                   esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "(ID:".$id_hyper.")</b></td> ";
+                                                   esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "(ID:".
+                                                   '<a href="' . esc_url(get_edit_post_link(esc_attr($translation_id))) . 
+                                                   '" target="_blank">'.esc_attr($translation_id) . '</a>' .
+                                                   ")</b></td> ";
 
                                              } else {
                                                  $doc_lang_str .= "<td>" . esc_attr($stat_row->locale) . ": ". 
                                                        esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "</td> ";
                                              }
                                         }//foreach language
-                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td>". $doc_lang_str . "</tr>";
+
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td>". tmy_g11n_html_kses_esc($doc_lang_str) . "</tr>";
                                     }
 
                                 }// if (is_array($row->stats))
@@ -1696,8 +1702,7 @@ class TMY_G11n_Admin {
                     $return_msg .= esc_attr(var_export($server_reply,true));
                 }
 
-                echo $return_msg;
-                error_log( $return_msg );
+                echo tmy_g11n_html_kses_esc($return_msg);
 		wp_die();
 
         }
@@ -1839,7 +1844,6 @@ class TMY_G11n_Admin {
             }
 
             $all_post_type_options = tmy_g11n_available_post_type_options();
-            error_log("all_post_type_options: " . json_encode($all_post_type_options));
 
             if ((array_key_exists($option, $all_post_type_options))  && ($new != $old)) {
 
@@ -1964,7 +1968,7 @@ class TMY_G11n_Admin {
                     echo '<img style="display: inline; border: #00a6d3 1px outset" src="' .
                                                  plugins_url('includes/flags/24/', __DIR__) .
                                                  strtoupper($lang_code) . '.png" title="'.
-                                                 $lang_code .'" alt="' . $lang_code . "\" > " . $lang_code;
+                                                 esc_attr($lang_code) .'" alt="' . esc_attr($lang_code) . "\" > " . $lang_code;
                 break;
                 case 'original_id'     :
                     $original_id = get_post_meta($post_id, 'orig_post_id', true );
@@ -1973,7 +1977,7 @@ class TMY_G11n_Admin {
                 break;
                 case 'post_status'     :
                     //echo get_post_meta( $post_id, 'g11n_tmy_lang_status', true );
-                    echo $this->_update_g11n_translation_status($post_id, true);
+                    echo tmy_g11n_html_kses_esc($this->_update_g11n_translation_status($post_id, true));
                 break;
                 case 'tmy_server_status'     :
                     echo 'N/A';
@@ -2011,14 +2015,20 @@ class TMY_G11n_Admin {
         function tmy_plugin_g11n_admin_notice() {
 
 	    if( ! empty( $_REQUEST[ 'start_sync_tranlations' ] ) ) {
-                $message = $_REQUEST[ 'start_sync_tranlations' ];
 	        ?>
 			    <div class="updated notice is-dismissible">
-				    <p><?php echo esc_attr($message) ?></p>
+				    <p><?php echo esc_attr($_REQUEST[ 'start_sync_tranlations' ]) ?></p>
 			    </div>
 	        <?php
 	        //$redirect_to = remove_query_arg( 'start_sync_tranlations' );
 		//return $redirect_to;
 	    }
-       }
+        }
+        function tmy_plugin_g11n_admin_head() {
+
+            echo '<style type="text/css">
+                     .column-translation_started { text-align: left; width:150px !important; overflow:hidden }
+                 </style>';
+
+        }
 }

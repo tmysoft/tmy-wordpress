@@ -497,8 +497,6 @@ class TMY_G11n_Translator {
                 }
                 $seq_code = mt_rand(1000,9999);
 
-                error_log($seq_code . " In get_preferred_language, SHAO ". json_encode($_SESSION));
-
                 if ( WP_TMY_G11N_DEBUG ) {
                     if (isset($_SESSION)) {
                         error_log($seq_code . " In get_preferred_language, ". sanitize_textarea_field(json_encode($_SESSION)));
@@ -515,8 +513,8 @@ class TMY_G11n_Translator {
                             error_log($seq_code . " In get_preferred_language, _SESSION is not set");
                         }
                     }
-                    session_start();
-                error_log($seq_code . " In get_preferred_language, SHAO after session_start ". json_encode($_SESSION));
+                    //session_start();
+                    //this should not be needed anymore
                 }
                 if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');

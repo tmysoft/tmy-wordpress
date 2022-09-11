@@ -14,7 +14,7 @@ class G11n_Language_Widget extends WP_Widget {
 
     public function widget( $args, $instance ) {
                     $switcher =  $this->translator->get_language_switcher('widget');
-                    echo tmy_g11n_switcher_esc($switcher);
+                    echo tmy_g11n_html_kses_esc($switcher);
                     //echo $args['before_widget'], wpautop( $instance['text'] ), $args['after_widget'];
                 }
 
