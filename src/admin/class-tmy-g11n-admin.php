@@ -1881,12 +1881,14 @@ class TMY_G11n_Admin {
     	   return $views;
         }
 
-        function tmy_plugin_post_set_columns( $columns ){
-            unset($columns['date']);
-            unset($columns['featured']);
-            $columns['translation_started']     = 'Translation Started';
-            $columns['featured']     = 'featured';
-            $columns['date']     = 'Date';
+        function tmy_plugin_post_set_columns( $columns, $post_type ){
+
+            if (strcmp($post_type, "g11n_translation") !== 0) {
+                error_log("tmy_plugin_post_set_columns: " . $post_type);
+                //unset($columns['date']);
+                $columns['translation_started']     = 'Translation Started';
+                //$columns['date']     = 'Date';
+            }
             return $columns;
         }
 
@@ -2027,7 +2029,7 @@ class TMY_G11n_Admin {
         function tmy_plugin_g11n_admin_head() {
 
             echo '<style type="text/css">
-                     .column-translation_started { text-align: left; width:150px !important; overflow:hidden }
+                     .column-translation_started { text-align: left; width:100px !important; overflow:hidden }
                  </style>';
 
         }
