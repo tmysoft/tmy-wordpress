@@ -1150,7 +1150,11 @@ class TMY_G11n_Admin {
                          (strcmp('', get_option('g11n_server_url','')) !== 0)) {
 
                          $content_title = get_post_field('post_title', $post_id);
-                         $tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
+                         $content_excerpt = get_post_field('post_content', $post_id) . "\n\n" .
+                                            get_post_field('post_excerpt', $post_id);
+
+                         //$tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
+                         $tmp_array = preg_split('/(\n)/', $content_excerpt, -1, PREG_SPLIT_DELIM_CAPTURE);
                          $contents_array = array();
 
                          if (strcmp(get_post_field('post_title', $post_id),'blogname') === 0){
