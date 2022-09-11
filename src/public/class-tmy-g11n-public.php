@@ -122,8 +122,8 @@ class TMY_G11n_Public {
         	    error_log("In G11nStartSession");
                 }
 
-    		if(!session_id()) {
-        	    session_start();
+                if (session_status() !== PHP_SESSION_ACTIVE) {
+                    session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession id=" . session_id());
@@ -1030,6 +1030,7 @@ public function g11n_add_floating_menu() {
 	public function tmy_g11n_template_redirect() {
 
             session_start();
+
             if (! is_admin()) {
                 if ( WP_TMY_G11N_DEBUG ) {
                     if (isset($_SESSION)) {

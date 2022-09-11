@@ -491,10 +491,20 @@ class TMY_G11n_Translator {
 	public function get_preferred_language() {
 
            
-                session_start();
                 if (is_admin()) {
+      
+                    error_log(" In get_preferred_language is_admin");
                     return get_option('g11n_default_lang');
                 }
+
+                // error_log(" In get_preferred_language session status :". session_status() . " is_admin:" . is_admin());
+                if (session_status() !== PHP_SESSION_ACTIVE) { 
+                    session_start();
+                }
+
+                //if (! isset($_SESSION)) {
+                //    session_start();
+                //}
                 $seq_code = mt_rand(1000,9999);
 
                 if ( WP_TMY_G11N_DEBUG ) {
