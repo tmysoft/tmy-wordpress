@@ -724,6 +724,22 @@ class TMY_G11n_Admin {
         	<th scope="row">Translation Resource File Directory</th>
         	<td><input type="text" name="g11n_resource_file_location" value="<?php echo esc_attr( get_option('g11n_resource_file_location') ); ?>" /></td>
         	</tr>
+
+        	</tr>
+        	<tr valign="top">
+        	<th scope="row">Theme Translation Files</th>
+        	<td> <?php 
+                         $theme_name = get_template();
+                         $all_langs = get_option('g11n_additional_lang');
+                         $default_lang = get_option('g11n_default_lang');
+                         unset($all_langs[$default_lang]);
+                         foreach( $all_langs as $value => $code) {
+                             echo WP_LANG_DIR . '/themes/' .
+                                  $theme_name."-".$code . '.mo <br>';
+                         } 
+                     ?>
+                </td>
+        	</tr>
     		</table>
     			<!-- <?php submit_button(); ?> -->
                         <input type="submit" name="submit" id="submit" class="button button-primary" onclick="G11nmyOptionSaveChanges()" value="Save Changes"  /> &nbsp; <div id="tmy_save_changes_status" style="display:inline-block; vertical-align: middle;"></div><br>
@@ -1864,6 +1880,12 @@ class TMY_G11n_Admin {
         	array_push($views, "Translation Completed (XX)");
            }
     	   return $views;
+        }
+
+        function tmy_plugin_page_set_columns( $columns ){
+
+            $columns['translation_started']     = 'Translation Started';
+            return $columns;
         }
 
         function tmy_plugin_post_set_columns( $columns, $post_type ){
