@@ -92,10 +92,6 @@ class TMY_G11n_Translator {
 	 */
 	public function rest_get_translation_server( $rest_url ) {
 
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In rest_get_translation_server, " . $rest_url);
-                }
-
                 if (strpos($rest_url,'version') !== false) {
                     $accept_fmt="application/vnd.zanata.Version+json";
                 } else {
@@ -123,9 +119,6 @@ class TMY_G11n_Translator {
 				 'server_msg' => $translation_server_log_messages,
 				 'http_code' => $http_response_code
 				);
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In rest_get_translation_server, return " . json_encode($return_array));
-                }
 		return $return_array;
 
 	}
@@ -153,7 +146,7 @@ class TMY_G11n_Translator {
 
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In sync_translation_from_server, " . $post_id);
+                    error_log("In sync_translation_from_server, " . esc_attr($post_id));
                 }
 
                 $args = array(
@@ -170,7 +163,7 @@ class TMY_G11n_Translator {
                     //$payload = json_decode($output);
                 } else {
                     if ( WP_TMY_G11N_DEBUG ) {
-                         error_log('In sync_translation_from_server, Error: ' . $response->get_error_message());
+                         error_log('In sync_translation_from_server, Error: ' . esc_attr($response->get_error_message()));
                     }
                 }
 
@@ -228,7 +221,7 @@ class TMY_G11n_Translator {
                         $output = $response['body'];
                         $payload = json_decode($output);
                     } else {
-                        error_log("In push_contents_to_translation_server, Error: " . $response->get_error_message());
+                        error_log("In push_contents_to_translation_server, Error: " . esc_attr($response->get_error_message()));
                     }
 		    $return_msg = "Sent for translation " . $rest_url;
 		    $return_msg .= " server return: " . wp_remote_retrieve_response_code( $response );
@@ -285,11 +278,6 @@ class TMY_G11n_Translator {
 	public function get_translation_id( $post_id, $locale_id, $post_type, $admin_user = true ) {
 
 		global $wpdb;
-
-//$admin_user = true;
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In get_translation_id,".$post_id." ".$locale_id." ".$post_type.",admin ".$admin_user);
-                }
 
                 if ( ! $admin_user ) {
 
@@ -357,8 +345,8 @@ class TMY_G11n_Translator {
                                             "meta2.meta_value = '" . $locale_id . "')";
 	        $result = $wpdb->get_results($sql);
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In get_translation_id,".$sql);
-                    error_log("In get_translation_id,".json_encode($result));
+                    error_log("In get_translation_id,".esc_attr($sql));
+                    error_log("In get_translation_id,".esc_attr(json_encode($result)));
                 }
 
 		if (isset($result[0]->post_id)) {
@@ -379,7 +367,7 @@ class TMY_G11n_Translator {
        			"{$wpdb->prefix}postmeta.post_id = " . $trans_id;
 
                 if ( WP_TMY_G11N_DEBUG ) {
-		    error_log("GET POST SQL = " . $sql);
+		    error_log("GET POST SQL = " . esc_attr($sql));
                 }
 		$result = $wpdb->get_results($sql);
 		return ($result);
@@ -509,18 +497,18 @@ class TMY_G11n_Translator {
 
                 if ( WP_TMY_G11N_DEBUG ) {
                     if (isset($_SESSION)) {
-                        error_log($seq_code . " In get_preferred_language, ". sanitize_textarea_field(json_encode($_SESSION)));
+                        error_log(esc_attr($seq_code) . " In get_preferred_language, ". sanitize_textarea_field(json_encode($_SESSION)));
                     } else {
-                        error_log($seq_code . " In get_preferred_language, _SESSION is not set");
+                        error_log(esc_attr($seq_code) . " In get_preferred_language, _SESSION is not set");
                     }
-                    error_log($seq_code . " In get_preferred_language, session id ".session_id());
+                    error_log(esc_attr($seq_code) . " In get_preferred_language, session id ".esc_attr(session_id()));
                 }
                 if(!session_id()) {
                     if ( WP_TMY_G11N_DEBUG ) {
                         if (isset($_SESSION)) {
-                            error_log($seq_code . " In get_preferred_language, ".sanitize_textarea_field(json_encode($_SESSION)));
+                            error_log(esc_attr($seq_code) . " In get_preferred_language, ".sanitize_textarea_field(json_encode($_SESSION)));
                         } else {
-                            error_log($seq_code . " In get_preferred_language, _SESSION is not set");
+                            error_log(esc_attr($seq_code) . " In get_preferred_language, _SESSION is not set");
                         }
                     }
                     //session_start();
@@ -529,17 +517,17 @@ class TMY_G11n_Translator {
                 if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log($seq_code . " Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
+                        error_log(esc_attr($seq_code) . " Starting session, id=" . esc_attr(session_id()) . ",lang is not set, set as: " . esc_attr(get_option('g11n_default_lang')));
                     }
                 } 
 		$lang_var_from_query = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
                 if ( WP_TMY_G11N_DEBUG ) {
-		  error_log($seq_code . " In get_preferred_language query lang = ". $lang_var_from_query);
+		  error_log(esc_attr($seq_code) . " In get_preferred_language query lang = ". esc_attr($lang_var_from_query));
                 }
 		if (!empty($lang_var_from_query)) {
 		   $_SESSION['g11n_language'] = $lang_var_from_query;
                    if ( WP_TMY_G11N_DEBUG ) {
-		       error_log($seq_code . " In get_preferred_language return query lang = ". $lang_var_from_query);
+		       error_log(esc_attr($seq_code) . " In get_preferred_language return query lang = ". esc_attr($lang_var_from_query));
                    }
 		   return $lang_var_from_query;
 		}
@@ -547,8 +535,8 @@ class TMY_G11n_Translator {
 		if ((isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) and (strcmp(get_option('g11n_site_lang_browser'),'Yes')===0)) {
 
                    if ( WP_TMY_G11N_DEBUG ) {
-		       error_log($seq_code . " In get_preferred_language checking browser setting: ". sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']));
-		       error_log($seq_code . " In get_preferred_language checking browser setting: ". get_option('g11n_site_lang_browser'));
+		       error_log(esc_attr($seq_code) . " In get_preferred_language checking browser setting: ". sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']));
+		       error_log(esc_attr($seq_code) . " In get_preferred_language checking browser setting: ". esc_attr(get_option('g11n_site_lang_browser')));
                    }
 
 		    $languages = explode(',', sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']));
@@ -600,7 +588,7 @@ class TMY_G11n_Translator {
 
 		if (isset($_SESSION['g11n_language'])) {
                    if ( WP_TMY_G11N_DEBUG ) {
-		      error_log($seq_code . " In get_preferred_language return _SESSION g11n_language = ". tmy_g11n_lang_sanitize($_SESSION['g11n_language']));
+		      error_log(esc_attr($seq_code) . " In get_preferred_language return _SESSION g11n_language = ". tmy_g11n_lang_sanitize($_SESSION['g11n_language']));
                    }
 		   return tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 		}

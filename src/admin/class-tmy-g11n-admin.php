@@ -213,7 +213,7 @@ class TMY_G11n_Admin {
                 $post_status = get_post_status($post_id);
             
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In _update_g11n_translation_status: ".$post_id.$post_type.$post_status);
+                    error_log("In _update_g11n_translation_status: ".esc_attr($post_id));
                 }
                
 	    	if (strcmp($post_type,"g11n_translation")!==0) {
@@ -725,8 +725,17 @@ class TMY_G11n_Admin {
         	<td><input type="text" name="g11n_resource_file_location" value="<?php echo esc_attr( get_option('g11n_resource_file_location') ); ?>" /></td>
         	</tr>
     		</table>
-    			<?php submit_button(); ?>
+    			<!-- <?php submit_button(); ?> -->
+                        <input type="submit" name="submit" id="submit" class="button button-primary" onclick="G11nmyOptionSaveChanges()" value="Save Changes"  /> &nbsp; <div id="tmy_save_changes_status" style="display:inline-block; vertical-align: middle;"></div><br>
 		</form>
+
+                <script>
+                    function G11nmyOptionSaveChanges() {
+                        var div = document.getElementById('tmy_save_changes_status');
+                        div.innerHTML = "<div class=\"tmy_loader\"></div>   Saving Changes ....";
+                    }
+                </script>
+
 		</div>
 		<?php 
 
@@ -757,7 +766,7 @@ class TMY_G11n_Admin {
 
                     function G11nmyGetServerStatus() {
                         var div = document.getElementById('tmy_server_status');
-                        div.innerHTML = "Connecting to server ....";
+                        div.innerHTML = "<div class=\"tmy_loader\"></div>   Connecting to server ....";
 
                         jQuery(document).ready(function($) {
                                 var data = {
@@ -789,7 +798,7 @@ class TMY_G11n_Admin {
                                                   $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang" ORDER BY ID');
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In tmy_l10n_manager_page sql:" . json_encode($rows));
+                    error_log("In tmy_l10n_manager_page sql:" . esc_attr(json_encode($rows)));
                 }
 
                 $this->tmy_g11n_get_local_translation_status();
@@ -802,6 +811,8 @@ class TMY_G11n_Admin {
                      echo "Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>";
                 } else {
                     echo '<button type="button" onclick="G11nmyGetServerStatus()">Get Server Status</button> Click Button To Get Latest Status';
+                    echo '<br><br>';
+                    //echo '<div class="tmy_loader"></div>';
         	    echo '<div id="tmy_server_status"></div>';
 
 
@@ -852,14 +863,6 @@ class TMY_G11n_Admin {
     		$g11n_sys_info .= "*** Wordpress html_type: " . get_bloginfo('html_type') . "\n";
     		$g11n_sys_info .= "*** Wordpress text_direction: " . get_bloginfo('text_direction') . "\n";
     		$g11n_sys_info .= "*** Wordpress language: " . get_bloginfo('language') . "\n";
-    		$g11n_sys_info .= "*** Wordpress stylesheet_directory: " . get_bloginfo('stylesheet_directory') . "\n";
-    		$g11n_sys_info .= "*** Wordpress stylesheet_url: " . get_bloginfo('stylesheet_url') . "\n";
-    		$g11n_sys_info .= "*** Wordpress template_url: " . get_bloginfo('template_url') . "\n";
-    		$g11n_sys_info .= "*** Wordpress template_directory: " . get_bloginfo('template_directory') . "\n";
-    		$g11n_sys_info .= "*** Wordpress pingback_url: " . get_bloginfo('pingback_url') . "\n";
-    		$g11n_sys_info .= "*** Wordpress atom_url: " . get_bloginfo('atom_url') . "\n";
-    		$g11n_sys_info .= "*** Wordpress rdf_url: " . get_bloginfo('rdf_url') . "\n";
-    		$g11n_sys_info .= "*** Wordpress rss_url: " . get_bloginfo('rss_url') . "\n";
 
     		$g11n_sys_info .= "*** G11n Plugin Info: \n" . var_export(get_plugin_data( __FILE__ ),true) . "\n";
 
@@ -1105,8 +1108,6 @@ class TMY_G11n_Admin {
 
                  //if (strcmp($post_type, "product") !== 0) {
                     
-                     if ( WP_TMY_G11N_DEBUG ) { error_log("In tmy_create_sync_translation langs,".json_encode($all_langs));};
-
                      // creating language translations for each language
                      $num_success_entries = 0;
                      $num_langs = 0;
@@ -1115,7 +1116,7 @@ class TMY_G11n_Admin {
                          foreach( $all_langs as $value => $code) {
                              $new_translation_id = $this->translator->get_translation_id($post_id,$code,$post_type);
                              if ( WP_TMY_G11N_DEBUG ) { 
-                                 error_log("In tmy_create_sync_translation, translation_id = " . $new_translation_id);
+                                 error_log("In tmy_create_sync_translation, translation_id = " . esc_attr($new_translation_id));
                              }
                              if (! isset($new_translation_id)) {
                                  $num_success_entries += 1;
@@ -1136,7 +1137,7 @@ class TMY_G11n_Admin {
                              }
                              $this->_update_g11n_translation_status($new_translation_id);
                              if ( WP_TMY_G11N_DEBUG ) { 
-                                 error_log("In tmy_create_sync_translation, new_translation_id = " . $new_translation_id);
+                                 error_log("In tmy_create_sync_translation, new_translation_id = " . esc_attr($new_translation_id));
                              }
                          }
                      }
@@ -1179,7 +1180,7 @@ class TMY_G11n_Admin {
                          $push_return_msg = $this->translator->push_contents_to_translation_server($json_file_name, $contents_array);
                          $message .= " " . $json_file_name . " is pushed to Translation Server: ".$push_return_msg;
                          if ( WP_TMY_G11N_DEBUG ) {
-                              error_log("In tmy_create_sync_translation,filename:".$json_file_name);
+                              error_log("In tmy_create_sync_translation,filename:".esc_attr($json_file_name));
                          }
                      } else {
                         $message .= " No translation server setup.";
@@ -1199,7 +1200,7 @@ class TMY_G11n_Admin {
 	public function _tmy_g11n_create_server_project($project_name,$version_num,$lang_list) {
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In _tmy_g11n_create_server_project :". $project_name . " " . $version_num . " " . json_encode($lang_list));
+                    error_log("In _tmy_g11n_create_server_project :". esc_attr($project_name) . " " . esc_attr($version_num) . " " . esc_attr(json_encode($lang_list)));
                 }
 
 	        $ch = curl_init();
@@ -1219,8 +1220,7 @@ class TMY_G11n_Admin {
  	        curl_reset($ch);
 
                 if ( WP_TMY_G11N_DEBUG ) {
-	            error_log("REST URL" . $rest_url);
-	            error_log("REST PALOAD" . $payload);
+	            error_log("REST URL" . esc_attr($rest_url));
                 }
 
                 $args = array(
@@ -1238,7 +1238,7 @@ class TMY_G11n_Admin {
                     $payload = json_decode($output);
                 } else {
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                        error_log("In _tmy_g11n_create_server_project, Error: " . esc_attr($response->get_error_message()));
                     }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
@@ -1250,10 +1250,6 @@ class TMY_G11n_Admin {
 		    500 => 'Internal server error');
 
                 $ret_msg .= $project_name . ": " . $http_code_msg[$http_code] . " (" . $http_code . ")";
-
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In _tmy_g11n_create_server_project proj ".$http_code_msg[$http_code]."(" . $http_code . ")");
-                }
 
                 //
                 // create the version 
@@ -1282,16 +1278,12 @@ class TMY_G11n_Admin {
                     $payload = json_decode($output);
                 } else {
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                        error_log("In _tmy_g11n_create_server_project, Error: " . esc_attr($response->get_error_message()));
                     }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
 
                 $ret_msg .= "; " . $version_num . ": " . $http_code_msg[$http_code] . " (" . $http_code . ")";
-
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In _tmy_g11n_create_server_project version ".$http_code_msg[$http_code]."(" . $http_code . ")");
-                }
 
                 //
                 // add language setting to the version 
@@ -1318,7 +1310,7 @@ class TMY_G11n_Admin {
                     $payload = json_decode($output);
                 } else {
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("In _tmy_g11n_create_server_project, Error: " . $response->get_error_message());
+                        error_log("In _tmy_g11n_create_server_project, Error: " . esc_attr($response->get_error_message()));
                     }
                 }
 	        $http_code = wp_remote_retrieve_response_code( $response );
@@ -1333,10 +1325,6 @@ class TMY_G11n_Admin {
 
         }
 	public function tmy_g11n_create_server_project() {
-
-            if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_g11n_create_server_project ".json_encode(sanitize_post($_POST)));
-            }
 
 	    if (strcmp(sanitize_text_field($_POST['action_type']),"project")!==0) {
                 echo "Wrong Action";
@@ -1527,7 +1515,7 @@ class TMY_G11n_Admin {
             //$return_msg .= json_encode($row_arr);
             $ret_msg .= "<br>";
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_g11n_get_local_translation_status, rows:".json_encode($row_arr));
+                error_log("In tmy_g11n_get_local_translation_status, rows:".esc_attr(json_encode($row_arr)));
             }
             foreach ( $row_arr as $row ) {
                 //if (isset($post_info[0])) {
@@ -1543,7 +1531,7 @@ class TMY_G11n_Admin {
             //echo $ret_msg;
             echo tmy_g11n_html_kses_esc($ret_msg);
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_g11n_get_local_translation_status, ret:".json_encode($ret_msg));
+                error_log("In tmy_g11n_get_local_translation_status, ret:".esc_attr(json_encode($ret_msg)));
             }
 
         }
@@ -1735,7 +1723,7 @@ class TMY_G11n_Admin {
 	public function tmy_plugin_option_update($value, $option, $old_value) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("tmy_plugin_option_update:" . json_encode($option) );
+                error_log("tmy_plugin_option_update:" . esc_attr(json_encode($option)) );
             } 
 
             if (((strcmp($option, "g11n_additional_lang")===0) && ($value != $old_value)) ||
@@ -1760,8 +1748,6 @@ class TMY_G11n_Admin {
 
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("tmy_plugin_option_update: additional_lang changed");
-                    error_log("tmy_plugin_option_update: " . json_encode($old_value) . "->". json_encode($value));
-                    error_log("tmy_plugin_option_update: project info: " . $project_name . " " . $version_num . " ". json_encode($lang_list));
                 }
                 $default_language = get_option('g11n_default_lang');
                 $language_options = $lang_list;
@@ -1776,16 +1762,12 @@ class TMY_G11n_Admin {
                                                        $selected_langs);
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("tmy_plugin_option_update: " . $ret_msg);
+                    error_log("tmy_plugin_option_update: " . esc_attr($ret_msg));
                 }
 
             }
             //if ((strcmp($option, "g11n_l10n_props_blogname")===0) && ($value != $old_value)) {
             if ((strcmp($option, "g11n_l10n_props_blogname")===0)) {
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("tmy_plugin_option_update blogname:" . $old_value. "->" . $value );
-                    error_log("tmy_plugin_option_update blogname:" . get_bloginfo('name') );
-                } 
                 if (strcmp($value,"Yes")==0){
                     // creating placeholder of the blogname entry as private post type
                     $title_post  = get_page_by_title('blogname',OBJECT,'post');
@@ -1803,7 +1785,7 @@ class TMY_G11n_Admin {
                                                             'post_type'  => "post"));
                     }
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("tmy_plugin_option_update_blogname, blogname post ID: :" . $new_post_id );
+                        error_log("tmy_plugin_option_update_blogname, blogname post ID: :" . esc_attr($new_post_id) );
                     } 
                 }
 
@@ -1812,8 +1794,7 @@ class TMY_G11n_Admin {
             //if ((strcmp($option, "g11n_l10n_props_blogdescription")===0) && ($value != $old_value)) {
             if ((strcmp($option, "g11n_l10n_props_blogdescription")===0)) {
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("tmy_plugin_option_update description: " . $old_value. "->" . $value );
-                    error_log("tmy_plugin_option_update blog description:" . get_bloginfo('description') );
+                    error_log("tmy_plugin_option_update description: " . esc_attr($old_value). "->" . esc_attr($value) );
                 }
                 if (strcmp($value,"Yes")==0){
                     // creating placeholder entry as private post type
@@ -1832,7 +1813,7 @@ class TMY_G11n_Admin {
                                                             'post_type'  => "post"));
                     }
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("tmy_plugin_option_update_description, blog description post ID: :" . $new_post_id );
+                        error_log("tmy_plugin_option_update_description, blog description post ID: :" . esc_attr($new_post_id) );
                     }
                 }
             }
@@ -1844,7 +1825,7 @@ class TMY_G11n_Admin {
         public function tmy_plugin_option_update_after($old, $new, $option) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In tmy_plugin_option_update_after " . $old . " " . $new . " " . $option . "(" . get_option($option) . ")");
+                error_log("In tmy_plugin_option_update_after");
             }
 
             $all_post_type_options = tmy_g11n_available_post_type_options();
@@ -1888,7 +1869,7 @@ class TMY_G11n_Admin {
         function tmy_plugin_post_set_columns( $columns, $post_type ){
 
             if (strcmp($post_type, "g11n_translation") !== 0) {
-                error_log("tmy_plugin_post_set_columns: " . $post_type);
+                error_log("tmy_plugin_post_set_columns: " . esc_attr($post_type));
                 //unset($columns['date']);
                 $columns['translation_started']     = 'Translation Started';
                 //$columns['date']     = 'Date';
@@ -2035,6 +2016,31 @@ class TMY_G11n_Admin {
             echo '<style type="text/css">
                      .column-translation_started { text-align: left; width:100px !important; overflow:hidden }
                  </style>';
+             ?>
+               <style>
+               .tmy_loader {
+                 border: 4px solid #01a6d7;
+                 border-radius: 50%;
+                 display: inline-block;
+                 border-top: 4px solid #F3F3F3;
+                 width: 18px;
+                 height: 18px;
+                 -webkit-animation: spin 2s linear infinite; /* Safari */
+                 animation: spin 2s linear infinite;
+               }
+               
+               /* Safari */
+               @-webkit-keyframes spin {
+                 0% { -webkit-transform: rotate(0deg); }
+                 100% { -webkit-transform: rotate(360deg); }
+               }
+
+               @keyframes spin {
+                 0% { transform: rotate(0deg); }
+                 100% { transform: rotate(360deg); }
+               }
+               </style>
+             <?php
 
         }
 }

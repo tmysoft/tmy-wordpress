@@ -104,7 +104,7 @@ class TMY_G11n_Public {
 
         public function g11n_option_editor_change($in) {
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log ("G11nOptionChange: " . get_option('g11n_editor_choice'));
+                    error_log ("G11nOptionChange: " . esc_attr(get_option('g11n_editor_choice')));
                 }
                 if(strcmp(get_option('g11n_editor_choice','Yes'),'No')==0){
                     return (true);
@@ -126,7 +126,7 @@ class TMY_G11n_Public {
                     session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
-        	    error_log("In G11nStartSession id=" . session_id());
+        	    error_log("In G11nStartSession id=" . esc_attr(session_id()));
                 }
 
     		if (isset($_SESSION['g11n_language'])) {
@@ -140,11 +140,11 @@ class TMY_G11n_Public {
     		if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');
                     if ( WP_TMY_G11N_DEBUG ) {
-        		error_log("Starting session, id=" . session_id() . ",lang is not set, set as: " . get_option('g11n_default_lang'));
+        		error_log("Starting session, id=" . esc_attr(session_id()) . ",lang is not set, set as: " . esc_attr(get_option('g11n_default_lang')));
                     }
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
-    		    error_log("Starting session, id=" . session_id() . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
+    		    error_log("Starting session, id=" . esc_attr(session_id()) . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
                 }
             }
 	}
@@ -158,17 +158,17 @@ class TMY_G11n_Public {
             if (! is_admin()) {
 	    	$lang_var = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
                 if ( WP_TMY_G11N_DEBUG ) {
-	    	    error_log("In g11n_setcookie , lang_var " . $lang_var);
+	    	    error_log("In g11n_setcookie , lang_var " . esc_attr($lang_var));
                 }
     		if (!empty($lang_var)) {
         		setcookie('g11n_language', $lang_var, strtotime('+1 day'));
                         if ( WP_TMY_G11N_DEBUG ) {
-        		     error_log("In g11n_setcookie SET COOKIE from query string - " . $lang_var);
+        		     error_log("In g11n_setcookie SET COOKIE from query string - " . esc_attr($lang_var));
                         }
     		} else {
         		setcookie('g11n_language', get_option('g11n_default_lang'), strtotime('+1 day'));
                         if ( WP_TMY_G11N_DEBUG ) {
-        		     error_log("In g11n_setcookie SET COOKIE from wp language option - " .  get_option('g11n_default_lang'));
+        		     error_log("In g11n_setcookie SET COOKIE from wp language option - " .  esc_attr(get_option('g11n_default_lang')));
                         }
     		}
             }
@@ -410,7 +410,7 @@ public function g11n_add_floating_menu() {
 
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_locale_filter: " . $locale_in . " admin: " . is_admin());
+                    error_log("In g11n_locale_filter: " . esc_attr($locale_in) . " admin: " . is_admin());
                 }
 
                 if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
@@ -426,7 +426,7 @@ public function g11n_add_floating_menu() {
 
 		$pre_lang = $this->translator->get_preferred_language();
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_locale_filter, preferred language: " . $pre_lang);
+                    error_log("In g11n_locale_filter, preferred language: " . esc_attr($pre_lang));
                 }
 		if (array_key_exists($pre_lang, $language_options)) {
 			$s_locale = $language_options[$pre_lang];
@@ -443,7 +443,7 @@ public function g11n_add_floating_menu() {
 			    load_theme_textdomain($template_name);
 			}
                         if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In g11n_locale_filter, change locale to: " . $s_locale . " template name = ". $template_name);
+                            error_log("In g11n_locale_filter, change locale to: " . esc_attr($s_locale) . " template name = ". esc_attr($template_name));
                         }
 
                         //$al = get_available_languages();
@@ -518,8 +518,8 @@ public function g11n_add_floating_menu() {
 	public function g11n_post_saved_notification( $ID, $post ) {
 
             if ( WP_TMY_G11N_DEBUG ) {
-                error_log("In g11n_post_saved_notification, " . $ID);
-                error_log("In g11n_post_saved_notification, " . json_encode($post));
+                error_log("In g11n_post_saved_notification, " . esc_attr($ID));
+                error_log("In g11n_post_saved_notification, " . esc_attr(json_encode($post)));
             }
 
             //do_action('do_meta_boxes', null, 'normal', $post);
@@ -535,16 +535,13 @@ public function g11n_add_floating_menu() {
 		 */
 
 		    if (strcmp($post->post_type, "g11n_translation") === 0) {
-			error_log("SKIP Sending for translation POST type: " . $post->post_type);
+			error_log("SKIP Sending for translation POST type: " . esc_attr($post->post_type));
 			return;
 		    }
 
 		    if (strcmp($post->post_type, "product") === 0) {
                         if ( WP_TMY_G11N_DEBUG ) {
-			    error_log("Publishing product id: " . $post->ID);
-	    		    error_log("Publishing product title: " . $post->post_title);
-			    error_log("Publishing product content: " . $post->post_content);
-			    error_log("Publishing product excerpt: " . $post->post_excerpt);
+			    error_log("Publishing product id: " . esc_attr($post->ID));
                         }
 			return;
 		    }
@@ -556,7 +553,7 @@ public function g11n_add_floating_menu() {
 		    //$contents_array = array($content_title,$content);
 
                     if ( WP_TMY_G11N_DEBUG ) {
-		        error_log("MYSQL" . var_export($post->post_content,true));
+		        error_log("MYSQL" . esc_attr(var_export($post->post_content,true)));
                     }
 		    $tmp_array = preg_split('/(\n)/', $post->post_content,-1, PREG_SPLIT_DELIM_CAPTURE);
 		    //error_log("MYSQL" . var_export($tmp_array,true));
@@ -580,7 +577,7 @@ public function g11n_add_floating_menu() {
 	public function g11n_pre_get_option_blogdescription( $output, $show ) {
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("IN g11n_pre_get_option_blogdescription: " . $output . "." . $show . ".");
+                    error_log("IN g11n_pre_get_option_blogdescription: " . esc_attr($output) . "." . esc_attr($show) . ".");
                 }
 
 		remove_filter('pre_option_blogdescription',array($this, 'g11n_pre_get_option_blogdescription'),10);
@@ -601,7 +598,7 @@ public function g11n_add_floating_menu() {
                          $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
                          if (isset($translation_post_id)) {
                              if ( WP_TMY_G11N_DEBUG ) {
-                                 error_log("In g11n_pre_get_option_blogdescription, translation id:" . $translation_post_id);
+                                 error_log("In g11n_pre_get_option_blogdescription, translation id:" . esc_attr($translation_post_id));
                              }
                              $output = get_post_field("post_content", $translation_post_id);
                          }
@@ -620,7 +617,7 @@ public function g11n_add_floating_menu() {
 	public function g11n_pre_get_option_blogname( $output, $show ) {
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("IN g11n_pre_get_option_blogname: " . $output . "." . $show . ".");
+                    error_log("IN g11n_pre_get_option_blogname: " . esc_attr($output) . "." . esc_attr($show) . ".");
                 }
 
 
@@ -650,14 +647,14 @@ public function g11n_add_floating_menu() {
                         $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
                         if (isset($translation_post_id)) {
                             if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In g11n_pre_get_option_blogname, translation id:" . $translation_post_id);
+                                error_log("In g11n_pre_get_option_blogname, translation id:" . esc_attr($translation_post_id));
                             }
                             $output = get_post_field("post_content", $translation_post_id);
                         }
                     }
                 }
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_pre_get_option_blogname, g11n_switcher_title,".get_option('g11n_switcher_title'));
+                    error_log("In g11n_pre_get_option_blogname, g11n_switcher_title,".esc_attr(get_option('g11n_switcher_title')));
                 }
                 if(strcmp(get_option('g11n_switcher_title'),"Yes")==0){
                     $switcher_html = $this->translator->get_language_switcher('blogname');
@@ -666,7 +663,7 @@ public function g11n_add_floating_menu() {
                     $switcher_html = "";
                 }
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_pre_get_option_blogname, output:".$output . $switcher_html);
+                    error_log("In g11n_pre_get_option_blogname, output:".esc_attr($output) . esc_attr($switcher_html));
                 }
                 return $output . $switcher_html;
 
@@ -677,7 +674,7 @@ public function g11n_add_floating_menu() {
 	        global $wp_query;
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("g11n_pre_option_blogname:" . $in );
+                    error_log("g11n_pre_option_blogname:" . esc_attr($in) );
                 }
                 if (strcmp(get_option('g11n_l10n_props_blogname'),"Yes")==0) {
 
@@ -695,7 +692,7 @@ public function g11n_add_floating_menu() {
                                                             'post_type'  => "post"));
                     }
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("g11n_pre_option_blogname post id:" . $new_post_id );
+                        error_log("g11n_pre_option_blogname post id:" . esc_attr($new_post_id) );
                     }
                 }
 		//error_log("PRE UPDATE BLOGNAME: " . $in);
@@ -710,7 +707,7 @@ public function g11n_add_floating_menu() {
 	        global $wp_query;
 
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("g11n_pre_option_blogdescription:" . $in );
+                    error_log("g11n_pre_option_blogdescription:" . esc_attr($in) );
                 }
                 if (strcmp(get_option('g11n_l10n_props_blogdescription'),"Yes")==0) {
 
@@ -728,7 +725,7 @@ public function g11n_add_floating_menu() {
                                                             'post_type'  => "post"));
                     }
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("g11n_pre_option_blogdescription post id:" . $new_post_id );
+                        error_log("g11n_pre_option_blogdescription post id:" . esc_attr($new_post_id) );
                     }
                 }
 		 //   error_log("PRE UPDATE blogdescription: " . $in);
@@ -746,7 +743,7 @@ public function g11n_add_floating_menu() {
 
 	            foreach ( $posts as $post ) {
                         if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In g11n_the_posts_filter, post_id: " . $post->ID . " excerpt: " . $post->post_excerpt);
+                            error_log("In g11n_the_posts_filter, post_id: " . esc_attr($post->ID) . " excerpt: " . esc_attr($post->post_excerpt));
                         }
                         if ( tmy_g11n_is_valid_post_type($post->post_type) && (! empty($post->post_excerpt))) {
 		        //if ((strcmp($post->post_type, "product") === 0) && (! empty($post->post_excerpt))) {
@@ -761,9 +758,9 @@ public function g11n_add_floating_menu() {
                                                                                          $post->post_type,
                                                                                          false);
                             if ( WP_TMY_G11N_DEBUG ) {
-                                error_log("In g11n_the_posts_filter, excerpt post_id: " . $post->ID . " language: " . $language_name);
-                                error_log("In g11n_the_posts_filter, translation_id:  " . $translation_post_id);
-                                error_log("In g11n_the_posts_filter, SESSION:  " . $_SESSION['g11n_language']);
+                                error_log("In g11n_the_posts_filter, excerpt post_id: " . esc_attr($post->ID) . " language: " . esc_attr($language_name));
+                                error_log("In g11n_the_posts_filter, translation_id:  " . esc_attr($translation_post_id));
+                                error_log("In g11n_the_posts_filter, SESSION:  " . esc_attr($_SESSION['g11n_language']));
                             }
 		            if (isset($translation_post_id)) {
                                 $post->post_excerpt=get_the_excerpt($translation_post_id);
@@ -779,14 +776,13 @@ public function g11n_add_floating_menu() {
                     //if (! ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST )) {
 		        global $wp_query; 
 
-       error_log("aaaaaaaaaaaaaaaaaaaaaaaaaIn excerpt filter, post id =" . $postid);
 		        $postid = $wp_query->post->ID;
 		        $posttype = $wp_query->post->post_type;
 
                         if ( WP_TMY_G11N_DEBUG ) {
-		            error_log("In excerpt filter, post id =" . $postid);
-		            error_log("In excerpt filter, post type =" . $posttype);
-		            error_log("In excerpt filter, input =" . $input);
+		            error_log("In excerpt filter, post id =" . esc_attr($postid));
+		            error_log("In excerpt filter, post type =" . esc_attr($posttype));
+		            error_log("In excerpt filter, input =" . esc_attr($input));
                         }
 
 		        if (strcmp($posttype,"product")==0) {
@@ -804,7 +800,7 @@ public function g11n_add_floating_menu() {
 		        global $wp_query; 
 
                         if ( WP_TMY_G11N_DEBUG ) {
-		            error_log("In g11n_content_filter filter, session_id=" . session_id() . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
+		            error_log("In g11n_content_filter filter, session_id=" . esc_attr(session_id()) . "session lang=" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']) );
 		            error_log("In g11n_content_filter filter, session lang = [" . tmy_g11n_lang_sanitize($_SESSION['g11n_language']). "]");
 		            error_log("In g11n_content_filter filter, cookie lang = [" . tmy_g11n_lang_sanitize($_COOKIE['g11n_language']) . "]");
 		            error_log("In g11n_content_filter filter, browser lang = [" . sanitize_textarea_field($_SERVER['HTTP_ACCEPT_LANGUAGE']) . "]");
@@ -814,7 +810,7 @@ public function g11n_add_floating_menu() {
 		        $posttype = $wp_query->post->post_type;
 
                         if ( WP_TMY_G11N_DEBUG ) {
-		            error_log("In g11n_content_filter filter, postid, posttype:" . $postid . " " . $posttype );
+		            error_log("In g11n_content_filter filter, postid, posttype:" . esc_attr($postid) . " " . esc_attr($posttype) );
                         }
 
                         if (! tmy_g11n_post_type_enabled($postid, $wp_query->post->post_title)) {
@@ -844,10 +840,10 @@ public function g11n_add_floating_menu() {
 		        $translation_post_id = $this->translator->get_translation_id($postid,$language_name,$posttype,false);
 
                         if ( WP_TMY_G11N_DEBUG ) {
-		            error_log("In g11n_content_filter original post id = " . $postid . ".");
-		            error_log("In g11n_content_filter language = " . $language_name . ".");
-		            error_log("In g11n_content_filter type = " . $posttype . ".");
-		            error_log("In g11n_content_filter translation_post_id = " . $translation_post_id . ".");
+		            error_log("In g11n_content_filter original post id = " . esc_attr($postid) . ".");
+		            error_log("In g11n_content_filter language = " . esc_attr($language_name) . ".");
+		            error_log("In g11n_content_filter type = " . esc_attr($posttype) . ".");
+		            error_log("In g11n_content_filter translation_post_id = " . esc_attr($translation_post_id) . ".");
                         }
 
 		        if(strcmp(get_option('g11n_switcher_post'),"Yes")==0){
@@ -869,7 +865,7 @@ public function g11n_add_floating_menu() {
 
                     if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
                         if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("g11n_title_filter: " . $title);
+                            error_log("g11n_title_filter: " . esc_attr($title));
                         }
                         return $title;
                     }
@@ -921,7 +917,7 @@ public function g11n_add_floating_menu() {
 	public function g11n_wp_title_filter( $output, $show ) {
 
                     if ( WP_TMY_G11N_DEBUG ) {
-                        error_log("In g11n_wp_title_filter starting with, output: " . $output . ",show: " . $show);
+                        error_log("In g11n_wp_title_filter starting with, output: " . esc_attr($output) . ",show: " . esc_attr($show));
                     }
 
 		    if (strcmp($show,'description')==0) {
@@ -945,7 +941,7 @@ public function g11n_add_floating_menu() {
                                  $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
 			         if (isset($translation_post_id)) {
                                      if ( WP_TMY_G11N_DEBUG ) {
-                                         error_log("In g11n_wp_title_filter,blogdescription translation id:" . $translation_post_id);
+                                         error_log("In g11n_wp_title_filter,blogdescription translation id:" . esc_attr($translation_post_id));
                                      }
 			             $output = get_post_field("post_content", $translation_post_id);
 			         }
@@ -983,14 +979,14 @@ public function g11n_add_floating_menu() {
                                 $translation_post_id = $this->translator->get_translation_id($title_post->ID,$language_name,"post",false);
 			        if (isset($translation_post_id)) {
                                     if ( WP_TMY_G11N_DEBUG ) {
-                                        error_log("In g11n_wp_title_filter,blogname translation id:" . $translation_post_id);
+                                        error_log("In g11n_wp_title_filter,blogname translation id:" . esc_attr($translation_post_id));
                                     }
 			            $output = get_post_field("post_content", $translation_post_id);
 			        }
                             }
 		        }
                         if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In g11n_wp_title_filter, g11n_switcher_title,".get_option('g11n_switcher_title'));
+                            error_log("In g11n_wp_title_filter, g11n_switcher_title,".esc_attr(get_option('g11n_switcher_title')));
                         }
 			if(strcmp(get_option('g11n_switcher_title'),"Yes")==0){
 			    $switcher_html = $this->translator->get_language_switcher('blogname');
@@ -998,7 +994,7 @@ public function g11n_add_floating_menu() {
 			    $switcher_html = "";
 			}
                         if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In g11n_wp_title_filter, output,".$output . $switcher_html);
+                            error_log("In g11n_wp_title_filter, output,".esc_attr($output));
                         }
 		        return $output . $switcher_html;
 		    } 
@@ -1038,24 +1034,24 @@ public function g11n_add_floating_menu() {
                     } else {
                         error_log("In tmy_g11n_template_redirect, _SESSION is not set");
                     }
-                    error_log("In tmy_g11n_template_redirect, session id ".session_id());
+                    error_log("In tmy_g11n_template_redirect, session id ".esc_attr(session_id()));
                 }
             }
 
             if (! is_admin()) {
                 $lang_var = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
                 if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_setcookie , lang_var " . $lang_var);
+                    error_log("In g11n_setcookie , lang_var " . esc_attr($lang_var));
                 }
                 if (!empty($lang_var)) {
                         setcookie('g11n_language', $lang_var, strtotime('+1 day'));
                         if ( WP_TMY_G11N_DEBUG ) {
-                             error_log("In g11n_setcookie SET COOKIE from query string - " . $lang_var);
+                             error_log("In g11n_setcookie SET COOKIE from query string - " . esc_attr($lang_var));
                         }
                 } else {
                         setcookie('g11n_language', get_option('g11n_default_lang'), strtotime('+1 day'));
                         if ( WP_TMY_G11N_DEBUG ) {
-                             error_log("In g11n_setcookie SET COOKIE from wp language option - " .  get_option('g11n_default_lang'));
+                             error_log("In g11n_setcookie SET COOKIE from wp language option - " . esc_attr(get_option('g11n_default_lang')));
                         }
                 }
             }

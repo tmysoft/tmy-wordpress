@@ -18,7 +18,7 @@ function tmy_g11n_lang_sanitize( $lang ) {
         if (array_key_exists($lang, $all_langs)) {
             return $lang;
         } else {
-            error_log("Warning tmy_g11n_language_escape, invalid:" . $lang . " reset to: " . $default_lang);
+            error_log("Warning tmy_g11n_language_escape, invalid:" . esc_attr($lang) . " reset to: " . esc_attr($default_lang));
             return $default_lang;
         }
     } else {
