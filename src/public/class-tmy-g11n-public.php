@@ -1141,5 +1141,30 @@ public function g11n_add_floating_menu() {
             }
 
         }
+	public function tmy_g11n_html_head_handler() {
+
+            //<link rel="alternate" hreflang="de" href="https://de.example.com/index.html" />
+            //<link rel="alternate" href="https://example.com/country-selector" hreflang="x-default" />
+
+            $all_langs = get_option('g11n_additional_lang');
+            $default_lang = get_option('g11n_default_lang');
+            //unset($all_langs[$default_lang]);
+            global $wp;
+            $site_url = get_site_url();
+
+            if (is_array($all_langs)) {
+                foreach( $all_langs as $value => $code) {
+                    $current_url = home_url( $wp->request );
+                    $current_url = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($code), $current_url);
+                    $current_url = $current_url . '/';
+                    $lang_code = strtolower($code);
+                    $lang_code = str_replace('_', '-', $lang_code);
+                    echo '<link rel="alternate" hreflang="' . esc_attr($lang_code) . '" href="' .
+                    esc_url($current_url) . '" />' . "\n";
+                }
+            }
+            $current_url = home_url( $wp->request );
+            echo '<link rel="alternate" href="' . esc_url($current_url) . '" hreflang="x-default" />' . "\n";
+        }
 
 }

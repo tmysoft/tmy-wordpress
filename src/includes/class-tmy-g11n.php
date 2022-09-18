@@ -256,6 +256,7 @@ class TMY_G11n {
 		    $this->loader->add_filter( 'category_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
 		    $this->loader->add_filter( 'search_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
 		    //$this->loader->add_filter( 'home_url', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_action( 'wp_head', $plugin_public, 'tmy_g11n_html_head_handler');
 
                 }
 
