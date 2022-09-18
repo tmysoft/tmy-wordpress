@@ -4,7 +4,7 @@ Donate link: https://tmysoft.com/solutions.html
 Tags: i18n, l10n, translation, localization, globalization, multilingual, internationalization
 Requires at least: 5.0
 Tested up to: 6.0.2
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -42,7 +42,7 @@ TMY Plugin provides multiple ways to handle different development phases of the 
 == Installation ==
 
 1. Install and Activate "TMY Globalization" from Plugin directory.
-1. Setup the plugin from Settings-> TMY Setup.
+1. Setup the plugin from TMY Globalization -> TMY Setup.
 
 More information at [TMY Plugin for Wordpress Getting Started & FAQ](https://github.com/tmysoft/tmy-wordpress)
 
@@ -56,16 +56,23 @@ Make sure translation is enabled in TMY Setup page:
 
 = TMY Plugin shows connecting error code 7 in Wordpress
 
-On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting which blocks the network connection, using following command to change the SELinux setting:
+On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting which blocks the network connection, using following command to change the SELinux setting: setsebool httpd_can_network_connect on
 
-```
-# setsebool httpd_can_network_connect on
-```
+
 == Screenshots ==
 
-1. The screenshot description corresponds to screenshot-1.(png|jpg|jpeg|gif).
-2. The screenshot description corresponds to screenshot-2.(png|jpg|jpeg|gif).
-3. The screenshot description corresponds to screenshot-3.(png|jpg|jpeg|gif).
+1. Main Menu
+2. Setup Page
+3. Live Translation
+4. Start Translate Posts
+5. Finish Translation
+6. Language Switcher Locations
+7. Translations Page
+8. 3 Usage Modes
+9. Setup TMY External Editor
+10. TMY External Editor Screen
+11. TMY Globalization Switcher Block
+12. TMY Globalization Switcher Widget
 
 == Changelog ==
 
