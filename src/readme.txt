@@ -1,7 +1,7 @@
 === TMY Globalization ===
 Contributors: yushao
 Donate link: https://tmysoft.com/solutions.html
-Tags: i18n, l10n, translation, localization, globalization, multilingual, internationalization
+Tags: i18n, l10n, translation, localization, globalization, multilingual, internationalization, SEO
 Requires at least: 5.0
 Tested up to: 6.0.2
 Stable tag: 1.6.5
@@ -26,6 +26,7 @@ TMY Plugin provides multiple ways to handle different development phases of the 
 
 * Live Translation powered by Google Translate
 * Full cycle to keep translation locally for proof read, edit and publish.
+* Support Search Engeine Optimizaion/SEO URL
 * Support new block Gutenberg editor and classic editor.
 * Support Google Translate integration with editing capability
 * Language switcher based on
@@ -76,6 +77,9 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 
 == Changelog ==
 
+= 1.6.5 =
+* SEO compatible URL
+
 = 1.6.0 =
 * tested with woocommerce
 
@@ -99,6 +103,9 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 * Initial Release.
 
 == Upgrade Notice ==
+
+= 1.6.5 =
+* SEO compatible URL
 
 = 1.6.0 =
 * tested with woocommerce
