@@ -206,6 +206,7 @@ class TMY_G11n {
 
                 $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
                 $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
+                //$this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
  
  
 	}
@@ -237,8 +238,28 @@ class TMY_G11n {
 
 		//$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
 
+	        $this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
+		//$this->loader->add_action( 'init', $plugin_public, 'g11n_create_rewrite_rule' );
 
-		$this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
+                if ((strcmp(trim(get_option('permalink_structure')),'')!==0) &&
+                    (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0)) {
+
+		    $this->loader->add_filter( 'post_type_link', $plugin_public, 'rewrite_tag_permalink_post_link', 10, 3 );
+		    $this->loader->add_filter( 'post_link', $plugin_public, 'rewrite_tag_permalink_post_link', 10, 3 );
+		    $this->loader->add_filter( 'page_link', $plugin_public, 'rewrite_tag_permalink_post_link', 10, 3 );
+
+		    $this->loader->add_filter( 'year_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'month_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'day_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    //$this->loader->add_filter( 'post_type_archive_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'tag_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'category_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'search_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    //$this->loader->add_filter( 'home_url', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+
+                }
+
+
 		$this->loader->add_action( 'get_sidebar', $plugin_public, 'add_before_my_siderbar' );
 		//$this->loader->add_action( 'before_sidebar', $plugin_public, 'add_before_my_siderbar' );
 		$this->loader->add_action( 'dynamic_sidebar', $plugin_public, 'add_before_dynamic_siderbar' );
@@ -267,6 +288,7 @@ class TMY_G11n {
 
 		$this->loader->add_action( 'init', $plugin_public, 'tmy_g11n_blocks_init');
 		$this->loader->add_action( 'template_redirect', $plugin_public, 'tmy_g11n_template_redirect');
+		//$this->loader->add_filter( 'site_url', $plugin_public, 'tmy_g11n_site_url', 10, 2);
 
 	}
 

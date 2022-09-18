@@ -142,6 +142,9 @@ class TMY_G11n_Admin {
     		register_setting( 'tmy-g11n-settings-group', 'g11n_auto_pullpush_translation' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_resource_file_location' );
     		register_setting( 'tmy-g11n-settings-group', 'g11n_editor_choice' );
+
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_seo_url_enable' );
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_seo_url_label' );
 	
 
                 $all_post_types = tmy_g11n_available_post_types();
@@ -740,6 +743,77 @@ class TMY_G11n_Admin {
                      ?>
                 </td>
         	</tr>
+                <tr valign="top">
+                <th scope="row">Search Engine Optimization(SEO) URL</th>
+                <td> 
+                    <?php
+		
+                         $blog_url = get_bloginfo('url');
+
+                         if (strcmp(trim(get_option('permalink_structure')),'')===0) {
+                             $seo_disabled = "disabled";
+                         } else {
+                             $seo_disabled = "";
+                         }
+
+                         echo "Change the Permalinks Setting to non-Plain to start: Settings->Permalinks<br><br>";
+		         $selected = (get_option('g11n_seo_url_enable','Yes') == 'Yes') ? 'checked="checked"' : '';
+		         echo "\n\t<label><input type='radio' id='g11n_seo_url_enable_yes".
+                                    "' name='g11n_seo_url_enable' value='Yes' " .
+                                    esc_attr($selected) . " " . esc_attr($seo_disabled) . " /> " . 
+                                    'Yes - URL format: ' . $blog_url . '/<input type="text" name="g11n_seo_url_label" value="'.
+                                    esc_attr(get_option('g11n_seo_url_label','language')).
+                                    '" ' . esc_attr($seo_disabled) . ' />/English/' .
+                                    "</label><br />";
+		         $selected = (get_option('g11n_seo_url_enable','No') == 'No') ? 'checked="checked"' : '';
+		         echo "\n\t<label><input type='radio' id='g11n_seo_url_enable_no".
+                                    "' name='g11n_seo_url_enable' value='No' " . 
+                                    esc_attr($selected) . esc_attr($seo_disabled) . " /> " . 'No' . "</label><br />";
+
+ 
+                         $home_root = parse_url( home_url() );
+                         if ( isset( $home_root['path'] ) ) {
+                            $home_root = trailingslashit( $home_root['path'] );
+                         } else {
+                            $home_root = '/';
+                         }
+
+                         $htaccess_file = get_home_path() . '.htaccess';
+
+                         if (is_writable($htaccess_file)) {
+                            $htaccess_permission = $htaccess_file . " is writable.";
+                         } else {
+                            $htaccess_permission = $htaccess_file . " is not writable.";
+                         }
+
+                     ?>
+            	</select>
+                        <br>
+                        Depends on your specific configuration, here is the example .htaccess file if you are using Apache, lines between "# BEGIN TMY G11N RULES" and "# END TMY G11N RULES" are newly added. Your .htaccess might look different, in most cases, adding these new lines will work.<br><br>
+                        Let's know if you need help, SEO friendly URLs could get really complex sometimes.<br><br>
+
+                        Current .htaccess file: <?php echo esc_attr($htaccess_permission);?> 
+                        <textarea rows="15" class="large-text readonly" readonly="readonly" aria-describedby="htaccess-description">
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /mysite/wordpress/
+RewriteRule ^index\.php$ - [L]
+# BEGIN TMY G11N RULES #############
+RewriteCond %{REQUEST_FILENAME} -d   
+RewriteCond %{REQUEST_URI} /+[^\.]+$  
+RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]  
+RewriteRule ^<?php echo esc_attr(get_option("g11n_seo_url_label")); ?>/([^/]+)/(.*) http://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P]
+# END TMY G11N RULES ###############
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /mysite/wordpress/index.php [L]
+</IfModule>
+
+                        </textarea>
+                </td>
+                </tr>
+
     		</table>
     			<!-- <?php submit_button(); ?> -->
                         <input type="submit" name="submit" id="submit" class="button button-primary" onclick="G11nmyOptionSaveChanges()" value="Save Changes"  /> &nbsp; <div id="tmy_save_changes_status" style="display:inline-block; vertical-align: middle;"></div><br>
@@ -2063,6 +2137,26 @@ class TMY_G11n_Admin {
                }
                </style>
              <?php
+
+        }
+        function tmy_plugin_g11n_update_htaccess() {
+
+            $home_root = parse_url( home_url() );
+            if ( isset( $home_root['path'] ) ) {
+               $home_root = trailingslashit( $home_root['path'] );
+            } else {
+               $home_root = '/';
+            }
+            $content = array(
+                '# BEGIN TMY_G11N_RULES_EDIT',
+                'RewriteCond %{REQUEST_FILENAME} -d',
+                'RewriteCond %{REQUEST_URI} /+[^\.]+$',
+                'RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]',
+                'RewriteRule ^' . get_option("g11n_seo_url_label") .'/([^/]+)/(.*) http://%{HTTP_HOST}' . $home_root . '$2?g11n_tmy_lang_code=$1 [QSA,P]',
+                '# END TMY_G11N_RULES_EDIT'
+            );
+            $htaccess_location = get_home_path() . '.htaccess';
+            $ret = insert_with_markers( $htaccess_location, 'TMY_G11N_RULES', $content );
 
         }
 }

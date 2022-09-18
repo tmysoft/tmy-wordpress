@@ -386,6 +386,8 @@ class TMY_G11n_Translator {
                 }	
                 include 'lang2googlelan.php';
 		$current_url = sanitize_url($_SERVER['REQUEST_URI']);
+                $site_url = get_site_url();
+
 		$query_variable_name = "g11n_tmy_lang";
 		$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 
@@ -441,7 +443,21 @@ class TMY_G11n_Translator {
 		    $language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: block;">';
 		    //$language_switcher_html = '<div style="border:1px solid;border-radius:5px;">';
 		    foreach( $language_options as $value => $code) {
-		    //<img src="./flags/24/CN.png" alt="CN">
+		        //<img src="./flags/24/CN.png" alt="CN">
+                    
+
+                         if ((strcmp(trim(get_option('permalink_structure')),'')!==0) &&
+                             (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0)) {
+
+                             global $wp;
+		             $current_url = home_url( $wp->request );
+                             //$current_url = str_replace($site_url, $site_url . '/lang/' . $value, $current_url);
+                             $current_url = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($code), $current_url);
+                             $current_url = $current_url . '/';
+                        } else {
+		             $current_url = sanitize_url($_SERVER['REQUEST_URI']);
+                             $current_url = add_query_arg($query_variable_name, $value, $current_url);
+                        }
 
 		        if (strcmp('Text', get_option('g11n_switcher_type','Text')) === 0) {
 			    $href_text_ht = $value;
@@ -461,11 +477,13 @@ class TMY_G11n_Translator {
 		        }
 		        if (strcmp($value, $g11n_current_language) === 0) {
 			    $language_switcher_html .= '<a href=' . 
-				                   add_query_arg($query_variable_name, $value, $current_url) . '><b>' .
+				                   //add_query_arg($query_variable_name, $value, $current_url) . '><b>' .
+				                   $current_url . '><b>' .
 				                   $href_text_ht.'</b></a>';
 		        } else {
 			    $language_switcher_html .= '<a href=' . 
-				                   add_query_arg($query_variable_name, $value, $current_url) . '>' .
+				                   //add_query_arg($query_variable_name, $value, $current_url) . '>' .
+				                   $current_url . '>' .
 				                   $href_text.'</a>';
 		        }
                     }
@@ -486,9 +504,9 @@ class TMY_G11n_Translator {
                 }
 
                 // error_log(" In get_preferred_language session status :". session_status() . " is_admin:" . is_admin());
-                if (session_status() !== PHP_SESSION_ACTIVE) { 
-                    session_start();
-                }
+                //if (session_status() !== PHP_SESSION_ACTIVE) { 
+                //    session_start();
+                //}
 
                 //if (! isset($_SESSION)) {
                 //    session_start();
@@ -520,17 +538,27 @@ class TMY_G11n_Translator {
                         error_log(esc_attr($seq_code) . " Starting session, id=" . esc_attr(session_id()) . ",lang is not set, set as: " . esc_attr(get_option('g11n_default_lang')));
                     }
                 } 
+
 		$lang_var_from_query = tmy_g11n_lang_sanitize(filter_input(INPUT_GET, 'g11n_tmy_lang', FILTER_SANITIZE_SPECIAL_CHARS));
+
+                $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+		$lang_var_code_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang_code', FILTER_SANITIZE_SPECIAL_CHARS);
+
+	        if (!empty($lang_var_code_from_query)) {
+                    $lang_var_from_query = array_search($lang_var_code_from_query, $all_configed_langs);
+                }
+
                 if ( WP_TMY_G11N_DEBUG ) {
 		  error_log(esc_attr($seq_code) . " In get_preferred_language query lang = ". esc_attr($lang_var_from_query));
                 }
 		if (!empty($lang_var_from_query)) {
+
 		   $_SESSION['g11n_language'] = $lang_var_from_query;
                    if ( WP_TMY_G11N_DEBUG ) {
 		       error_log(esc_attr($seq_code) . " In get_preferred_language return query lang = ". esc_attr($lang_var_from_query));
                    }
 		   return $lang_var_from_query;
-		}
+		} 
 
 		if ((isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) and (strcmp(get_option('g11n_site_lang_browser'),'Yes')===0)) {
 
