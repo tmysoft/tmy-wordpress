@@ -406,9 +406,12 @@ class TMY_G11n_Translator {
                     $google_lang_list = rtrim($google_lang_list, ",");
                     //error_log("google_lang_list: " . json_encode($google_lang_list));                
 
+		    $default_lang = get_option('g11n_default_lang','English');
+                    $default_lang_code = $lang2googlelan[$default_lang];
+
 		    $language_switcher_html = '<script type="text/javascript">
                         function googleTranslateElementInit() {
-                            new google.translate.TranslateElement({pageLanguage: "en",
+                            new google.translate.TranslateElement({pageLanguage: "' . $default_lang_code . '",
                                                                    includedLanguages:"' . $google_lang_list . '",
                                                                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE},
                             "google_translate_element");
