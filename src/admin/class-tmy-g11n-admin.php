@@ -823,7 +823,7 @@ class TMY_G11n_Admin {
                     }
 		</script>
               <?php
-		 if  (esc_attr(get_option('g11n_seo_url_enable','Yes')) == 'Yes') {
+		 if  ((esc_attr(get_option('g11n_seo_url_enable','Yes')) == 'Yes') && (strcmp(trim(get_option('permalink_structure')),'')!==0)) {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: block\"><br>";
                  } else {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: none\"><br>";
@@ -839,12 +839,12 @@ RewriteEngine On <br>
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}] <br>
 RewriteBase <?php echo esc_attr($home_root); ?> <br>
 RewriteRule ^index\.php$ - [L] <br>
-<b># BEGIN TMY G11N RULES ############# <br>
+<b># BEGIN TMY_G11N_RULES <br>
 RewriteCond %{REQUEST_FILENAME} -d  <br> 
 RewriteCond %{REQUEST_URI} /+[^\.]+$  <br>
 RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L] <br> 
 RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) http://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
-# END TMY G11N RULES ############### <br> </b>
+# END TMY_G11N_RULES <br> </b>
 RewriteCond %{REQUEST_FILENAME} !-f <br>
 RewriteCond %{REQUEST_FILENAME} !-d <br>
 RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
