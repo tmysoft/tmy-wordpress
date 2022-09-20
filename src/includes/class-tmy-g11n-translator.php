@@ -411,7 +411,8 @@ class TMY_G11n_Translator {
 
 		    $language_switcher_html = '<script type="text/javascript">
                         function googleTranslateElementInit() {
-                            new google.translate.TranslateElement({pageLanguage: "' . $default_lang_code . '",
+                            //new google.translate.TranslateElement({pageLanguage: "' . $default_lang_code . '",
+                            new google.translate.TranslateElement({
                                                                    includedLanguages:"' . $google_lang_list . '",
                                                                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE},
                             "google_translate_element");
@@ -455,8 +456,14 @@ class TMY_G11n_Translator {
                              global $wp;
 		             $current_url = home_url( $wp->request );
                              //$current_url = str_replace($site_url, $site_url . '/lang/' . $value, $current_url);
-                             $current_url = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($code), $current_url);
-                             $current_url = $current_url . '/';
+                             $url_code = strtolower(str_replace('_', '-', $code));
+
+                             $lang_path = explode('/', str_replace($site_url, '', $current_url))[1];
+                             $lang_path = str_replace('-', '_', $lang_path);
+                             if (! array_search(strtolower($lang_path), array_map('strtolower',$language_options))) {
+                                 $current_url = str_replace($site_url, $site_url . '/' . esc_attr($url_code), $current_url);
+                                 $current_url = $current_url . '/';
+                             }
                         } else {
 		             $current_url = sanitize_url($_SERVER['REQUEST_URI']);
                              $current_url = add_query_arg($query_variable_name, $value, $current_url);
@@ -546,9 +553,11 @@ class TMY_G11n_Translator {
 
                 $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
 		$lang_var_code_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang_code', FILTER_SANITIZE_SPECIAL_CHARS);
+		$lang_var_code_from_query = str_replace('-', '_', $lang_var_code_from_query);
+
 
 	        if (!empty($lang_var_code_from_query)) {
-                    $lang_var_from_query = array_search($lang_var_code_from_query, $all_configed_langs);
+                    $lang_var_from_query = array_search(strtolower($lang_var_code_from_query), array_map('strtolower',$all_configed_langs));
                 }
 
                 if ( WP_TMY_G11N_DEBUG ) {

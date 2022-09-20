@@ -206,7 +206,7 @@ class TMY_G11n {
 
                 $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
                 $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
-                //$this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
+                $this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
  
  
 	}

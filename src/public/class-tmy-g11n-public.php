@@ -148,21 +148,30 @@ class TMY_G11n_Public {
             $site_url = get_site_url();
             $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
             $lang_code = $all_configed_langs[$this->translator->get_preferred_language()];
+            $lang_code = strtolower(str_replace('_', '-', $lang_code));
 
-            $ret = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($lang_code), $permalink);
-	    return $ret;
+            $lang_path = explode('/', str_replace($site_url, '', $permalink))[1];
+            $lang_path = str_replace('-', '_', $lang_path);
 
+            if (! array_search(strtolower($lang_path), array_map('strtolower',$all_configed_langs))) {
+                $ret = str_replace($site_url, $site_url . '/' . esc_attr($lang_code), $permalink);
+	        return $ret;
+            }
+            return $permalink;
         }
         function rewrite_tag_permalink_post_link( $permalink, $post, $leavename ) {
 
             $site_url = get_site_url();
             $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
             $lang_code = $all_configed_langs[$this->translator->get_preferred_language()];
-            $ret = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($lang_code), $permalink);
-
-            return $ret;
-
-
+            $lang_code = strtolower(str_replace('_', '-', $lang_code));
+            $lang_path = explode('/', str_replace($site_url, '', $permalink))[1];
+            $lang_path = str_replace('-', '_', $lang_path);
+            if (! array_search(strtolower($lang_path), array_map('strtolower',$all_configed_langs))) {
+                $ret = str_replace($site_url, $site_url . '/' . esc_attr($lang_code), $permalink);
+	        return $ret;
+            }
+            return $permalink;
         }
 
 
@@ -201,9 +210,10 @@ class TMY_G11n_Public {
 
                 $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
                 $lang_var_code_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang_code', FILTER_SANITIZE_SPECIAL_CHARS);
+                $lang_var_code_from_query = str_replace('-', '_', $lang_var_code_from_query);
 
                 if (!empty($lang_var_code_from_query)) {
-                    $lang_var = array_search($lang_var_code_from_query, $all_configed_langs);
+                    $lang_var = array_search(strtolower($lang_var_code_from_query), array_map('strtolower',$all_configed_langs));
                 }
 
                 if (!empty($lang_var)) {
@@ -1117,9 +1127,10 @@ public function g11n_add_floating_menu() {
 
                 $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
                 $lang_var_code_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang_code', FILTER_SANITIZE_SPECIAL_CHARS);
+                $lang_var_code_from_query = str_replace('-', '_', $lang_var_code_from_query);
 
                 if (!empty($lang_var_code_from_query)) {
-                    $lang_var = array_search($lang_var_code_from_query, $all_configed_langs);
+                    $lang_var = array_search(strtolower($lang_var_code_from_query), array_map('strtolower',$all_configed_langs));
                 }
 
 
@@ -1154,11 +1165,11 @@ public function g11n_add_floating_menu() {
 
             if (is_array($all_langs)) {
                 foreach( $all_langs as $value => $code) {
-                    $current_url = home_url( $wp->request );
-                    $current_url = str_replace($site_url, $site_url . '/' . esc_attr(get_option('g11n_seo_url_label')) . '/' . esc_attr($code), $current_url);
-                    $current_url = $current_url . '/';
                     $lang_code = strtolower($code);
                     $lang_code = str_replace('_', '-', $lang_code);
+                    $current_url = home_url( $wp->request );
+                    $current_url = str_replace($site_url, $site_url . '/' . esc_attr($lang_code), $current_url);
+                    $current_url = $current_url . '/';
                     echo '<link rel="alternate" hreflang="' . esc_attr($lang_code) . '" href="' .
                     esc_url($current_url) . '" />' . "\n";
                 }
