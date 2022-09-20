@@ -201,6 +201,14 @@ Visit TMY Dashboard page would automatically pull the finished translation from 
 
 <kbd><img src="doc/tmy-dashboard.png" width="700"/></kbd>
 
+## Enable Search Engine Optimization(SEO) URL
+
+To use the SEO firednly URL, choose a non "Plain URL"  from Setting -> Permalinks page. Then come to TMY Glolalization -> TMY Setup page, choose "Yes" in SEO URL section.
+
+<kbd><img src="doc/tmy-seo.png" width="700"/></kbd>
+
+Then, copy and paste the bold lines from the Setup page into your site's .htaccess file.
+
 ## To start developing TMY Wordpress Plugin
 
 TMY Wordpress plugin is following open source license, look at code here:
