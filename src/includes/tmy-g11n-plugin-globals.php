@@ -95,9 +95,21 @@ function tmy_g11n_available_post_type_options() {
 
 }
 
-function tmy_g11n_post_type_enabled($post_id, $post_title) {
+function tmy_g11n_post_type_enabled($post_id, $post_title, $type) {
 
-    if ((strcmp($post_title,"blogname")===0) || (strcmp($post_title,"blogdescription")===0)) {
+    $qualified_taxonomies = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
+    if (array_key_exists($type, $qualified_taxonomies)) {
+        $all_configed_taxs = get_option('g11n_l10n_props_tax', array());
+        if (empty($all_configed_taxs)) {
+            return false;
+        } else {
+            if (array_key_exists($type, $all_configed_taxs)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    } elseif ((strcmp($post_title,"blogname")===0) || (strcmp($post_title,"blogdescription")===0)) {
         $option_name = "g11n_l10n_props_" . $post_title;
     } else {
         $post_type = get_post_type($post_id);

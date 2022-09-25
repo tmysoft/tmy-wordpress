@@ -123,6 +123,8 @@ class TMY_G11n_Admin {
                 foreach ( $all_post_types  as $post_type ) {
     		    register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_'.$post_type );
                 }
+    		register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_tax' );
+
     		//register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_posts' );
     		//register_setting( 'tmy-g11n-settings-group', 'g11n_l10n_props_pages' );
 	
@@ -184,6 +186,14 @@ class TMY_G11n_Admin {
                           	  'tmy-g11n-dashboard-menu',
                           	  array( $this,
                                          'tmy_l10n_manager_page') );
+
+        	add_submenu_page( 'tmy-g11n-main-menu',
+                                  'TMY Taxonomies',
+                          	  'TMY Taxonomies',
+                          	  'manage_options',
+                          	  'tmy-g11n-taxonomy-menu',
+                          	  array( $this,
+                                         'tmy_l10n_taxonomy_page') );
 	
         	add_submenu_page( 'tmy-g11n-main-menu',
                                   'TMY Diagnosis',
@@ -225,9 +235,10 @@ class TMY_G11n_Admin {
 
 	    	if (strcmp($post_type,"g11n_translation")===0) {
                     $original_id = get_post_meta($post_id, 'orig_post_id', true);
+                    $original_type = get_post_meta($post_id, 'g11n_tmy_orig_type', true);
                     $original_title = get_the_title($original_id);
 
-                    if ( tmy_g11n_post_type_enabled($original_id, $original_title) ) {
+                    if ( tmy_g11n_post_type_enabled($original_id, $original_title, $original_type) ) {
                         if (strcmp($post_status,"publish")===0) {
                             $translation_entry_status = 'LIVE'; 
                             update_post_meta( $post_id, 'g11n_tmy_lang_status', 'LIVE');
@@ -262,31 +273,45 @@ class TMY_G11n_Admin {
         }
 
 
-        public function _get_tmy_g11n_metabox($id) {
+        public function _get_tmy_g11n_metabox($id, $post_type) {
 
                 $post_id = $id;
-                $post_type = get_post_type($post_id);
+                //$post_type = get_post_type($post_id);
                 $post_status = get_post_status($post_id);
                 $return_msg = '';
-
+                $qualified_taxonomies = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
                 $all_post_types = tmy_g11n_available_post_types();
 	    	if (strcmp($post_type,"g11n_translation")===0) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $trans_info = $this->translator->get_translation_info($post_id);
-                    if (isset($trans_info[0])) {
-                        $original_id = $trans_info[0]->ID;
-                        $original_title = $trans_info[0]->post_title;
-                    }
+		    $origin_type = get_post_meta($post_id,'g11n_tmy_orig_type',true);
 		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
 
-                    $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
-                         esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
-                       ' (ID:' . esc_attr($original_id) . ')</a>';
+                    if (array_key_exists($origin_type, $qualified_taxonomies)) {
+	    	    //if (strcmp($origin_type,"taxonomy")===0) {
+                        $original_id = get_post_meta($post_id,'orig_post_id',true);
+                        $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                             esc_url( get_edit_term_link($original_id) ) . '">' . "Taxonomy" . 
+                           ' (ID:' . esc_attr($original_id) . ')</a>';
+
+                    } else {
+                        if (isset($trans_info[0])) {
+                            $original_id = $trans_info[0]->ID;
+                            $original_title = $trans_info[0]->post_title;
+                        }
+
+                        $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                             esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
+                           ' (ID:' . esc_attr($original_id) . ')</a>';
+                    }
 
 		    $return_msg .= ' Status: ' . $this->_update_g11n_translation_status($post_id, true) . '</br>';
                     //$return_msg .= "</div>";
 
-                } elseif (array_key_exists($post_type, $all_post_types)) {
+                } elseif ((array_key_exists($post_type, $all_post_types)) ||
+                        //(strcmp($post_type,"taxonomy")===0)) {
+                          (array_key_exists($post_type, $qualified_taxonomies))) {
+
                 //} elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $return_msg .= '<table class="wp-list-table striped table-view-list">';
@@ -332,6 +357,62 @@ class TMY_G11n_Admin {
                 return $return_msg;
        }
 
+        public function tmy_translation_metabox_taxonomy_edit( $wp_term, $taxonomy ) {
+
+            echo ("<table><tr><td><div id=\"tmy_translation_status_box_div\">");
+            echo ("<br><b>Translation Status: </b>" . $taxonomy);
+            echo ("<br>". $taxonomy);
+            echo ("<br>Taxonomy: " . json_encode($wp_term));
+            //echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, "taxonomy"));
+            echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, $taxonomy));
+            echo ("</div></td></tr></table>");
+            
+            ?>
+                 <script>            
+                 function create_sync_translation(id, post_type) {
+
+                        var r = confirm("This will create sync translation");
+                        if (r == true) {
+                            jQuery(document).ready(function($) {
+                                    var data = {
+                                            'action': 'tmy_create_sync_translation',
+                                            'id': id,
+                                            'post_type': post_type
+                                    };
+                                    $.ajax({
+                                        type:    "POST",
+                                        url:     ajaxurl,
+                                        data:    data,
+                                        success: function(response) {
+                                            if (response === undefined) {
+                                                alert('No Server Reply, talk to system admininstrator.');
+                                            } else {
+                                                var response_json = $.parseJSON(response);
+                                                if (response_json.message === undefined) {
+                                                    alert('No Server Reply, talk to system admininstrator.');
+                                                } else {
+                                                    if (response_json.div_status !== undefined) {
+                                                        var div = document.getElementById('tmy_translation_status_box_div');
+                                                        div.innerHTML = response_json.div_status.slice(0, -1) ;
+                                                    }
+                                                    alert('Server Reply: ' + response_json.message);
+                                                }
+                                                //window.location.reload();
+                                            }
+                                        },
+                                        error:   function(jqXHR, textStatus, errorThrown ) {
+                                            alert("Error, status = " + jqXHR.status + ", " + "textStatus: " + textStatus + "ErrorThrown: " + errorThrown);
+                                        }
+                                    });
+                                    return;
+                            });
+                        }
+                    }
+                </script>
+             <?php
+
+
+        }
 
         public function tmy_translation_metabox_callback( $post ) {
 
@@ -352,7 +433,8 @@ class TMY_G11n_Admin {
                                     console.log("all events");
                                     var data = {
                                             'action': 'tmy_get_post_translation_status',
-                                            'id': <?php echo intval($post->ID); ?>
+                                            'id': <?php echo intval($post->ID); ?>,
+                                            'post_type': '<?php echo $post->post_type; ?>'
                                     };
                                     $.ajax({
                                         type:    "POST",
@@ -425,7 +507,7 @@ class TMY_G11n_Admin {
                 //$post_status = get_post_status($post_id);
 
                 echo '<div id="tmy_translation_status_box_div">';
-                echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($post->ID));
+                echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($post->ID, $post->post_type));
                 echo '</div>';
 	
         }
@@ -685,7 +767,38 @@ class TMY_G11n_Admin {
 
         	</td>
         	</tr>             
+ 
+		<tr valign="top">
+        	<th scope="row">Taxonomy Translation Option</th>
+        	<td>
+            	<br>
+                <?php
 
+                $all_configed_taxs = get_option('g11n_l10n_props_tax', array());
+       
+                if (! isset($all_configed_taxs)) {
+                    $all_configed_taxs = array();
+                }
+                $all_taxs = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
+                foreach ( $all_taxs as $key ) {
+                    if (! empty($all_configed_taxs)) {
+                        if (array_key_exists($key, $all_configed_taxs)) {
+                            $item_checked = "checked";
+                        } else {
+                            $item_checked = "";
+                        }
+                    } else {
+                        $item_checked = "";
+                    }
+                    ?>
+            	    <input type="checkbox" id="<?php echo esc_attr($key); ?>" name="g11n_l10n_props_tax[<?php echo esc_attr($key); ?>]" value="<?php echo esc_attr($key); ?>" <?php echo $item_checked; echo esc_attr($config_disable); ?> /> <?php echo esc_attr($key); ?><br>
+                    <?php
+                }
+
+                ?>
+
+        	</td>
+        	</tr>             
             	<?php
 
          
@@ -771,7 +884,7 @@ class TMY_G11n_Admin {
                          } else {
                              echo "<div id=\"tmy_seo_example_urls\" style=\"display: none\"><br>";
                          }
-                         $all_langs = get_option('g11n_additional_lang');
+                         $all_langs = get_option('g11n_additional_lang',array());
                          $rewrite_rules = strtolower(implode("|", $all_langs));
                          $rewrite_rules = str_replace('_', '-', $rewrite_rules);
 
@@ -870,6 +983,156 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
         }
 
+        public function tmy_l10n_taxonomy_page() {
+	    if ( !current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+ 	    }
+            ?>
+            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Taxonomy Translation Manager</h1>
+            <?php
+
+            //echo "<br>Abc<br>";
+            //echo "<br>". json_encode(get_current_screen()) . "<br>";
+  	    $tmy_g11n_dir = dirname( __FILE__ );
+    	    require_once "{$tmy_g11n_dir}/include/class-tmy-g11n-table.php";
+
+          
+            $qualified_taxonomies = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
+            unset($qualified_taxonomies['translation_priority']);
+            global $wpdb;
+            $sql = "select {$wpdb->prefix}terms.term_id, name, slug, taxonomy
+                from {$wpdb->prefix}terms,{$wpdb->prefix}term_taxonomy 
+                where {$wpdb->prefix}terms.term_id={$wpdb->prefix}term_taxonomy.term_id";
+            $rows = $wpdb->get_results( $sql, "ARRAY_N" );
+ 
+            $qualified_rows = array();
+            foreach ($rows as $row) {
+                if (array_key_exists($row[3], $qualified_taxonomies)) {
+                   $sql = "select id_meta.post_id, 
+                                  lang_meta.meta_value 
+                             from {$wpdb->prefix}postmeta as id_meta, 
+                                  {$wpdb->prefix}postmeta as lang_meta,
+                                  {$wpdb->prefix}postmeta as type_meta 
+                            where id_meta.meta_key=\"orig_post_id\" and 
+                                  id_meta.meta_value={$row[0]} and 
+                                  type_meta.meta_key=\"g11n_tmy_orig_type\" and
+                                  type_meta.meta_value=\"{$row[3]}\" and
+                                  lang_meta.meta_key=\"g11n_tmy_lang\" and 
+                                  lang_meta.post_id=type_meta.post_id and
+                                  lang_meta.post_id=id_meta.post_id";
+                   $lang_rows = $wpdb->get_results( $sql, "ARRAY_N" );
+                   $lang_info = "";
+
+                   foreach ($lang_rows as $lang_row) {
+                       //$lang_info .= "{$lang_row[1]}({$lang_row[0]}) "; 
+                       $lang_info .= "{$lang_row[1]}(<a href=\"" .
+                             esc_url( get_edit_post_link($lang_row[0]) ) . "\">" . 
+                             esc_attr($lang_row[0]) . "</a>) "; 
+                   }
+                   $row[] = $lang_info;
+                   $row[] =  "<a href=\"" . esc_url(get_edit_term_link($row[0])) . "\">" .  esc_attr($row[0]) . "</a>"; 
+                   $qualified_rows[] = $row;
+                   //echo "<br>" . json_encode($lang_rows) . "<br>";
+                   //echo "<br>" . $lang_info . "<br>";
+                }
+            }
+            $table = new TMY_G11N_Table();
+
+            //echo $sql;
+            echo "<br>";
+            //echo json_encode($qualified_rows);
+            echo "<br>";
+            //echo json_encode($rows);
+            echo '<form method="post">';
+            ?> <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" /><?php
+
+
+            $table->items = $qualified_rows;
+            $table->process_bulk_action = $this->tmy_translation_taxonomy_table_action();
+            //$table->process_bulk_action();
+            $table->prepare_items();
+            $table->display();
+            echo '</form>';
+            //echo "<br>Abc";
+
+
+        }
+        public function tmy_translation_taxonomy_table_action() {
+           //         echo '<div class="notice notice-success is-dismissible"><p> bulk action 456</p></div>';
+ 
+                     // security check!
+error_log("AAAAAAAAAAAABBB: " . json_encode($_POST));
+error_log("AAAAAAAAAAAABBB: " . json_encode($_REQUEST));
+            if ( isset( $_POST['_wpnonce'] ) && ! empty( $_POST['_wpnonce'] ) ) {
+                $nonce  = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
+                $action = 'bulk-' . $this->_args['plural'];
+
+                if ( ! wp_verify_nonce( $nonce, $action ) )
+                    wp_die( 'Nope! Security check failed!' );
+            }
+
+            $action = current_action();
+            switch ( $_POST['action'] ) {
+
+                case 'start_translation_from_taxonomies_form':
+
+                 $term_ids = esc_sql($_POST['term_id']);
+                    //echo '<div class="notice notice-success is-dismissible"><p> bulk action' .implode("-", $term_ids) . '</p></div>';
+                    foreach ($term_ids as $term_id) {
+                        //echo '<div class="notice notice-success is-dismissible"><p> Process: ' . $term_id . '</p></div>';
+                        $tax_type = get_term_field('taxonomy', $term_id);
+                        //$this->_tmy_create_sync_translation($term_id, "taxonomy");
+                        $this->_tmy_create_sync_translation($term_id, $tax_type);
+                    }
+                    wp_redirect($_SERVER['REQUEST_URI']);
+                    return;
+                    break;
+
+                case 'remove_translation_from_taxonomies_form':
+
+                    $term_ids = esc_sql($_POST['term_id']);
+
+                    foreach ($term_ids as $term_id) {
+                        $term_notify = "";
+                        $all_langs = get_option('g11n_additional_lang');
+                        $default_lang = get_option('g11n_default_lang');
+                        unset($all_langs[$default_lang]);
+                        $tax_type = get_term_field('taxonomy', $term_id);
+
+                        if (is_array($all_langs)) {
+                            foreach( $all_langs as $value => $code) {
+                                $translation_id = $this->translator->get_translation_id($term_id,$code,$tax_type);
+                                //$translation_id = $this->translator->get_translation_id($term_id,$code,"taxonomy");
+                                if (isset($translation_id)) {
+                                    wp_delete_post( $translation_id );
+                                    delete_post_meta( $translation_id, 'orig_post_id' );
+                                    delete_post_meta( $translation_id, 'g11n_tmy_lang' );
+                                    delete_post_meta( $translation_id, 'g11n_tmy_orig_type' );
+                                    $term_notify .= "{$code}:{$translation_id} ";
+                                }
+                             }
+                        }
+                        if (strcmp($term_notify,"")===0) {
+                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . $term_id . ", no translation found" . '</p></div>';
+                        } else {
+                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . $term_id . ", removed translation for: " . $term_notify . '</p></div>';
+                        }
+
+                    }
+                    wp_redirect($_SERVER['REQUEST_URI']);
+                    return;
+                    break;
+
+
+                default:
+                    // do nothing or something else
+                    return;
+                    break;
+            }
+
+            return;
+
+        }
         public function tmy_l10n_manager_page() {
 
 		if ( !current_user_can( 'manage_options' ) )  {
@@ -1204,7 +1467,8 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
         }
 
 	public function tmy_get_post_translation_status() {
-            echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox(intval($_POST['id'])));
+            echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox(intval($_POST['id']), $_POST['post_type']));
+
             echo "  ";
         }
 
@@ -1240,6 +1504,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                      // creating language translations for each language
                      $num_success_entries = 0;
                      $num_langs = 0;
+                     $qualified_taxonomies = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
                      if (is_array($all_langs)) {
                          $num_langs = count($all_langs);
                          foreach( $all_langs as $value => $code) {
@@ -1251,18 +1516,30 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                                  $num_success_entries += 1;
                                  //$message .= " $value($code)";
                                  //error_log("in create_sync_translation, no translation_id");
-                                 $translation_title = get_post_field('post_title', $post_id);
-                                 $translation_contents = get_post_field('post_content', $post_id);
-                                 $translation_excerpt = get_post_field('post_excerpt', $post_id);
-                                 $g11n_translation_post = array(
-                                       'post_title'    => $translation_title,
-                                       'post_content'  => $translation_contents,
-                                       'post_excerpt'  => $translation_excerpt,
-                                       'post_type'  => "g11n_translation"
-                                 );
+             
+                                 if (array_key_exists($post_type, $qualified_taxonomies)) {
+                                 //if (strcmp($post_type, "taxonomy") === 0) {
+                                     $term_name = get_term_field('name', $post_id);
+                                     $g11n_translation_post = array(
+                                           'post_title'    => $term_name,
+                                           'post_content'  => "",
+                                           'post_type'  => "g11n_translation"
+                                     );
+                                 } else {
+                                     $translation_title = get_post_field('post_title', $post_id);
+                                     $translation_contents = get_post_field('post_content', $post_id);
+                                     $translation_excerpt = get_post_field('post_excerpt', $post_id);
+                                     $g11n_translation_post = array(
+                                           'post_title'    => $translation_title,
+                                           'post_content'  => $translation_contents,
+                                           'post_excerpt'  => $translation_excerpt,
+                                           'post_type'  => "g11n_translation"
+                                     );
+                                 }
                                  $new_translation_id = wp_insert_post( $g11n_translation_post );
                                  add_post_meta( $new_translation_id, 'orig_post_id', $post_id, true );
                                  add_post_meta( $new_translation_id, 'g11n_tmy_lang', $code, true );
+                                 add_post_meta( $new_translation_id, 'g11n_tmy_orig_type', $post_type, true );
                              }
                              $this->_update_g11n_translation_status($new_translation_id);
                              if ( WP_TMY_G11N_DEBUG ) { 
@@ -1279,21 +1556,31 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                          (strcmp('', get_option('g11n_server_token','')) !== 0) &&
                          (strcmp('', get_option('g11n_server_url','')) !== 0)) {
 
-                         $content_title = get_post_field('post_title', $post_id);
-                         $content_excerpt = get_post_field('post_content', $post_id) . "\n\n" .
-                                            get_post_field('post_excerpt', $post_id);
-
-                         //$tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
-                         $tmp_array = preg_split('/(\n)/', $content_excerpt, -1, PREG_SPLIT_DELIM_CAPTURE);
-                         $contents_array = array();
-
-                         if (strcmp(get_post_field('post_title', $post_id),'blogname') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . $post_id;
-                         } elseif (strcmp(get_post_field('post_title', $post_id),'blogdescription') === 0){
-                             $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . $post_id;
-                         } else {
+                         if (array_key_exists($post_type, $qualified_taxonomies)) {
+                        // if (strcmp($post_type, "taxonomy") === 0) {
+                             $content_title = get_term_field('name', $post_id);
+                             $content_excerpt = "";
+                             $tmp_array = array();
+                             $contents_array = array();
                              $json_file_name = "WordpressG11nAret-" . $post_type . "-" . $post_id;
                              array_push($contents_array, $content_title);
+                         } else {
+                             $content_title = get_post_field('post_title', $post_id);
+                             $content_excerpt = get_post_field('post_content', $post_id) . "\n\n" .
+                                            get_post_field('post_excerpt', $post_id);
+
+                             //$tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
+                             $tmp_array = preg_split('/(\n)/', $content_excerpt, -1, PREG_SPLIT_DELIM_CAPTURE);
+                             $contents_array = array();
+
+                            if (strcmp(get_post_field('post_title', $post_id),'blogname') === 0){
+                                $json_file_name = "WordpressG11nAret-" . "blogname" . "-" . $post_id;
+                            } elseif (strcmp(get_post_field('post_title', $post_id),'blogdescription') === 0){
+                                $json_file_name = "WordpressG11nAret-" . "blogdescription" . "-" . $post_id;
+                            } else {
+                                $json_file_name = "WordpressG11nAret-" . $post_type . "-" . $post_id;
+                                array_push($contents_array, $content_title);
+                            }
                          }
 
                          $paragraph = "";
@@ -1319,7 +1606,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
              }
 
              $return_msg = json_encode(array("message" => esc_attr($message),
-                                             "div_status" => $this->_get_tmy_g11n_metabox($post_id)
+                                             "div_status" => $this->_get_tmy_g11n_metabox($post_id, $post_type)
                                       ));
              //echo esc_attr($message);
              return $return_msg . "  ";
@@ -1835,7 +2122,11 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
 		    $no_g11n_config = $wpdb->get_results( 'delete from '.$wpdb->prefix.'options where option_name like "g11n%"');
 		    $no_g11n_trans = $wpdb->get_results( 'delete from '.$wpdb->prefix.'posts where post_type="g11n_translation" or post_title="blogname" or post_title="blogdescription"');
-		    $no_g11n_metas = $wpdb->get_results( 'delete from '.$wpdb->prefix.'postmeta where meta_key="g11n_tmy_lang" or meta_key="g11n_tmy_lang_status" or meta_key="orig_post_id" or meta_key="translation_push_status"');
+		    $no_g11n_metas = $wpdb->get_results( 'delete from '.$wpdb->prefix.'postmeta where meta_key="g11n_tmy_lang" or 
+                                                                                                      meta_key="g11n_tmy_lang_status" or 
+                                                                                                      meta_key="g11n_tmy_orig_type" or 
+                                                                                                      meta_key="orig_post_id" or 
+                                                                                                      meta_key="translation_push_status"');
 		    //error_log(var_export($no_g11n_config,true));
 		    //error_log(var_export($no_g11n_trans,true));
 		    //error_log(var_export($no_g11n_metas,true));
@@ -2200,4 +2491,5 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
             $ret = insert_with_markers( $htaccess_location, 'TMY_G11N_RULES', $content );
 
         }
+
 }

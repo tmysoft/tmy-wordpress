@@ -208,7 +208,11 @@ class TMY_G11n {
                 $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
                 //$this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
  
- 
+                $this->loader->add_action( 'category_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
+                $this->loader->add_action( 'post_tag_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
+                $this->loader->add_action( 'product_cat_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
+                $this->loader->add_action( 'product_tag_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
+
 	}
 
 	/**
@@ -291,6 +295,19 @@ class TMY_G11n {
 		$this->loader->add_action( 'template_redirect', $plugin_public, 'tmy_g11n_template_redirect');
 		//$this->loader->add_filter( 'site_url', $plugin_public, 'tmy_g11n_site_url', 10, 2);
 
+                //$this->loader->add_filter( 'get_category', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                //$this->loader->add_filter( 'get_post_tag', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                //$this->loader->add_filter( 'get_product_tag', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                //$this->loader->add_filter( 'get_product_cat', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+
+                $all_configed_taxs = get_option('g11n_l10n_props_tax');
+                if (! isset($all_configed_taxs)) {
+                    $all_configed_taxs = array();
+                }
+
+                foreach ( $all_configed_taxs as $key ) {
+                    $this->loader->add_filter( 'get_' . $key, $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                }
 	}
 
 	/**

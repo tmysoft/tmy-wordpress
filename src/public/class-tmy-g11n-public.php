@@ -890,7 +890,7 @@ public function g11n_add_floating_menu() {
 		            error_log("In g11n_content_filter filter, postid, posttype:" . esc_attr($postid) . " " . esc_attr($posttype) );
                         }
 
-                        if (! tmy_g11n_post_type_enabled($postid, $wp_query->post->post_title)) {
+                        if (! tmy_g11n_post_type_enabled($postid, $wp_query->post->post_title, $posttype)) {
 			    return $input;
                         }
 
@@ -958,7 +958,7 @@ public function g11n_add_floating_menu() {
 
 		    $posttype = $wp_query->post->post_type;
 
-                    if (! tmy_g11n_post_type_enabled($wp_query->post->ID, $title)) {
+                    if (! tmy_g11n_post_type_enabled($wp_query->post->ID, $title, $posttype)) {
 			return $title;
                     }
 		    //if ((strcmp(get_option('g11n_l10n_props_posts'),"Yes")!=0) and 
@@ -1177,5 +1177,28 @@ public function g11n_add_floating_menu() {
             $current_url = home_url( $wp->request );
             echo '<link rel="alternate" href="' . esc_url($current_url) . '" hreflang="x-default" />' . "\n";
         }
+        public function tmy_translation_get_taxonomy_filter( $wp_term, $taxonomy ) {
+
+            error_log("In tmy_translation_get_taxonomy_filter: " . json_encode($wp_term));
+
+            if ( ! is_admin() ) {
+
+                //if (! tmy_g11n_post_type_enabled($wp_term->term_id, "", "taxonomy")) {
+                //    return $wp_term;
+                //}
+
+                $all_configed_langs = get_option('g11n_additional_lang');
+                $lang_code = $all_configed_langs[$this->translator->get_preferred_language()];
+                //$translation_id = $this->translator->get_translation_id($wp_term->term_id, $lang_code, "taxonomy", false);
+                $translation_id = $this->translator->get_translation_id($wp_term->term_id, $lang_code, $taxonomy, false);
+
+                if (isset($translation_id)) {
+                    $wp_term->name = get_post_field("post_title", $translation_id);
+                }
+            }
+            return $wp_term;
+        }
+
+
 
 }
