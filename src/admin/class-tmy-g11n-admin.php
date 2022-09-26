@@ -301,7 +301,7 @@ class TMY_G11n_Admin {
                         }
 
                         $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
-                             esc_url( get_edit_post_link($original_id) ) . '">' . $original_title . 
+                             esc_url( get_edit_post_link($original_id) ) . '">' . esc_attr($original_title) . 
                            ' (ID:' . esc_attr($original_id) . ')</a>';
                     }
 
@@ -360,9 +360,7 @@ class TMY_G11n_Admin {
         public function tmy_translation_metabox_taxonomy_edit( $wp_term, $taxonomy ) {
 
             echo ("<table><tr><td><div id=\"tmy_translation_status_box_div\">");
-            echo ("<br><b>Translation Status: </b>" . $taxonomy);
-            echo ("<br>". $taxonomy);
-            echo ("<br>Taxonomy: " . json_encode($wp_term));
+            echo ("<br><b>Translation Status: </b>" );
             //echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, "taxonomy"));
             echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, $taxonomy));
             echo ("</div></td></tr></table>");
@@ -1024,8 +1022,8 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                    $lang_info = "";
 
                    foreach ($lang_rows as $lang_row) {
-                       //$lang_info .= "{$lang_row[1]}({$lang_row[0]}) "; 
-                       $lang_info .= "{$lang_row[1]}(<a href=\"" .
+                       //$lang_info .= "{esc_attr($lang_row[1])}({esc_attr($lang_row[0]})) "; 
+                       $lang_info .= esc_attr($lang_row[1]) . "(<a href=\"" .
                              esc_url( get_edit_post_link($lang_row[0]) ) . "\">" . 
                              esc_attr($lang_row[0]) . "</a>) "; 
                    }
@@ -1044,7 +1042,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
             echo "<br>";
             //echo json_encode($rows);
             echo '<form method="post">';
-            ?> <input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>" /><?php
+            ?> <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']) ?>" /><?php
 
 
             $table->items = $qualified_rows;
@@ -1058,11 +1056,9 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
         }
         public function tmy_translation_taxonomy_table_action() {
-           //         echo '<div class="notice notice-success is-dismissible"><p> bulk action 456</p></div>';
- 
-                     // security check!
-error_log("AAAAAAAAAAAABBB: " . json_encode($_POST));
-error_log("AAAAAAAAAAAABBB: " . json_encode($_REQUEST));
+
+            //         echo '<div class="notice notice-success is-dismissible"><p> bulk action 456</p></div>';
+            // security check!
             if ( isset( $_POST['_wpnonce'] ) && ! empty( $_POST['_wpnonce'] ) ) {
                 $nonce  = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
                 $action = 'bulk-' . $this->_args['plural'];
@@ -1084,7 +1080,7 @@ error_log("AAAAAAAAAAAABBB: " . json_encode($_REQUEST));
                         //$this->_tmy_create_sync_translation($term_id, "taxonomy");
                         $this->_tmy_create_sync_translation($term_id, $tax_type);
                     }
-                    wp_redirect($_SERVER['REQUEST_URI']);
+                    wp_redirect(esc_url($_SERVER['REQUEST_URI']));
                     return;
                     break;
 
@@ -1113,13 +1109,13 @@ error_log("AAAAAAAAAAAABBB: " . json_encode($_REQUEST));
                              }
                         }
                         if (strcmp($term_notify,"")===0) {
-                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . $term_id . ", no translation found" . '</p></div>';
+                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", no translation found" . '</p></div>';
                         } else {
-                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . $term_id . ", removed translation for: " . $term_notify . '</p></div>';
+                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", removed translation for: " . esc_attr($term_notify) . '</p></div>';
                         }
 
                     }
-                    wp_redirect($_SERVER['REQUEST_URI']);
+                    wp_redirect(esc_url($_SERVER['REQUEST_URI']));
                     return;
                     break;
 

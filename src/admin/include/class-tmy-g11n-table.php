@@ -33,7 +33,7 @@ public function __construct() {
 
         function column_cb($item) {
             return sprintf(
-                '<input type="checkbox" name="term_id[]" value="%s" />', $item[0]
+                '<input type="checkbox" name="term_id[]" value="%s" />', esc_attr($item[0])
                            );    
         }
 

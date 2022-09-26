@@ -117,6 +117,30 @@ Then the plugin will automatically create the place holder post corresponding to
 
 Following the same way to translate the page or post to complete the translation.
 
+## Use TMY Plugin For Taxonomies Translation(Categories, Tags, Woocommerces) 
+
+TMY plugin will automatic detect all the taxonomy types including those from other themes or plugins, as shown in the following screen shots, enable as your need.
+
+<kbd><img src="doc/tmy-enable-tax.png" width="300"/></kbd>
+
+Then visit TMY Globalization -> TMY Taxonomies page, to start translation, you can use bulk action or in the invidual Catgeories or Tags page to start individual setup page , then following the same steps as you tanslate Posts or Pages.
+
+<kbd><img src="doc/tmy-taxonomies.png" width="600"/></kbd>
+
+TMY plugin will automatic detect all the taxonomy types including those from other themes or plugins, as shown in the following screen shots, enable as your need.
+
+Following the same way to translate the page or post to complete the translation.
+
+## Translate Woo Commerce Product Attributes
+
+Create a private Post with the title the same as the Product attribute, then start translation as you do with normal Post, remember to keep it private, so it will not show up on your site. 
+
+TMY plugin will pickup the translation following the string match("Color" to "Color") and use it for Woo Commerce product attribute translation.
+
+<kbd><img src="doc/tmy-woo-prod-attributes.png" width="600"/></kbd>
+
+<kbd><img src="doc/tmy-private-post-for-attribute.png" width="600"/></kbd>
+
 ## Translate Excerpt of Woo Commerce Product
 
 Excerpt of a Woo Commerce product is used as brief introduction of the product, reference following screenshot to get it translated.
