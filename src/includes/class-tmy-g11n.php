@@ -308,6 +308,8 @@ class TMY_G11n {
                 foreach ( $all_configed_taxs as $key ) {
                     $this->loader->add_filter( 'get_' . $key, $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
                 }
+
+                $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
 	}
 
 	/**

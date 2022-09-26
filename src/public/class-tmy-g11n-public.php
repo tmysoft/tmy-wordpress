@@ -183,9 +183,8 @@ class TMY_G11n_Public {
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession");
                 }
-
                 if (session_status() !== PHP_SESSION_ACTIVE) {
-                    session_start();
+                      session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession id=" . esc_attr(session_id()));
@@ -946,42 +945,28 @@ public function g11n_add_floating_menu() {
                         }
                         return $title;
                     }
-		    global $wp_query; 
+
+		    //global $wp_query; 
 		    //$postid = $wp_query->post->ID;
-		    //error_log("G11N TITLE FILTER, id = [" . $id . "]");
-		    //error_log("G11N TITLE FILTER, postid = [" . $postid . "]");
+		    //if (!isset($wp_query->post)) return $title;
+		    //$posttype = $wp_query->post->post_type;
 
-                    //error_log("The Title filter, excerpt post_id: " . $wp_query->post->ID . " type: " . $wp_query->post->post_type);
-                    //error_log("The Title filter, excerpt post_id: " . var_export($wp_query, true));
+                    $posttype = get_post_type($id);
 
-		    if (!isset($wp_query->post)) return $title;
-
-		    $posttype = $wp_query->post->post_type;
-
-                    if (! tmy_g11n_post_type_enabled($wp_query->post->ID, $title, $posttype)) {
+                    if (! tmy_g11n_post_type_enabled($id, $title, $posttype)) {
 			return $title;
                     }
-		    //if ((strcmp(get_option('g11n_l10n_props_posts'),"Yes")!=0) and 
-	            //		(strcmp($posttype,"post")==0)) {
-	            //		return $title;
-		    //}
-
-		    //if ((strcmp(get_option('g11n_l10n_props_pages'),"Yes")!=0) and 
-		    //	(strcmp($posttype,"page")==0)) {
-		    //	return $title;
-		    //}
-
-		    //if (strcmp($posttype,"product")==0) {
-		    //	#return $title;
-			//error_log("Translation of Title: " . $title);
-		    //	return "Translation of Title: " . $title;
-		    //   }
 
 		    $language_options = get_option('g11n_additional_lang');
+
 		    //$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 		    $g11n_current_language = $this->translator->get_preferred_language();
 		    $language_name = $language_options[$g11n_current_language];
-		    $translation_post_id = $this->translator->get_translation_id($id,$language_name,$wp_query->post->post_type,false);
+
+		    //$translation_post_id = $this->translator->get_translation_id($id,$language_name,$wp_query->post->post_type,false);
+		    $translation_post_id = $this->translator->get_translation_id($id,$language_name,$posttype,false);
+
+		    //error_log("G11N TITLE FILTER, {$title}-{$id}-{$language_name}-{$wp_query->post->post_type}-{$translation_post_id})");
 
 		    if (isset($translation_post_id)) {
 			return get_post_field("post_title", $translation_post_id);
@@ -1179,7 +1164,7 @@ public function g11n_add_floating_menu() {
         }
         public function tmy_translation_get_taxonomy_filter( $wp_term, $taxonomy ) {
 
-            error_log("In tmy_translation_get_taxonomy_filter: " . json_encode($wp_term));
+            //error_log("In tmy_translation_get_taxonomy_filter: " . json_encode($wp_term));
 
             if ( ! is_admin() ) {
 
@@ -1199,6 +1184,34 @@ public function g11n_add_floating_menu() {
             return $wp_term;
         }
 
+        public function tmy_woocommerce_attribute_label_filter( $label, $name, $product ) {
+        
+            error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product}");
+
+            global $wpdb;
+            $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($label) . "\" and post_status=\"private\"";
+            $result = $wpdb->get_results($sql);
+
+            if (isset($result[0]->ID)) {
+                error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product} item_id {$result[0]->ID}");
+
+                $language_options = get_option('g11n_additional_lang');
+                $g11n_current_language = $this->translator->get_preferred_language();
+                $language_name = $language_options[$g11n_current_language];
+                $translation_post_id = $this->translator->get_translation_id($result[0]->ID,$language_name,"post",false);
+                if (isset($translation_post_id)) {
+                    return get_post_field("post_content", $translation_post_id);
+                } else {
+                    return $label;
+                }
+
+            } else {
+                return $label;
+            }
+
+            return $label;
+
+        }
 
 
 }

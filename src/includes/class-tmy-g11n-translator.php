@@ -358,8 +358,9 @@ class TMY_G11n_Translator {
                 $site_url = get_site_url();
 
 		$query_variable_name = "g11n_tmy_lang";
-		$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
 
+		//$g11n_current_language = tmy_g11n_lang_sanitize($_SESSION['g11n_language']);
+		$g11n_current_language = $this->get_preferred_language();
 
 		$language_options = get_option('g11n_additional_lang', array());
 		//$language_switcher_html = '<span style="font-color:red; font-size: xx-small; font-family: sans-serif; display: inline-block;">';
@@ -427,7 +428,12 @@ class TMY_G11n_Translator {
                              //$current_url = str_replace($site_url, $site_url . '/lang/' . $value, $current_url);
                              $url_code = strtolower(str_replace('_', '-', $code));
 
-                             $lang_path = explode('/', str_replace($site_url, '', $current_url))[1];
+                             if (isset(explode('/', str_replace($site_url, '', $current_url))[1])) {
+                                 $lang_path = explode('/', str_replace($site_url, '', $current_url))[1];
+                             } else {
+                                 $lang_path = "";
+                             }
+                             //$lang_path = explode('/', str_replace($site_url, '', $current_url))[1];
                              $lang_path = str_replace('-', '_', $lang_path);
                              if (! array_search(strtolower($lang_path), array_map('strtolower',$language_options))) {
                                  $current_url = str_replace($site_url, $site_url . '/' . esc_attr($url_code), $current_url);
