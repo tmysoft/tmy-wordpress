@@ -184,7 +184,7 @@ class TMY_G11n_Public {
         	    error_log("In G11nStartSession");
                 }
                 if (session_status() !== PHP_SESSION_ACTIVE) {
-                      session_start();
+//                      session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession id=" . esc_attr(session_id()));
@@ -514,10 +514,11 @@ public function g11n_add_floating_menu() {
 			global $locale;
 			$locale = $s_locale;
 			$template_name = get_template();
-			if (is_textdomain_loaded($template_name)) {
+                        // to-do
+			//if (is_textdomain_loaded($template_name)) {
 			    unload_textdomain($template_name);
 			    load_theme_textdomain($template_name);
-			}
+			//}
                         if ( WP_TMY_G11N_DEBUG ) {
                             error_log("In g11n_locale_filter, change locale to: " . esc_attr($s_locale) . " template name = ". esc_attr($template_name));
                         }
@@ -936,7 +937,7 @@ public function g11n_add_floating_menu() {
                     }
 	}
 
-	public function g11n_title_filter( $title, $id ) {
+	public function g11n_title_filter( $title, $id = 0 ) {
     
 
                     if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {

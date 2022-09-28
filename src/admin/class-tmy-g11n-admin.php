@@ -54,7 +54,6 @@ class TMY_G11n_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->translator = $translator;
-
 	}
 
 	/**
@@ -848,8 +847,8 @@ class TMY_G11n_Admin {
                          $default_lang = get_option('g11n_default_lang');
                          unset($all_langs[$default_lang]);
                          foreach( $all_langs as $value => $code) {
-                             echo WP_LANG_DIR . '/themes/' .
-                                  $theme_name."-".$code . '.mo <br>';
+                             echo WP_LANG_DIR . '/' . $code . '.mo <br>';
+                             echo WP_LANG_DIR . '/themes/' . $theme_name."-".$code . '.mo <br>';
                          } 
                      ?>
                 </td>
@@ -954,7 +953,7 @@ RewriteRule ^index\.php$ - [L] <br>
 RewriteCond %{REQUEST_FILENAME} -d  <br> 
 RewriteCond %{REQUEST_URI} /+[^\.]+$  <br>
 RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L] <br> 
-RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) http://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
+RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) https://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
 # END TMY_G11N_RULES <br> </b>
 RewriteCond %{REQUEST_FILENAME} !-f <br>
 RewriteCond %{REQUEST_FILENAME} !-d <br>
@@ -991,8 +990,8 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
             //echo "<br>Abc<br>";
             //echo "<br>". json_encode(get_current_screen()) . "<br>";
-  	    $tmy_g11n_dir = dirname( __FILE__ );
-    	    require_once "{$tmy_g11n_dir}/include/class-tmy-g11n-table.php";
+            $tmy_g11n_dir = dirname( __FILE__ );
+            require_once "{$tmy_g11n_dir}/include/class-tmy-g11n-table.php";
 
             echo '<form method="post">';
           
@@ -1127,41 +1126,50 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                                 return;
                         });
                     }
+
                     </script>
                 <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Dashboard</h1>
+                <!--- 
 		<h2>Translation Status:</h2>
                 <button type="button" onclick="G11nGetLocalTranslationStatus()">Refresh Translation Status</button>
 		<div class="wrap">
                 <div id="tmy_local_translation_status">
-
+                -->
 		<?php
 
-                global $wpdb;
-                $rows = $wpdb->get_results( 'SELECT ID, post_title, meta_value, post_modified  FROM '.
-                                                  $wpdb->prefix.'posts,'.
-                                                  $wpdb->prefix.'postmeta where post_type="g11n_translation" and '.
-                                                  $wpdb->prefix.'posts.post_status != "trash" and '.
-                                                  $wpdb->prefix.'posts.ID='.
-                                                  $wpdb->prefix.'postmeta.post_id and '.
-                                                  $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang" ORDER BY ID');
+                //global $wpdb;
+                //$rows = $wpdb->get_results( 'SELECT ID, post_title, meta_value, post_modified  FROM '.
+                //                                  $wpdb->prefix.'posts,'.
+                //                                  $wpdb->prefix.'postmeta where post_type="g11n_translation" and '.
+                //                                  $wpdb->prefix.'posts.post_status != "trash" and '.
+                //                                  $wpdb->prefix.'posts.ID='.
+                //                                  $wpdb->prefix.'postmeta.post_id and '.
+                //                                  $wpdb->prefix.'postmeta.meta_key="g11n_tmy_lang" ORDER BY ID');
 
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In tmy_l10n_manager_page sql:" . esc_attr(json_encode($rows)));
-                }
+                //if ( WP_TMY_G11N_DEBUG ) {
+                //    error_log("In tmy_l10n_manager_page sql:" . esc_attr(json_encode($rows)));
+                //}
 
-                $this->tmy_g11n_get_local_translation_status();
+                //$this->tmy_g11n_get_local_translation_status();
 
-                echo "</div>";
+                //echo "</div>";
            
 		echo "<h2>Translation Server Status:</h2>";
 
                 if ((strcmp('', get_option('g11n_server_user','')) === 0) || (strcmp('', get_option('g11n_server_token','')) === 0)) {
                      echo "Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>";
                 } else {
-                    echo '<button type="button" onclick="G11nmyGetServerStatus()">Get Server Status</button> Click Button To Get Latest Status';
-                    echo '<br><br>';
-                    //echo '<div class="tmy_loader"></div>';
-        	    echo '<div id="tmy_server_status"></div>';
+
+                    echo '<button type="button" onclick="G11nmyGetServerStatus()">Click This Button To Sync with Translation Server</button> ';
+                    echo '<br>';
+                    echo "<br>Translation Server: ". esc_attr(get_option('g11n_server_url')) . '<br> ';
+                    echo "Project: <b>" . esc_attr(get_option('g11n_server_project')). "</b> ";
+                    echo "Version: <b>" . esc_attr(get_option('g11n_server_version')) . "</b><br>";
+                    $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/version";
+                    $server_reply = $this->translator->rest_get_translation_server($rest_url);
+                    echo "Server Version: " . esc_attr($server_reply["payload"]->versionNo) . "<br><br>";
+        	    echo '<div id="tmy_server_status">';
+        	    echo '</div>';
 
 
                }
@@ -1908,6 +1916,10 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
         }
 
+	public function tmy_g11n_get_refresh_table_status() {
+
+        }
+
 	public function tmy_g11n_get_project_status() {
 
                 $http_erro_code_msg = array(
@@ -1918,15 +1930,15 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                         );
 
                 $return_msg = '';
-		$return_msg .= "<br>Translation Server URL: ". esc_attr(get_option('g11n_server_url')) . ' ';
+		//$return_msg .= "<br>Translation Server URL: ". esc_attr(get_option('g11n_server_url')) . ' ';
 
       	        $rest_url = rtrim(get_option('g11n_server_url'),"/") .  "/rest/version";
     		$server_reply = $this->translator->rest_get_translation_server($rest_url);
 
     	        if ($server_reply["http_code"] == 200) {
-                    $return_msg .= "Sever Version: " . esc_attr($server_reply["payload"]->versionNo) . "<br>";
-                    $return_msg .= "Project Name: <b>" . esc_attr(get_option('g11n_server_project')). "</b> ";
-                    $return_msg .= "Project Version: <b>" . esc_attr(get_option('g11n_server_version')) . "</b><br>";
+                    //$return_msg .= "Sever Version: " . esc_attr($server_reply["payload"]->versionNo) . "<br>";
+                    //$return_msg .= "Project Name: <b>" . esc_attr(get_option('g11n_server_project')). "</b> ";
+                    //$return_msg .= "Project Version: <b>" . esc_attr(get_option('g11n_server_version')) . "</b><br>";
                     $return_msg .= "<br>Translations Hosted on the Server: <br>";
 
                     $translation_server_status = True;
@@ -1965,9 +1977,13 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                                              // checking the post id/default_lang_post_id is a valid post in the system now, if yes, pulling the translation
                                              // otherwise ignore it
 
-                                    if( is_null(get_post($default_lang_post_id))){
+                                    
+                                    if ( strcmp($g11n_res_filename[0], "WordpressG11nAret") !== 0 ) {
                                         $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats)).
-                                                       "\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
+                                                       "\"> Skipping </td></tr>";
+                                    //if( is_null(get_post($default_lang_post_id))){
+                                        //$return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats)).
+                                                       //"\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
 
                                     } else {
 
@@ -2022,32 +2038,41 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 		                                     $translation_title = "blogdescription";
                                                  } 
 
+                                                 // this language on server is fully translated, and there is a local translation
+                                                 // started, and id is set and found, then update the translation. If no local translation
+                                                 // id, means out of sync, will show no id
+                                                
+
 		                                 if (isset($translation_id)) {
 		                                     $update_post_id = wp_update_post(array(
 		                                                        'ID'    => $translation_id,
 		                                                        'post_title'    => $translation_title,
 		                                                        'post_content'  => $translation_contents,
 		                                                        'post_type'  => "g11n_translation"));
+                                                     $doc_lang_str .= "<td><b>" . esc_attr($stat_row->locale) . ": ". 
+                                                       esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "(ID:".
+                                                       '<a href="' . esc_url(get_edit_post_link(esc_attr($translation_id))) . 
+                                                       '" target="_blank">'.esc_attr($translation_id) . '</a>' .
+                                                       ")</b></td> ";
 		                                 } else {
-		                                     $translation_id = wp_insert_post(array(
-		                                                        'post_title'    => $translation_title,
-		                                                        'post_content'  => $translation_contents,
-		                                                        'post_type'  => "g11n_translation"));
-		                                     add_post_meta( $translation_id, 'orig_post_id', $default_lang_post_id, true );
-		                                     add_post_meta( $translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
+		                                     //$translation_id = wp_insert_post(array(
+		                                     //                   'post_title'    => $translation_title,
+		                                     //                   'post_content'  => $translation_contents,
+		                                     //                   'post_type'  => "g11n_translation"));
+		                                     //add_post_meta( $translation_id, 'orig_post_id', $default_lang_post_id, true );
+		                                     //add_post_meta( $translation_id, 'g11n_tmy_lang', $stat_row->locale, true );
+                                                     $doc_lang_str .= "<td><b>" . esc_attr($stat_row->locale) . ": ". 
+                                                       esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . 
+                                                       "(No Local ID)</b></td> ";
 		                                 }
                                                  $this->_update_g11n_translation_status($translation_id);
 
 	                                         //tmy_g11n_pull_translation($stat_row->id, $stat_row->locale);
                                                  //finish fully translated, need to pull the translation down to local WP database
 
-                                                 $doc_lang_str .= "<td><b>" . esc_attr($stat_row->locale) . ": ". 
-                                                   esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "(ID:".
-                                                   '<a href="' . esc_url(get_edit_post_link(esc_attr($translation_id))) . 
-                                                   '" target="_blank">'.esc_attr($translation_id) . '</a>' .
-                                                   ")</b></td> ";
 
                                              } else {
+		                                 $stat_row->locale = str_replace("-", "_", $stat_row->locale);
                                                  $doc_lang_str .= "<td>" . esc_attr($stat_row->locale) . ": ". 
                                                        esc_attr($stat_row->translated) . "/" . esc_attr($stat_row->total) . "</td> ";
                                              }
@@ -2263,6 +2288,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
             unset($columns['date']);
             $columns['post_id']     = 'ID';
+            $columns['origin_type']     = 'Type';
             $columns['original_id']     = 'Original Post ID';
             $columns['Language']     = 'Language';
             $columns['post_status']     = 'Translation Status';
@@ -2347,6 +2373,9 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                 case 'post_status'     :
                     //echo get_post_meta( $post_id, 'g11n_tmy_lang_status', true );
                     echo tmy_g11n_html_kses_esc($this->_update_g11n_translation_status($post_id, true));
+                break;
+                case 'origin_type'     :
+                    echo get_post_meta( $post_id, 'g11n_tmy_orig_type', true );
                 break;
                 case 'tmy_server_status'     :
                     echo 'N/A';
