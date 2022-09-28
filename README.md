@@ -119,15 +119,13 @@ Following the same way to translate the page or post to complete the translation
 
 ## Use TMY Plugin For Taxonomies Translation(Categories, Tags, Woocommerces) 
 
-TMY plugin will automatic detect all the taxonomy types including those from other themes or plugins, as shown in the following screen shots, enable as your need.
+TMY plugin will automatically detect all the taxonomy types including those from other themes or plugins, as shown in the following screen shots, enable as you need.
 
 <kbd><img src="doc/tmy-enable-tax.png" width="300"/></kbd>
 
 Then visit TMY Globalization -> TMY Taxonomies page, to start translation, you can use bulk action or in the invidual Catgeories or Tags page to start individual setup page , then following the same steps as you tanslate Posts or Pages.
 
 <kbd><img src="doc/tmy-taxonomies.png" width="600"/></kbd>
-
-TMY plugin will automatic detect all the taxonomy types including those from other themes or plugins, as shown in the following screen shots, enable as your need.
 
 Following the same way to translate the page or post to complete the translation.
 
@@ -183,9 +181,7 @@ You might try to try to see which location is best fit in your website, here is 
 
 <kbd><img src="doc/tmy-trans.png" width="600"/></kbd>
 
-"TMY Dashboard" provides a similar information along with others:
-
-<kbd><img src="doc/tmy-dashboard-free.png" width="600"/></kbd>
+"TMY Dashboard" provides a centralized place to pull translations from translation server.
 
 
 ## Using TMY Plugin Premium Service
