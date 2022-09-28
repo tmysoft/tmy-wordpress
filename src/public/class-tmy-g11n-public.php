@@ -184,7 +184,7 @@ class TMY_G11n_Public {
         	    error_log("In G11nStartSession");
                 }
                 if (session_status() !== PHP_SESSION_ACTIVE) {
-                      session_start();
+//                      session_start();
     		}
                 if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession id=" . esc_attr(session_id()));

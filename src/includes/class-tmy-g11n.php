@@ -168,6 +168,7 @@ class TMY_G11n {
 		$this->loader->add_action( 'wp_ajax_tmy_create_server_project', $plugin_admin, 'tmy_g11n_create_server_project' );
 		$this->loader->add_action( 'wp_ajax_tmy_create_clear_plugin_data', $plugin_admin, 'tmy_g11n_clear_plugin_data' );
 		$this->loader->add_action( 'wp_ajax_tmy_get_project_status', $plugin_admin, 'tmy_g11n_get_project_status' );
+		$this->loader->add_action( 'wp_ajax_tmy_get_refresh_table_status', $plugin_admin, 'tmy_g11n_get_refresh_table_status' );
 		$this->loader->add_action( 'wp_ajax_tmy_get_local_translation_status', $plugin_admin, 'tmy_g11n_get_local_translation_status' );
 		$this->loader->add_action( 'wp_ajax_tmy_create_sync_translation', $plugin_admin, 'tmy_create_sync_translation' );
 		$this->loader->add_action( 'wp_ajax_tmy_get_post_translation_status', $plugin_admin, 'tmy_get_post_translation_status' );
