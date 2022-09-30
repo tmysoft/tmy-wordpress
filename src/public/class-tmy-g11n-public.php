@@ -1059,7 +1059,7 @@ public function g11n_add_floating_menu() {
                         if ( WP_TMY_G11N_DEBUG ) {
                             error_log("In g11n_wp_title_filter, output,".esc_attr($output));
                         }
-		        return $output . $switcher_html;
+                        return wp_strip_all_tags($output) . $switcher_html;
 		    } 
 
 		    return $output;

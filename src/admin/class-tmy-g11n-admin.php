@@ -625,6 +625,8 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=true;
                         document.getElementById("g11n_switcher_post").disabled=true;
                         document.getElementById("g11n_switcher_sidebar").disabled=true;
+                        document.getElementById("g11n_seo_url_enable_yes").disabled=true;
+                        document.getElementById("g11n_seo_url_enable_no").disabled=true;
                     }
                     if(element.value=='No'){
                         console.log("no");
@@ -632,6 +634,8 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=false;
                         document.getElementById("g11n_switcher_post").disabled=false;
                         document.getElementById("g11n_switcher_sidebar").disabled=false;
+                        document.getElementById("g11n_seo_url_enable_yes").disabled=false;
+                        document.getElementById("g11n_seo_url_enable_no").disabled=false;
                     }
                 
 
@@ -693,7 +697,7 @@ class TMY_G11n_Admin {
             	<!-- <button onclick="g11ncreateproject('project')">Create Project on Translation Server</button> -->
                 <!-- <input type="button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')"> -->
             	Version <input type="text" id="g11n_server_version" name="g11n_server_version" value="<?php echo esc_attr( get_option('g11n_server_version') ); ?>" <?php echo esc_attr($config_disable); ?>  />
-                <input type="button" id="g11n_create_project_button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')" <?php echo esc_attr($config_disable); ?> ><br>
+                <input type="button" id="g11n_create_project_button" value="Create Project on Translation Server" onclick="g11ncreateproject('project')" <?php echo esc_attr($config_disable); ?> > <br>(Remember To Save Changes At the Bottom of The Page)<br><br>
             	Trunk Size <input type="text" id="g11n_server_trunksize" name="g11n_server_trunksize" value="<?php echo esc_attr( get_option('g11n_server_trunksize',900) ); ?>" <?php echo esc_attr($config_disable); ?>  />
         	</td>
 
@@ -860,14 +864,15 @@ class TMY_G11n_Admin {
 		
                          $blog_url = get_bloginfo('url');
 
-                         if (strcmp(trim(get_option('permalink_structure')),'')===0) {
+               	         if ((strcmp(get_option('g11n_using_google_tookit','No'),'Yes' )===0) ||
+                             (strcmp(trim(get_option('permalink_structure')),'')===0)) {
                              $seo_disabled = "disabled";
                          } else {
                              $seo_disabled = "";
                          }
 
                          echo "Change the Permalinks Setting to non-Plain to start: Settings->Permalinks<br><br>";
-		         $selected_yes = (esc_attr(get_option('g11n_seo_url_enable','Yes')) === 'Yes') ? 'checked' : '';
+		         $selected_yes = (esc_attr(get_option('g11n_seo_url_enable','No')) === 'Yes') ? 'checked' : '';
 		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('Yes');\" id='g11n_seo_url_enable_yes".
                                     "' name='g11n_seo_url_enable' value='Yes' " .
                                     esc_attr($selected_yes) . " " . esc_attr($seo_disabled) . " > <label> " . 
@@ -876,7 +881,7 @@ class TMY_G11n_Admin {
                                     "</label><br>";
 
 
-		         if  (esc_attr(get_option('g11n_seo_url_enable','Yes')) == 'Yes') {
+		         if  (esc_attr(get_option('g11n_seo_url_enable','No')) == 'Yes') {
                              echo "<div id=\"tmy_seo_example_urls\" style=\"display: block\"><br>";
                          } else {
                              echo "<div id=\"tmy_seo_example_urls\" style=\"display: none\"><br>";
@@ -890,7 +895,7 @@ class TMY_G11n_Admin {
                          } 
                          echo "</div><br>";
 
-		         $selected_no = (esc_attr(get_option('g11n_seo_url_enable','Yes')) === 'No') ? 'checked' : '';
+		         $selected_no = (esc_attr(get_option('g11n_seo_url_enable','No')) === 'No') ? 'checked' : '';
 		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('No');\" id='g11n_seo_url_enable_no".
                                     "' name='g11n_seo_url_enable' value='No' " . 
                                     esc_attr($selected_no) . esc_attr($seo_disabled) . " > <label> " . 'No' . "</label><br><br>";
@@ -933,7 +938,7 @@ class TMY_G11n_Admin {
                     }
 		</script>
               <?php
-		 if  ((esc_attr(get_option('g11n_seo_url_enable','Yes')) == 'Yes') && (strcmp(trim(get_option('permalink_structure')),'')!==0)) {
+		 if  ((esc_attr(get_option('g11n_seo_url_enable','No')) == 'Yes') && (strcmp(trim(get_option('permalink_structure')),'')!==0)) {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: block\"><br>";
                  } else {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: none\"><br>";
@@ -1023,66 +1028,70 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
             }
 
             $action = current_action();
-            switch ( $_POST['action'] ) {
 
-                case 'start_translation_from_taxonomies_form':
+            if ( isset( $_POST['action'] )) {
 
-                    $term_ids = esc_sql($_POST['term_id']);
-                    //echo '<div class="notice notice-success is-dismissible"><p> bulk action' .implode("-", $term_ids) . '</p></div>';
+                switch ( esc_attr($_POST['action']) ) {
 
-                    foreach ($term_ids as $term_id) {
-                        $tax_type = get_term_field('taxonomy', $term_id);
-                        //$this->_tmy_create_sync_translation($term_id, "taxonomy");
+                    case 'start_translation_from_taxonomies_form':
 
-                        //$this->_tmy_create_sync_translation($term_id, $tax_type);
-                        $response = json_decode($this->_tmy_create_sync_translation($term_id, $tax_type));
+                        $term_ids = esc_sql($_POST['term_id']);
+                        //echo '<div class="notice notice-success is-dismissible"><p> bulk action' .implode("-", $term_ids) . '</p></div>';
 
-                        //echo '<div class="notice notice-success is-dismissible"><p> Starting translation for: ' . $term_id . '</p></div>';
-                        echo '<div class="notice notice-success is-dismissible"><p>' .  esc_html($response->message) . '</p></div>';
-                    }
+                        foreach ($term_ids as $term_id) {
+                            $tax_type = get_term_field('taxonomy', $term_id);
+                            //$this->_tmy_create_sync_translation($term_id, "taxonomy");
 
-                    return;
-                    break;
+                            //$this->_tmy_create_sync_translation($term_id, $tax_type);
+                            $response = json_decode($this->_tmy_create_sync_translation($term_id, $tax_type));
 
-                case 'remove_translation_from_taxonomies_form':
-
-                    $term_ids = esc_sql($_POST['term_id']);
-
-                    foreach ($term_ids as $term_id) {
-                        $term_notify = "";
-                        $all_langs = get_option('g11n_additional_lang');
-                        $default_lang = get_option('g11n_default_lang');
-                        unset($all_langs[$default_lang]);
-                        $tax_type = get_term_field('taxonomy', $term_id);
-
-                        if (is_array($all_langs)) {
-                            foreach( $all_langs as $value => $code) {
-                                $translation_id = $this->translator->get_translation_id($term_id,$code,$tax_type);
-                                //$translation_id = $this->translator->get_translation_id($term_id,$code,"taxonomy");
-                                if (isset($translation_id)) {
-                                    wp_delete_post( $translation_id );
-                                    delete_post_meta( $translation_id, 'orig_post_id' );
-                                    delete_post_meta( $translation_id, 'g11n_tmy_lang' );
-                                    delete_post_meta( $translation_id, 'g11n_tmy_orig_type' );
-                                    $term_notify .= "{$code}:{$translation_id} ";
-                                }
-                             }
+                            //echo '<div class="notice notice-success is-dismissible"><p> Starting translation for: ' . $term_id . '</p></div>';
+                            echo '<div class="notice notice-success is-dismissible"><p>' .  esc_html($response->message) . '</p></div>';
                         }
-                        if (strcmp($term_notify,"")===0) {
-                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", no translation found" . '</p></div>';
-                        } else {
-                            echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", removed translation for: " . esc_attr($term_notify) . '</p></div>';
+
+                        return;
+                        break;
+
+                    case 'remove_translation_from_taxonomies_form':
+
+                        $term_ids = esc_sql($_POST['term_id']);
+
+                        foreach ($term_ids as $term_id) {
+                            $term_notify = "";
+                            $all_langs = get_option('g11n_additional_lang');
+                            $default_lang = get_option('g11n_default_lang');
+                            unset($all_langs[$default_lang]);
+                            $tax_type = get_term_field('taxonomy', $term_id);
+
+                            if (is_array($all_langs)) {
+                                foreach( $all_langs as $value => $code) {
+                                    $translation_id = $this->translator->get_translation_id($term_id,$code,$tax_type);
+                                    //$translation_id = $this->translator->get_translation_id($term_id,$code,"taxonomy");
+                                    if (isset($translation_id)) {
+                                        wp_delete_post( $translation_id );
+                                        delete_post_meta( $translation_id, 'orig_post_id' );
+                                        delete_post_meta( $translation_id, 'g11n_tmy_lang' );
+                                        delete_post_meta( $translation_id, 'g11n_tmy_orig_type' );
+                                        $term_notify .= "{$code}:{$translation_id} ";
+                                    }
+                                 }
+                            }
+                            if (strcmp($term_notify,"")===0) {
+                                echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", no translation found" . '</p></div>';
+                            } else {
+                                echo '<div class="notice notice-success is-dismissible"><p> Term ID: ' . esc_attr($term_id) . ", removed translation for: " . esc_attr($term_notify) . '</p></div>';
+                            }
                         }
-                    }
 
-                    return;
-                    break;
+                        return;
+                        break;
 
 
-                default:
-                    // do nothing or something else
-                    return;
-                    break;
+                    default:
+                        // do nothing or something else
+                        return;
+                        break;
+                }
             }
 
             return;
@@ -1582,6 +1591,9 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                 if ( WP_TMY_G11N_DEBUG ) {
                     error_log("In _tmy_g11n_create_server_project :". esc_attr($project_name) . " " . esc_attr($version_num) . " " . esc_attr(json_encode($lang_list)));
                 }
+
+                //update_option("g11n_server_project", esc_attr($project_name));
+                //update_option("g11n_server_version", esc_attr($version_num));
 
 	        $ch = curl_init();
 
