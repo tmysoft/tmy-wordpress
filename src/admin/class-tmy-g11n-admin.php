@@ -151,7 +151,7 @@ class TMY_G11n_Admin {
                 $all_post_types = tmy_g11n_available_post_types();
                 foreach ( $all_post_types  as $post_type ) {
                     add_filter( 'bulk_actions-edit-' . $post_type, array($this, 'tmy_plugin_g11n_register_bulk_actions'));
-                    add_filter( 'handle_bulk_actions-edit-' . $post_type, array($this, 'tmy_plugin_g11n_bulk_action_handler', 10, 3 ));
+                    add_filter( 'handle_bulk_actions-edit-' . $post_type, array($this, 'tmy_plugin_g11n_bulk_action_handler'), 10, 3 );
                 }
 
 	}
@@ -194,6 +194,14 @@ class TMY_G11n_Admin {
                           	  array( $this,
                                          'tmy_l10n_taxonomy_page') );
 	
+        	add_submenu_page( 'tmy-g11n-main-menu',
+                                  'TMY Text',
+                          	  'TMY Text',
+                          	  'manage_options',
+                          	  'tmy-g11n-text-menu',
+                          	  array( $this,
+                                         'tmy_l10n_text_page') );
+
         	add_submenu_page( 'tmy-g11n-main-menu',
                                   'TMY Diagnosis',
                           	  'TMY Diagnosis',
@@ -777,7 +785,8 @@ class TMY_G11n_Admin {
 
                 $all_configed_taxs = get_option('g11n_l10n_props_tax', array());
        
-                if (! isset($all_configed_taxs)) {
+                //if (! isset($all_configed_taxs)) {
+                if (! is_array($all_configed_taxs)) {
                     $all_configed_taxs = array();
                 }
                 $all_taxs = get_taxonomies(array("public" => true, "show_ui"=> true), "names", "or");
@@ -871,8 +880,19 @@ class TMY_G11n_Admin {
                              $seo_disabled = "";
                          }
 
+		         $current_seo_option = esc_attr(get_option('g11n_seo_url_enable','No'));
+                         if (strcmp($current_seo_option, "")===0) {
+                             $current_seo_option = "No";
+                         }
+
                          echo "Change the Permalinks Setting to non-Plain to start: Settings->Permalinks<br><br>";
-		         $selected_yes = (esc_attr(get_option('g11n_seo_url_enable','No')) === 'Yes') ? 'checked' : '';
+
+		         $selected_no = ($current_seo_option === 'No') ? 'checked' : '';
+		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('No');\" id='g11n_seo_url_enable_no".
+                                    "' name='g11n_seo_url_enable' value='No' " . 
+                                    esc_attr($selected_no) . " " . esc_attr($seo_disabled) . " > <label> " . 'No' . "</label><br><br>";
+
+		         $selected_yes = ($current_seo_option === 'Yes') ? 'checked' : '';
 		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('Yes');\" id='g11n_seo_url_enable_yes".
                                     "' name='g11n_seo_url_enable' value='Yes' " .
                                     esc_attr($selected_yes) . " " . esc_attr($seo_disabled) . " > <label> " . 
@@ -880,8 +900,7 @@ class TMY_G11n_Admin {
                                     '/<i>language_code</i>/' .
                                     "</label><br>";
 
-
-		         if  (esc_attr(get_option('g11n_seo_url_enable','No')) == 'Yes') {
+		         if  ($current_seo_option == 'Yes') {
                              echo "<div id=\"tmy_seo_example_urls\" style=\"display: block\"><br>";
                          } else {
                              echo "<div id=\"tmy_seo_example_urls\" style=\"display: none\"><br>";
@@ -895,12 +914,6 @@ class TMY_G11n_Admin {
                          } 
                          echo "</div><br>";
 
-		         $selected_no = (esc_attr(get_option('g11n_seo_url_enable','No')) === 'No') ? 'checked' : '';
-		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('No');\" id='g11n_seo_url_enable_no".
-                                    "' name='g11n_seo_url_enable' value='No' " . 
-                                    esc_attr($selected_no) . esc_attr($seo_disabled) . " > <label> " . 'No' . "</label><br><br>";
-
-                         echo "<br>";
 
 
                          $home_root = parse_url( home_url() );
@@ -938,7 +951,7 @@ class TMY_G11n_Admin {
                     }
 		</script>
               <?php
-		 if  ((esc_attr(get_option('g11n_seo_url_enable','No')) == 'Yes') && (strcmp(trim(get_option('permalink_structure')),'')!==0)) {
+		 if  (($current_seo_option == 'Yes') && (strcmp(trim(get_option('permalink_structure')),'')!==0)) {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: block\"><br>";
                  } else {
                      echo "<div id=\"tmy_seo_rules_box\" style=\"display: none\"><br>";
@@ -985,6 +998,34 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
         }
 
+        public function tmy_l10n_text_page() {
+	    if ( !current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+ 	    }
+            ?>
+            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Text Translation Manager</h1>
+            <?php
+
+            $tmy_g11n_dir = dirname( __FILE__ );
+            require_once "{$tmy_g11n_dir}/include/class-tmy-g11n-table.php";
+
+            echo '<form method="post">';
+
+            echo "<br>";
+            echo "<br>";
+
+            $table = new TMY_G11N_Text_Table();
+            $table->process_bulk_action = $this->tmy_translation_text_table_action();
+            $table->prepare_items();
+
+            ?> <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']) ?>" /><?php
+            $table->display();
+            echo '</form>';
+
+
+
+
+        }
         public function tmy_l10n_taxonomy_page() {
 	    if ( !current_user_can( 'manage_options' ) )  {
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -1015,6 +1056,94 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
         }
 
+        public function tmy_translation_text_table_action() {
+
+            if ( isset( $_POST['_wpnonce'] ) && ! empty( $_POST['_wpnonce'] ) ) {
+                $nonce  = filter_input( INPUT_POST, '_wpnonce', FILTER_SANITIZE_STRING );
+                $action = 'bulk-' . $this->_args['plural'];
+
+                if ( ! wp_verify_nonce( $nonce, $action ) )
+                    wp_die( 'Nope! Security check failed!' );
+            }
+            global $wpdb;
+            if ( isset( $_POST['action'] )) {
+
+                switch ( esc_attr($_POST['action']) ) {
+
+                    case 'start_translation_from_text_form':
+
+                        $text_str = esc_sql($_POST['text_str']);
+
+                        foreach ($text_str as $text_string) {
+                            $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($text_string) . "\" and post_status=\"private\"";
+                            $result = $wpdb->get_results($sql);
+                            if (! isset($result[0]->ID)) {
+                                 $holder_id = wp_insert_post(
+                                      array(
+                                           'post_title'    => esc_attr($text_string),
+                                           'post_content'  => esc_attr($text_string),
+                                           'post_status' => 'private',
+                                           'post_type'  => "post"
+                                     ));
+                            } else {
+                                $holder_id = $result[0]->ID;
+                            }
+                            $response = json_decode($this->_tmy_create_sync_translation($holder_id, "post"));
+                            echo '<div class="notice notice-success is-dismissible"><p>' .  esc_html($response->message) . '</p></div>';
+                        }
+
+                        return;
+                        break;
+
+                    case 'remove_translation_from_text_form':
+
+                        $text_str = esc_sql($_POST['text_str']);
+
+                        foreach ($text_str as $text_string) {
+                            $term_notify = "";
+                            $all_langs = get_option('g11n_additional_lang');
+                            $default_lang = get_option('g11n_default_lang');
+                            unset($all_langs[$default_lang]);
+
+                            $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($text_string) . "\" and post_status=\"private\"";
+                            $result = $wpdb->get_results($sql);
+                            if (isset($result[0]->ID)) {
+                                wp_delete_post( $result[0]->ID );
+                                $term_notify .= "ID : {$result[0]->ID} ";
+                                if (is_array($all_langs)) {
+                                    foreach( $all_langs as $value => $code) {
+                                        $translation_id = $this->translator->get_translation_id($result[0]->ID, $code, "post");
+                                        if (isset($translation_id)) {
+                                            wp_delete_post( $translation_id );
+                                            delete_post_meta( $translation_id, 'orig_post_id' );
+                                            delete_post_meta( $translation_id, 'g11n_tmy_lang' );
+                                            delete_post_meta( $translation_id, 'g11n_tmy_orig_type' );
+                                            $term_notify .= "{$code}:{$translation_id} ";
+                                        }
+                                    }
+                                }
+                            }
+                            if (strcmp($term_notify,"")===0) {
+                                echo '<div class="notice notice-success is-dismissible"><p> Text: ' . esc_attr($text_string) . ", no translation found" . '</p></div>';
+                            } else {
+                                echo '<div class="notice notice-success is-dismissible"><p> Text: ' . esc_attr($text_string) . ", removed translation for: " . esc_attr($term_notify) . '</p></div>';
+                            }
+                        }
+
+                        return;
+                        break;
+
+
+                    default:
+                        // do nothing or something else
+                        return;
+                        break;
+                }
+            }
+
+            return;
+
+        }
         public function tmy_translation_taxonomy_table_action() {
 
             //         echo '<div class="notice notice-success is-dismissible"><p> bulk action 456</p></div>';
@@ -2288,7 +2417,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
         function tmy_plugin_post_set_columns( $columns, $post_type ){
 
             if (strcmp($post_type, "g11n_translation") !== 0) {
-                error_log("tmy_plugin_post_set_columns: " . esc_attr($post_type));
+                //error_log("tmy_plugin_post_set_columns: " . esc_attr($post_type));
                 //unset($columns['date']);
                 $columns['translation_started']     = 'Translation Started';
                 //$columns['date']     = 'Date';
@@ -2409,14 +2538,15 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
             if ( $doaction !== 'start_sync_tranlations' ) {
                 return $redirect_to;
             }
-            $result = '';
+            $result = '<br>';
             foreach ( $post_ids as $post_id ) {
                $post_type = get_post_type($post_id);
 	       $post_result = $this->_tmy_create_sync_translation($post_id, $post_type);
 	       $post_result_var = json_decode($post_result);
-               $result .= $post_result_var->message . '<br>';
+               $result .= $post_result_var->message ."<br>";
                //error_log($post_result);
             }
+            $result .= "<br>";
             //$redirect_to = add_query_arg( 'start_sync_tranlations', count( $post_ids ), $redirect_to );
             $redirect_to = add_query_arg( 'start_sync_tranlations', $result, $redirect_to );
             return $redirect_to;
@@ -2427,7 +2557,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 	    if( ! empty( $_REQUEST[ 'start_sync_tranlations' ] ) ) {
 	        ?>
 			    <div class="updated notice is-dismissible">
-				    <p><?php echo esc_attr($_REQUEST[ 'start_sync_tranlations' ]) ?></p>
+				    <?php echo $_REQUEST['start_sync_tranlations'] ?>
 			    </div>
 	        <?php
 	        //$redirect_to = remove_query_arg( 'start_sync_tranlations' );

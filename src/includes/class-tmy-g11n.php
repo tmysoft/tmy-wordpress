@@ -300,16 +300,18 @@ class TMY_G11n {
                 //$this->loader->add_filter( 'get_product_tag', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
                 //$this->loader->add_filter( 'get_product_cat', $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
 
-                $all_configed_taxs = get_option('g11n_l10n_props_tax');
-                if (! isset($all_configed_taxs)) {
-                    $all_configed_taxs = array();
-                }
-
-                foreach ( $all_configed_taxs as $key ) {
-                    $this->loader->add_filter( 'get_' . $key, $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                $all_configed_taxs = get_option('g11n_l10n_props_tax', array());
+                if (is_array($all_configed_taxs)) {
+                    if (count($all_configed_taxs) > 0) {
+                        foreach ( $all_configed_taxs as $key ) {
+                            $this->loader->add_filter( 'get_' . $key, $plugin_public, 'tmy_translation_get_taxonomy_filter', 10, 2 );
+                        }
+                    }
                 }
 
                 $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
+                $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
+                //$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'tmy_nav_menu_item_filter', 10, 2 );
 	}
 
 	/**

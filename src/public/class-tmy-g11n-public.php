@@ -1185,9 +1185,43 @@ public function g11n_add_floating_menu() {
             return $wp_term;
         }
 
+        public function tmy_nav_menu_item_filter( $items, $args ) {
+
+            if ($args->menu_id == "primary-menu") {
+                $items .=  '<li class="menu-item">TMY</li>';
+            } 
+            return $items;
+
+        }
+        public function tmy_nav_menu_item_title_filter( $title, $menu_item, $args, $depth ) {
+
+            //error_log("In tmy_nav_menu_item_title_filter: " . json_encode($title) . " " . json_encode($menu_item));
+            global $wpdb;
+            $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($title) . "\" and post_status=\"private\"";
+            $result = $wpdb->get_results($sql);
+
+            if (isset($result[0]->ID)) {
+
+                $language_options = get_option('g11n_additional_lang');
+                $g11n_current_language = $this->translator->get_preferred_language();
+                $language_name = $language_options[$g11n_current_language];
+                $translation_post_id = $this->translator->get_translation_id($result[0]->ID,$language_name,"post",false);
+                if (isset($translation_post_id)) {
+                    return get_post_field("post_content", $translation_post_id);
+                } else {
+                    return $title;
+                }
+
+            } else {
+                return $title;
+            }
+
+            return $title;
+
+        }
         public function tmy_woocommerce_attribute_label_filter( $label, $name, $product ) {
         
-            error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product}");
+            //error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product}");
 
             global $wpdb;
             $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($label) . "\" and post_status=\"private\"";
