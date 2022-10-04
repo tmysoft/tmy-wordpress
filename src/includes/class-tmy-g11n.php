@@ -260,6 +260,7 @@ class TMY_G11n {
 		    $this->loader->add_filter( 'category_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
 		    $this->loader->add_filter( 'search_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
 		    //$this->loader->add_filter( 'home_url', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
+		    $this->loader->add_filter( 'term_link', $plugin_public, 'tmy_rewrite_permalink_links', 10, 1 );
 		    $this->loader->add_action( 'wp_head', $plugin_public, 'tmy_g11n_html_head_handler');
 
                 }
@@ -309,6 +310,7 @@ class TMY_G11n {
                     }
                 }
 
+                $this->loader->add_filter( 'woocommerce_cart_item_name', $plugin_public, 'tmy_woocommerce_cart_item_name', 10, 3 );
                 $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
                 $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
                 //$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'tmy_nav_menu_item_filter', 10, 2 );

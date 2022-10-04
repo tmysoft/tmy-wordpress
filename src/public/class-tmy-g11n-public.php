@@ -211,12 +211,55 @@ class TMY_G11n_Public {
                 $lang_var_code_from_query = filter_input(INPUT_GET, 'g11n_tmy_lang_code', FILTER_SANITIZE_SPECIAL_CHARS);
                 $lang_var_code_from_query = str_replace('-', '_', $lang_var_code_from_query);
 
+
                 if (!empty($lang_var_code_from_query)) {
                     $lang_var = array_search(strtolower($lang_var_code_from_query), array_map('strtolower',$all_configed_langs));
+                    $lang_var_code = $all_configed_langs[$lang_var];
                 }
 
+                if (strcmp($lang_var_code, "en_US") === 0) {
+
+                    error_log("unloading for en_US");
+                        $template_name = get_template();
+		        unload_textdomain($template_name);
+                        unload_textdomain('default');
+
+                        $active_plugins = get_option('active_plugins'); 
+                        error_log("active plugins : " . json_encode($active_plugins));
+                        foreach ($active_plugins as $key => $value) {
+                            $string = explode('/',$value);
+                            unload_textdomain($string[0]);
+                        }
+
+                }
                 if (!empty($lang_var)) {
+        	    if (strcmp(esc_attr($_SESSION['g11n_language']), $lang_var) !== 0) {
+
+                        $template_name = get_template();
+		        unload_textdomain($template_name);
+                        unload_textdomain('default');
+
+                        $active_plugins = get_option('active_plugins'); 
+                        error_log("active plugins : " . json_encode($active_plugins));
+                        foreach ($active_plugins as $key => $value) {
+                            $string = explode('/',$value);
+                            unload_textdomain($string[0]);
+                        }
+
+                        $lang_var_code = $all_configed_langs[$lang_var];
+                        error_log("SESSION START loading textdomain: " . $lang_var_code);
+                        if (strcmp($lang_var_code, "en_US") !== 0) {
+                            load_textdomain( "default", WP_LANG_DIR . '/' . $lang_var_code . '.mo' );
+                            load_textdomain( $template_name, WP_LANG_DIR . '/themes/'. $template_name . '-' . $lang_var_code . '.mo' );
+                            foreach ($active_plugins as $key => $value) {
+                                $string = explode('/',$value);
+                                load_textdomain($string[0], WP_LANG_DIR . '/plugins/' . $string[0]. '-' . $lang_var_code . '.mo' );
+                            }
+                        }
+                    }
                     $_SESSION['g11n_language'] = $lang_var;
+        	    setcookie('g11n_language', $lang_var, strtotime('+1 day'));
+
                 }
 
                 if ( WP_TMY_G11N_DEBUG ) {
@@ -493,76 +536,50 @@ public function g11n_add_floating_menu() {
                     return $locale_in; 
                 }
 
+                $http_referer_path = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH);
+                $site_url_path = parse_url(get_site_url(), PHP_URL_PATH);
+                $http_referer_path = str_replace($site_url_path, "", $http_referer_path);
+                $http_paths = explode('/', $http_referer_path);
+
+                /* array format ((English -> en), ...) */
 		$language_options = get_option('g11n_additional_lang', array());
 
-		    /* if current locale code is not in the language list configured, return original locale to avoid dead lock */
-		    //if (!array_key_exists('$locale_in', $language_options)) {
-		    //    return $locale_in;
-		    //}
+                if (isset($http_paths[1])) {
+                    $http_referer_lang = strtolower(str_replace('-', '_', $http_paths[1]));
+                    $http_referer_code = array_search(strtolower($http_referer_lang), array_map('strtolower',$language_options));
+                    if (isset($http_referer_code) && strcmp($http_referer_code,"")!==0) {
+                        return $language_options[$http_referer_code];
+                    }
+                }
+            
+                if (isset($_REQUEST['post_data'])) {
+                    parse_str($_REQUEST['post_data'], $post_data_query_vars);
+                    $ajax_wp_query = parse_url($post_data_query_vars['_wp_http_referer'], PHP_URL_QUERY);
+                    parse_str($ajax_wp_query, $ajax_wp_query_vars);
+                    if (isset($ajax_wp_query_vars['g11n_tmy_lang_code'])) {
+                        $wp_ajax_lang = $ajax_wp_query_vars['g11n_tmy_lang_code'];
+                        $wp_ajax_lang = strtolower(str_replace('-', '_', $wp_ajax_lang));
+                        $wp_ajax_lang_code = array_search(strtolower($wp_ajax_lang), array_map('strtolower',$language_options));
+                        return $language_options[$wp_ajax_lang_code];
+
+                    };
+                }
+
+
+	        // if current locale code is not in the language list configured, return original locale to avoid dead lock
+	        //if (!array_key_exists('$locale_in', $language_options)) {
+	        //    return $locale_in;
+		//}
 
 		$pre_lang = $this->translator->get_preferred_language();
-                if ( WP_TMY_G11N_DEBUG ) {
-                    error_log("In g11n_locale_filter, preferred language: " . esc_attr($pre_lang));
-                }
+
 		if (array_key_exists($pre_lang, $language_options)) {
-			$s_locale = $language_options[$pre_lang];
-		    } else {
-			return $locale_in;
-		}
-		if (strcmp($s_locale,$locale_in != 0)) {
-			remove_filter('locale',array($this, 'g11n_locale_filter'),10);
-			global $locale;
-			$locale = $s_locale;
-			$template_name = get_template();
-                        // to-do
-			//if (is_textdomain_loaded($template_name)) {
-			    unload_textdomain($template_name);
-			    load_theme_textdomain($template_name);
-			//}
-                        if ( WP_TMY_G11N_DEBUG ) {
-                            error_log("In g11n_locale_filter, change locale to: " . esc_attr($s_locale) . " template name = ". esc_attr($template_name));
-                        }
-
-                        //$al = get_available_languages();
-                        //error_log(print_r($al));
-                        //error_log("locale now: " . locale_get_default());
- 
-
-                        //$WP_Sys_Locale_Switcher = new WP_Locale_Switcher();
-                        //$success_switch = $WP_Sys_Locale_Switcher->switch_to_locale($s_locale);
-                        //foreach ( $GLOBALS['wp_widget_factory']->widgets as $widget ) {
-                        //    error_log("list of widget base: " . $widget->id_base."\n");
-                        //    error_log("list of widget name: " .  $widget->name."\n");
-                        //    //error_log(var_dump($widget));
-                        //}
-                        //error_log("switched to: ". $s_locale. " result: ". $success_switch);
-                       
-                        //error_log("locale now: " . locale_get_default());
-
-			unload_textdomain('default');
-                        //error_log("load_default_textdomain:".$s_locale);
-			load_default_textdomain($s_locale);
-
-                        update_option(
-                            'widget_block',
-                              array(
-                                2              => array( 'content' => '<!-- wp:search /-->' ),
-                                3              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Recent Posts' ) . '</h2><!-- /wp:heading --><!-- wp:latest-posts /--></div><!-- /wp:group -->' ),
-                                4              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Recent Comments' ) . '</h2><!-- /wp:heading --><!-- wp:latest-comments {"displayAvatar":false,"displayDate":false,"displayExcerpt":false} /--></div><!-- /wp:group -->' ),
-                                5              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Archives' ) . '</h2><!-- /wp:heading --><!-- wp:archives /--></div><!-- /wp:group -->' ),
-                                6              => array( 'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:heading --><h2>' . __( 'Categories' ) . '</h2><!-- /wp:heading --><!-- wp:categories /--></div><!-- /wp:group -->' ),
-                                '_multiwidget' => 1,
-                                   )
-                        );
-
-			add_filter('locale',array($this, 'g11n_locale_filter'),10);
-			return $s_locale;
+		    return $language_options[$pre_lang];
 		} else {
-			return $locale_in;
+		    return $locale_in;
 		}
-		//  } else {
-		//    return $locale_in;
-		//  }
+		return $locale_in;
+
 	}
 
 	public function g11n_create_post_type_translation() {
@@ -1217,6 +1234,17 @@ public function g11n_add_floating_menu() {
             }
 
             return $title;
+
+        }
+        public function tmy_woocommerce_cart_item_name( $title, $values, $cart_item_key ) {
+
+            $language_name = get_locale();
+            $translation_post_id = $this->translator->get_translation_id($values["product_id"], $language_name, "product", false);
+            if (isset($translation_post_id)) {
+                return get_post_field("post_title", $translation_post_id);
+            } else {
+                return $title;
+            }
 
         }
         public function tmy_woocommerce_attribute_label_filter( $label, $name, $product ) {
