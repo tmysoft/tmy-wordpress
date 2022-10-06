@@ -519,6 +519,7 @@ class TMY_G11n_Translator {
                 }
                 if (!isset($_SESSION['g11n_language'])) {
                     $_SESSION['g11n_language'] = get_option('g11n_default_lang');
+                    setcookie('g11n_language', $_SESSION['g11n_language'], strtotime('+1 day'));
                     if ( WP_TMY_G11N_DEBUG ) {
                         error_log(esc_attr($seq_code) . " Starting session, id=" . esc_attr(session_id()) . ",lang is not set, set as: " . esc_attr(get_option('g11n_default_lang')));
                     }
@@ -541,6 +542,8 @@ class TMY_G11n_Translator {
 		if (!empty($lang_var_from_query)) {
 
 		   $_SESSION['g11n_language'] = $lang_var_from_query;
+                   // header warning SHAO 
+                   //setcookie('g11n_language', $_SESSION['g11n_language'], strtotime('+1 day'));
                    if ( WP_TMY_G11N_DEBUG ) {
 		       error_log(esc_attr($seq_code) . " In get_preferred_language return query lang = ". esc_attr($lang_var_from_query));
                    }
@@ -592,12 +595,14 @@ class TMY_G11n_Translator {
 		    }
 		    if (isset($pref_lang)) { 
 			$_SESSION['g11n_language'] = $pref_lang;
+                        setcookie('g11n_language', $_SESSION['g11n_language'], strtotime('+1 day'));
 			return $pref_lang; 
 		    }
 		}
 
 		if ((isset($_COOKIE['g11n_language'])) and (strcmp(get_option('g11n_site_lang_cookie'),'Yes')===0)) {
 		   $_SESSION['g11n_language'] = tmy_g11n_lang_sanitize($_COOKIE['g11n_language']);
+                   setcookie('g11n_language', $_SESSION['g11n_language'], strtotime('+1 day'));
 		   return tmy_g11n_lang_sanitize($_COOKIE['g11n_language']);
 		}
 
