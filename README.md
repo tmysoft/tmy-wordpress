@@ -153,7 +153,16 @@ Excerpt of a Woo Commerce product is used as brief introduction of the product, 
 
 ## Configure the Language Swither
 
-The plugin provides one language switcher widget and one switcher block so you can put the language switcher in a highly configurable fashion on your website.
+The plugin provides multiple way for website visitors to switch between different languages:
+
+- TMY Language Switch Links for setting up Menus
+
+  <kbd><img src="doc/tmy-switcher-links.png" width="500"/></kbd>
+
+  Somen menu links screenshots:
+
+  <kbd><img src="doc/tmy-switcher-links-1.png" width="400"/></kbd>
+  <kbd><img src="doc/tmy-switcher-links-2.png" width="400"/></kbd>
 
 - TMY Language Switcher Block
 
