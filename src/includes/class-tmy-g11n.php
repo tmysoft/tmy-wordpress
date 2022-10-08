@@ -207,6 +207,8 @@ class TMY_G11n {
                 $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
                 $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
                 //$this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
+
+                $this->loader->add_action( 'admin_head-nav-menus.php', $plugin_admin, 'tmy_admin_head_nav_menus' );
  
                 $this->loader->add_action( 'category_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
                 $this->loader->add_action( 'post_tag_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
@@ -315,7 +317,11 @@ class TMY_G11n {
                 $this->loader->add_filter( 'woocommerce_cart_item_name', $plugin_public, 'tmy_woocommerce_cart_item_name', 10, 3 );
                 $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
                 $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
+
                 //$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'tmy_nav_menu_item_filter', 10, 2 );
+                //$this->loader->add_filter( 'wp_nav_menu_objects', $plugin_public, 'tmy_nav_menu_objects_filter', 10, 2);
+
+                $this->loader->add_filter( 'nav_menu_link_attributes', $plugin_public, 'tmy_nav_menu_link_attributes_filter', 15, 4);
 	}
 
 	/**

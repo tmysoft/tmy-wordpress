@@ -577,6 +577,10 @@ public function g11n_add_floating_menu() {
                     return $locale_in; 
                 }
 
+//error_log("LOCALE _SERVER " . json_encode($_SERVER));
+//error_log("LOCALE _REQUEST " . json_encode($_REQUEST));
+
+
                 /* array format ((English -> en), ...) */
                 $language_options = get_option('g11n_additional_lang', array());
 
@@ -594,7 +598,6 @@ public function g11n_add_floating_menu() {
                     }
                 }
                 ******/
-
                 if (isset($_REQUEST['post_data'])) {
                     parse_str($_REQUEST['post_data'], $post_data_query_vars);
                     $ajax_wp_query = parse_url($post_data_query_vars['_wp_http_referer'], PHP_URL_QUERY);
@@ -1266,9 +1269,6 @@ public function g11n_add_floating_menu() {
 
         public function tmy_nav_menu_item_filter( $items, $args ) {
 
-            if ($args->menu_id == "primary-menu") {
-                $items .=  '<li class="menu-item">TMY</li>';
-            } 
             return $items;
 
         }
@@ -1307,6 +1307,13 @@ public function g11n_add_floating_menu() {
 
             return $value;
         }
+
+        public function tmy_nav_menu_objects_filter( $sorted_menu_items, $args ) 
+        {
+            return $sorted_menu_items;
+        }
+
+
         public function tmy_woocommerce_cart_item_name( $title, $values, $cart_item_key ) {
 
             $language_name = get_locale();
@@ -1316,6 +1323,63 @@ public function g11n_add_floating_menu() {
             } else {
                 return $title;
             }
+
+        }
+        public function tmy_nav_menu_link_attributes_filter($atts, $item, $args, $depth) {
+
+
+            $current_seo_option = esc_attr(get_option('g11n_seo_url_enable','No'));
+            if (strcmp($current_seo_option, "")===0) {
+                $current_seo_option = "No";
+            }
+
+            $current_url = sanitize_url($_SERVER['REQUEST_URI']);
+            $site_url = get_site_url();
+
+            $herf_arr = wp_parse_url($atts['href']);
+            $current_url_arr = wp_parse_url($current_url);
+            $site_url_arr = wp_parse_url($site_url);
+
+            if (isset($herf_arr['query'])) {
+                parse_str($herf_arr['query'], $query_arr);
+                if (array_key_exists("tmy_dynamic_url", $query_arr)) {
+                    $new_part = str_replace($site_url_arr["path"], "", $current_url_arr["path"]);
+                    if  ($current_seo_option == 'Yes') {
+                        $atts['href'] = esc_url($site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part);
+                        return $atts;
+                    } else {
+                        $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+                        $lang_code = strtolower(str_replace('-', '_', $query_arr["tmy_dynamic_url"]));
+                        $language = array_search(strtolower($lang_code), array_map('strtolower',$all_configed_langs));
+                        if (! $language) {
+                            $language = get_option("g11n_default_lang", "English");
+                        }
+                        $atts['href'] = esc_url(add_query_arg( array( 'g11n_tmy_lang' => $language), 
+                                                       $current_url ));
+                        return $atts;
+                    }
+                }
+            }
+
+            if  ($current_seo_option == 'Yes') {
+                if ($herf_arr['host'] !== $site_url_arr['host']) {
+                    return $atts;
+                }
+
+                $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+                $lang_code = get_locale();
+                $lang_code = strtolower(str_replace('_', '-', $lang_code));
+
+                $lang_path = explode('/', str_replace($site_url, '', $atts["href"]))[1];
+                $lang_path = str_replace('-', '_', $lang_path);
+    
+                if (! array_search(strtolower($lang_path), array_map('strtolower',$all_configed_langs))) {
+                    $atts["href"] = esc_url(str_replace($site_url, $site_url . '/' . esc_attr($lang_code), $atts["href"]));
+                    return $atts;
+                }
+            }
+
+            return $atts;
 
         }
         public function tmy_woocommerce_attribute_label_filter( $label, $name, $product ) {

@@ -2596,6 +2596,72 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
              <?php
 
         }
+        function tmy_admin_head_nav_menus() {
+
+            add_meta_box( 'tmy_nav_link_box',
+                          'TMY Language Switch Links',
+                           array( $this, 'tmy_nav_menu_links_callback' ), 
+                           'nav-menus', 'side', 'low' );
+
+        }
+        function tmy_nav_menu_links_callback() {
+
+            $tmy_g11n_dir = dirname( __FILE__ );
+   	    require_once "{$tmy_g11n_dir}/include/g11n-lang-list.php";
+            ?>
+            <div id="posttype-tmy-endpoints" class="posttypediv">
+                <div id="tabs-panel-tmy-endpoints" class="tabs-panel tabs-panel-active">
+                    <ul id="tmy-endpoints-checklist" class="categorychecklist form-no-clear">
+                        <li>
+                            <label class="menu-item-title">
+                                 <input type="checkbox" class="menu-item-checkbox" name="menu-item[1][menu-item-object-id]" value="tmy-languages" /> Choose Language
+                            </label>
+                                 <input type="hidden" class="menu-item-type" name="menu-item[1][menu-item-type]" value="custom" />
+                                 <input type="hidden" class="menu-item-title" name="menu-item[1][menu-item-title]" value="Choose Language" />
+                                 <input type="hidden" class="menu-item-classes" name="menu-item[1][menu-item-classes]" />
+                        </li>
+
+                        <?php 
+                            $i = 2;
+                            $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+                            foreach ( $all_configed_langs as $key => $value ) :
+                                $lang_native = "";
+                                if (array_key_exists($value, $lang_native_script)) {
+                                    $lang_native = $lang_native_script[$value];
+                                }
+                                $lang_path = strtolower(str_replace('_', '-', $value));
+
+                        ?>
+
+                        <li>
+                            <label class="menu-item-title">
+                                 <input type="checkbox" class="menu-item-checkbox" name="menu-item[<?php echo esc_attr( $i ); ?>][menu-item-object-id]" value="tmy-<?php echo esc_attr($value); ?>" /> <?php echo esc_attr($key); echo " " . esc_attr($lang_native); ?>
+                            </label>
+                                 <input type="hidden" class="menu-item-type" name="menu-item[<?php echo esc_attr( $i ); ?>][menu-item-type]" value="custom" />
+                                 <input type="hidden" class="menu-item-title" name="menu-item[<?php echo esc_attr( $i ); ?>][menu-item-title]" value="<?php echo esc_attr($key); echo " " . esc_attr($lang_native); ?>" />
+                                 <input type="hidden" class="menu-item-url" name="menu-item[<?php echo esc_attr( $i ); ?>][menu-item-url]" 
+                                     value="<?php echo site_url(); ?>/?tmy_dynamic_url=<?php echo esc_attr($lang_path); ?>" />
+                                 <input type="hidden" class="menu-item-classes" name="menu-item[<?php echo esc_attr( $i ); ?>][menu-item-classes]" />
+                        </li>
+
+                        <?php
+                            $i++;
+                            endforeach;
+                        ?>
+
+                    </ul>
+               </div>
+               <p class="button-controls">
+                <span class="add-to-menu">
+                    <button type="submit" class="button-secondary submit-add-to-menu right" value="<?php esc_attr_e( 'Add to menu', 'tmy-globalization' ); ?>" name="add-post-type-menu-item" id="submit-posttype-tmy-endpoints">Add to menu</button>
+                <span class="spinner"></span>
+                </span>
+               </p>
+            </div>
+
+           <?php
+                     
+        }
         function tmy_plugin_g11n_update_htaccess() {
 
             $home_root = parse_url( home_url() );
