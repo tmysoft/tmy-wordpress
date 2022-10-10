@@ -1298,6 +1298,26 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                      echo "Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>";
                 } else {
 
+                    $query_string = array(
+                        'user' => esc_attr(get_option('g11n_server_user','')),
+                        'token' => esc_attr(get_option('g11n_server_token','')),
+                        'projectname' => esc_attr(get_option('g11n_server_project')),
+                        'version' => esc_attr(get_option('g11n_server_version'))
+                    );
+
+                    $machine_trans_url = esc_url("https://www.tmysoft.com/wp-project.html?code=" . urlencode(http_build_query($query_string)));
+
+                    ?>
+                    <br>
+                    <br>
+                    <button onclick="location.href=('<?php echo $machine_trans_url; ?>')" target="_blank" type="button">Applying Machine Translation on tmysoft.com</button>
+                    <br>
+                    <br>
+                    <?php
+                    echo "<a href ='" . $machine_trans_url . "' target='_blank' >" . $machine_trans_url . "</a>";
+                    echo '<br>';
+                    echo '<br>';
+                    echo '<br>';
                     echo '<button type="button" onclick="G11nmyGetServerStatus()">Click This Button To Sync with Translation Server</button> ';
                     echo '<br>';
                     echo "<br>Translation Server: ". esc_attr(get_option('g11n_server_url')) . '<br> ';

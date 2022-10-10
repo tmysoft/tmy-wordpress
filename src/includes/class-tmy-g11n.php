@@ -245,7 +245,7 @@ class TMY_G11n {
 		//$this->loader->add_action( 'save_post', $plugin_public, 'g11n_post_saved_notification', 10, 2 );
 
 	        $this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
-		//$this->loader->add_action( 'init', $plugin_public, 'g11n_create_rewrite_rule' );
+		//$this->loader->add_action( 'init', $plugin_public, 'g11n_create_rewrite_rule', 10, 0 );
 
                 if ((strcmp(trim(get_option('permalink_structure')),'')!==0) &&
                     (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0)) {

@@ -122,29 +122,17 @@ class TMY_G11n_Public {
 
 	public function g11n_create_rewrite_rule() {
 
+
+            //#RewriteRule ^(en-us|zh-cn|ja|el)/(.*) http://%{HTTP_HOST}/wordpress601/$2?g11n_tmy_lang_code=$1 [QSA,NC,P]
+
             //error_log("in g11n_create_rewrite_rule: " . json_encode($_SERVER));
-	        //if ( strpos( $_SERVER['REQUEST_URI'], '/language/' ) === FALSE ) {
-                //   $_SERVER['REQUEST_URI'] = $_SERVER['REQUEST_URI'] . '/language/Japanese/';
-                //}
-                //$_SERVER['REQUEST_URI'] = preg_replace("/\/lang\/.*/",'',$_SERVER['REQUEST_URI']);
-                //$_SERVER['REDIRECT_URL'] = preg_replace("/\/lang\/.*/",'',$_SERVER['REDIRECT_URL']);
-                //error_log("in g11n_create_rewrite_rule: URI " . $_SERVER['REQUEST_URI']);
-                //error_log("in g11n_create_rewrite_rule: REDIRECT_URL" . $_SERVER['REDIRECT_URL']);
+            //global $wp_rewrite;
 
-            //global $wp;
+	    //add_rewrite_rule('^(zh-cn)/(.*)', '/$matches[1]', 'top');
+	    //add_rewrite_rule('^(en-us|zh-cn|ja|el)/(.*)', 'index.php?g11n_tmy_lang_code=$matches[1]','top');
+            //add_rewrite_rule('^shopshao/([^/]*)/?','index.php?page_id=1247&page=$matches[1]','top');
 
-	    //add_rewrite_tag( '%language%', '([^&]+)' );
-            //add_rewrite_rule( '^lang/([^/+a]+)[/]?$', 'index.php?g11n_tmy_lang=$matches[1]', 'top' );
-            //add_rewrite_rule( '^language/([^/]*)/?', 'index.php?g11n_tmy_lang=$matches[1]','top' );
-            //add_rewrite_rule( '^language/([^/]+)/(.*)', 'index.php?g11n_tmy_lang=$matches[1]','top' );
-
-            //add_rewrite_endpoint( 'lang', EP_ALL );
-            //add_rewrite_rule('^lang/([^/]+)/(.*)',
-            //                 '$2?g11n_tmy_lang=$1',
-            //                 'top'
-            //);
             //flush_rewrite_rules();
-
             //$wp_rewrite->flush_rules();
 
         }
