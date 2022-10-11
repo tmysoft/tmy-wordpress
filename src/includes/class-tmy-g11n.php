@@ -206,7 +206,7 @@ class TMY_G11n {
 
                 $this->loader->add_action( 'admin_notices', $plugin_admin, 'tmy_plugin_g11n_admin_notice' );
                 $this->loader->add_action( 'admin_head', $plugin_admin, 'tmy_plugin_g11n_admin_head' );
-                //$this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
+                $this->loader->add_action( 'admin_init', $plugin_admin, 'tmy_plugin_g11n_update_htaccess' );
 
                 $this->loader->add_action( 'admin_head-nav-menus.php', $plugin_admin, 'tmy_admin_head_nav_menus' );
  
@@ -247,8 +247,7 @@ class TMY_G11n {
 	        $this->loader->add_action( 'init', $plugin_public, 'g11n_create_post_type_translation' );
 		//$this->loader->add_action( 'init', $plugin_public, 'g11n_create_rewrite_rule', 10, 0 );
 
-                if ((strcmp(trim(get_option('permalink_structure')),'')!==0) &&
-                    (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0)) {
+                if (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0) {
 
 		    $this->loader->add_filter( 'post_type_link', $plugin_public, 'rewrite_tag_permalink_post_link', 10, 3 );
 		    $this->loader->add_filter( 'post_link', $plugin_public, 'rewrite_tag_permalink_post_link', 10, 3 );

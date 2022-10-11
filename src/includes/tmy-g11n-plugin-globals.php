@@ -123,3 +123,140 @@ function tmy_g11n_post_type_enabled($post_id, $post_title, $type) {
     }
 
 }
+
+
+function insert_with_markers_default_front( $filename, $marker, $insertion ) {
+	if ( ! file_exists( $filename ) ) {
+		if ( ! is_writable( dirname( $filename ) ) ) {
+			return false;
+		}
+
+		if ( ! touch( $filename ) ) {
+			return false;
+		}
+
+		// Make sure the file is created with a minimum set of permissions.
+		$perms = fileperms( $filename );
+
+		if ( $perms ) {
+			chmod( $filename, $perms | 0644 );
+		}
+	} elseif ( ! is_writable( $filename ) ) {
+		return false;
+	}
+
+	if ( ! is_array( $insertion ) ) {
+		$insertion = explode( "\n", $insertion );
+	}
+
+	$switched_locale = switch_to_locale( get_locale() );
+
+	$instructions = sprintf(
+		/* translators: 1: Marker. */
+		__(
+			'The directives (lines) between "BEGIN %1$s" and "END %1$s" are
+dynamically generated, and should only be modified via WordPress filters.
+Any changes to the directives between these markers will be overwritten.'
+		),
+		$marker
+	);
+
+	$instructions = explode( "\n", $instructions );
+
+	foreach ( $instructions as $line => $text ) {
+		$instructions[ $line ] = '# ' . $text;
+	}
+
+	/**
+	 * Filters the inline instructions inserted before the dynamically generated content.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @param string[] $instructions Array of lines with inline instructions.
+	 * @param string   $marker       The marker being inserted.
+	 */
+	$instructions = apply_filters( 'insert_with_markers_inline_instructions', $instructions, $marker );
+
+	if ( $switched_locale ) {
+		restore_previous_locale();
+	}
+
+	$insertion = array_merge( $instructions, $insertion );
+
+	$start_marker = "# BEGIN {$marker}";
+	$end_marker   = "# END {$marker}";
+
+	$fp = fopen( $filename, 'r+' );
+
+	if ( ! $fp ) {
+		return false;
+	}
+
+	// Attempt to get a lock. If the filesystem supports locking, this will block until the lock is acquired.
+	flock( $fp, LOCK_EX );
+
+	$lines = array();
+
+	while ( ! feof( $fp ) ) {
+		$lines[] = rtrim( fgets( $fp ), "\r\n" );
+	}
+
+	// Split out the existing file into the preceding lines, and those that appear after the marker.
+	$pre_lines        = array();
+	$post_lines       = array();
+	$existing_lines   = array();
+	$found_marker     = false;
+	$found_end_marker = false;
+
+	foreach ( $lines as $line ) {
+		if ( ! $found_marker && false !== strpos( $line, $start_marker ) ) {
+			$found_marker = true;
+			continue;
+		} elseif ( ! $found_end_marker && false !== strpos( $line, $end_marker ) ) {
+			$found_end_marker = true;
+			continue;
+		}
+
+		if ( ! $found_marker ) {
+			$pre_lines[] = $line;
+		} elseif ( $found_marker && $found_end_marker ) {
+			$post_lines[] = $line;
+		} else {
+			$existing_lines[] = $line;
+		}
+	}
+
+	// Check to see if there was a change.
+	if ( $existing_lines === $insertion ) {
+		flock( $fp, LOCK_UN );
+		fclose( $fp );
+
+		return true;
+	}
+
+	// Generate the new file data.
+	$new_file_data = implode(
+		"\n",
+		array_merge(
+			array( $start_marker ),
+			$insertion,
+			array( $end_marker ),
+			$pre_lines,
+			$post_lines
+		)
+	);
+
+	// Write to the start of the file, and truncate it to that length.
+	fseek( $fp, 0 );
+	$bytes = fwrite( $fp, $new_file_data );
+
+	if ( $bytes ) {
+		ftruncate( $fp, ftell( $fp ) );
+	}
+
+	fflush( $fp );
+	flock( $fp, LOCK_UN );
+	fclose( $fp );
+
+	return (bool) $bytes;
+}

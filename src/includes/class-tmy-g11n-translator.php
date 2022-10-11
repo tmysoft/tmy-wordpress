@@ -419,9 +419,7 @@ class TMY_G11n_Translator {
 		    foreach( $language_options as $value => $code) {
 		        //<img src="./flags/24/CN.png" alt="CN">
                     
-
-                         if ((strcmp(trim(get_option('permalink_structure')),'')!==0) &&
-                             (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0)) {
+                         if (strcmp(trim(get_option('g11n_seo_url_enable')),'Yes')===0) {
 
                              global $wp;
 		             $current_url = home_url( $wp->request );
@@ -439,6 +437,14 @@ class TMY_G11n_Translator {
                                  $current_url = str_replace($site_url, $site_url . '/' . esc_attr($url_code), $current_url);
                                  $current_url = $current_url . '/';
                              }
+
+                             parse_str($_SERVER['QUERY_STRING'], $query_str_arr);
+                             if (array_key_exists("g11n_tmy_lang_code", $query_str_arr)) {
+                                 unset($query_str_arr["g11n_tmy_lang_code"]);
+                             }
+
+                             //$current_url = $current_url . "?" . esc_attr($_SERVER['QUERY_STRING']);
+                             $current_url = esc_url(add_query_arg($query_str_arr, $current_url));
                         } else {
 		             $current_url = sanitize_url($_SERVER['REQUEST_URI']);
                              $current_url = add_query_arg($query_variable_name, $value, $current_url);

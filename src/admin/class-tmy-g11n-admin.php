@@ -324,7 +324,7 @@ class TMY_G11n_Admin {
                     $return_msg .= '<table class="wp-list-table striped table-view-list">';
     		    $return_msg .= '<tr><td><b>Language</b></td> <td><b>Code</b></td> <td><b>Id</b></th> <td><b>Status</b></td></tr>';
 
-                    $all_langs = get_option('g11n_additional_lang');
+                    $all_langs = get_option('g11n_additional_lang', array());
                     $default_lang = get_option('g11n_default_lang');
                     unset($all_langs[$default_lang]);
 
@@ -633,8 +633,6 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=true;
                         document.getElementById("g11n_switcher_post").disabled=true;
                         document.getElementById("g11n_switcher_sidebar").disabled=true;
-                        document.getElementById("g11n_seo_url_enable_yes").disabled=true;
-                        document.getElementById("g11n_seo_url_enable_no").disabled=true;
                     }
                     if(element.value=='No'){
                         console.log("no");
@@ -642,8 +640,6 @@ class TMY_G11n_Admin {
                         document.getElementById("g11n_switcher_tagline").disabled=false;
                         document.getElementById("g11n_switcher_post").disabled=false;
                         document.getElementById("g11n_switcher_sidebar").disabled=false;
-                        document.getElementById("g11n_seo_url_enable_yes").disabled=false;
-                        document.getElementById("g11n_seo_url_enable_no").disabled=false;
                     }
                 
 
@@ -856,7 +852,7 @@ class TMY_G11n_Admin {
         	<th scope="row">Theme Translation Files</th>
         	<td> <?php 
                          $theme_name = get_template();
-                         $all_langs = get_option('g11n_additional_lang');
+                         $all_langs = get_option('g11n_additional_lang', array());
                          $default_lang = get_option('g11n_default_lang');
                          unset($all_langs[$default_lang]);
                          foreach( $all_langs as $value => $code) {
@@ -873,19 +869,21 @@ class TMY_G11n_Admin {
 		
                          $blog_url = get_bloginfo('url');
 
-               	         if ((strcmp(get_option('g11n_using_google_tookit','No'),'Yes' )===0) ||
-                             (strcmp(trim(get_option('permalink_structure')),'')===0)) {
-                             $seo_disabled = "disabled";
-                         } else {
-                             $seo_disabled = "";
-                         }
+                         $seo_disabled = "";
+
+               	         //if ((strcmp(get_option('g11n_using_google_tookit','No'),'Yes' )===0) ||
+                         //    (strcmp(trim(get_option('permalink_structure')),'')===0)) {
+                         //    $seo_disabled = "disabled";
+                         //} else {
+                         //    $seo_disabled = "";
+                         //}
 
 		         $current_seo_option = esc_attr(get_option('g11n_seo_url_enable','No'));
                          if (strcmp($current_seo_option, "")===0) {
                              $current_seo_option = "No";
                          }
 
-                         echo "Change the Permalinks Setting to non-Plain to start: Settings->Permalinks<br><br>";
+                         //echo "Change the Permalinks Setting to non-Plain to start: Settings->Permalinks<br><br>";
 
 		         $selected_no = ($current_seo_option === 'No') ? 'checked' : '';
 		         echo "\n\t<input type='radio' onclick=\"tmy_seo_url_option_changed('No');\" id='g11n_seo_url_enable_no".
@@ -926,9 +924,9 @@ class TMY_G11n_Admin {
                          $htaccess_file = get_home_path() . '.htaccess';
 
                          if (is_writable($htaccess_file)) {
-                            $htaccess_permission = $htaccess_file . " is writable.";
+                            $htaccess_permission = $htaccess_file . " is writable, .htaccess will be updated automatically.";
                          } else {
-                            $htaccess_permission = $htaccess_file . " is not writable.";
+                            $htaccess_permission = $htaccess_file . " is NOT writable, please make sure your .htaccess is updated.";
                          }
 
                      ?>
@@ -962,21 +960,23 @@ class TMY_G11n_Admin {
 
                         Current .htaccess file: <?php echo esc_attr($htaccess_permission);?> 
 <div style="width: 1000px; padding: 10px; border: 2px solid black; margin: 0;"> 
-<IfModule mod_rewrite.c> <br>
-RewriteEngine On <br>
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}] <br>
-RewriteBase <?php echo esc_attr($home_root); ?> <br>
-RewriteRule ^index\.php$ - [L] <br>
 <b># BEGIN TMY_G11N_RULES <br>
+&lt;IfModule mod_rewrite.c&gt; <br>
 RewriteCond %{REQUEST_FILENAME} -d  <br> 
 RewriteCond %{REQUEST_URI} /+[^\.]+$  <br>
 RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L] <br> 
 RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) https://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
+&lt;IfModule&gt; <br>
 # END TMY_G11N_RULES <br> </b>
+&lt;IfModule mod_rewrite.c&gt; <br>
+RewriteEngine On <br>
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}] <br>
+RewriteBase <?php echo esc_attr($home_root); ?> <br>
+RewriteRule ^index\.php$ - [L] <br>
 RewriteCond %{REQUEST_FILENAME} !-f <br>
 RewriteCond %{REQUEST_FILENAME} !-d <br>
 RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
-</IfModule><br>
+&lt;IfModule&gt; <br>
 </div></div>
                 </td>
                 </tr>
@@ -1101,7 +1101,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
                         foreach ($text_str as $text_string) {
                             $term_notify = "";
-                            $all_langs = get_option('g11n_additional_lang');
+                            $all_langs = get_option('g11n_additional_lang', array());
                             $default_lang = get_option('g11n_default_lang');
                             unset($all_langs[$default_lang]);
 
@@ -1187,7 +1187,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
                         foreach ($term_ids as $term_id) {
                             $term_notify = "";
-                            $all_langs = get_option('g11n_additional_lang');
+                            $all_langs = get_option('g11n_additional_lang', array());
                             $default_lang = get_option('g11n_default_lang');
                             unset($all_langs[$default_lang]);
                             $tax_type = get_term_field('taxonomy', $term_id);
@@ -1305,7 +1305,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                         'version' => esc_attr(get_option('g11n_server_version'))
                     );
 
-                    $machine_trans_url = esc_url("https://www.tmysoft.com/wp-project.html?code=" . urlencode(http_build_query($query_string)));
+                    $machine_trans_url = esc_url("https://www.tmysoft.com/myprojects.html?tmycode=" . urlencode(http_build_query($query_string)));
 
                     ?>
                     <br>
@@ -1615,7 +1615,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
             $message = "Number of translation entries created for " . $post_id . ": ";
 
-            $all_langs = get_option('g11n_additional_lang');
+            $all_langs = get_option('g11n_additional_lang', array());
             $default_lang = get_option('g11n_default_lang');
             unset($all_langs[$default_lang]);
 
@@ -1688,8 +1688,12 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                              array_push($contents_array, $content_title);
                          } else {
                              $content_title = get_post_field('post_title', $post_id);
-                             $content_excerpt = get_post_field('post_content', $post_id) . "\n\n" .
-                                            get_post_field('post_excerpt', $post_id);
+                             $post_excertpt = get_post_field('post_excerpt', $post_id);
+                             if ($post_excertpt === "") {
+                                 $content_excerpt = get_post_field('post_content', $post_id);
+                             } else {
+                                 $content_excerpt = get_post_field('post_content', $post_id) . "\n" . $post_excertpt;
+                             }
 
                              //$tmp_array = preg_split('/(\n)/', get_post_field('post_content', $post_id),-1, PREG_SPLIT_DELIM_CAPTURE);
                              $tmp_array = preg_split('/(\n)/', $content_excerpt, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -2643,7 +2647,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
                         <?php 
                             $i = 2;
-                            $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+                            $all_configed_langs = get_option('g11n_additional_lang', array()); /* array format ((English -> en), ...) */
                             foreach ( $all_configed_langs as $key => $value ) :
                                 $lang_native = "";
                                 if (array_key_exists($value, $lang_native_script)) {
@@ -2684,24 +2688,37 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
         }
         function tmy_plugin_g11n_update_htaccess() {
 
-            $home_root = parse_url( home_url() );
-            if ( isset( $home_root['path'] ) ) {
-               $home_root = trailingslashit( $home_root['path'] );
-            } else {
-               $home_root = '/';
-            }
-            $all_langs = get_option('g11n_additional_lang');
-            $rewrite_rules = strtolower(implode("|", $all_langs));
-            $rewrite_rules = str_replace('_', '-', $rewrite_rules);
 
-            $content = array(
-                'RewriteCond %{REQUEST_FILENAME} -d',
-                'RewriteCond %{REQUEST_URI} /+[^\.]+$',
-                'RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]',
-                'RewriteRule ^(' . $rewrite_rules . ')/(.*) http://%{HTTP_HOST}' . esc_attr($home_root) .'$2?g11n_tmy_lang_code=$1 [QSA,P,NC]'
-            );
+            $current_seo_option = esc_attr(get_option('g11n_seo_url_enable','No'));
+            if (strcmp($current_seo_option, "")===0) {
+                $current_seo_option = "No";
+            }
+
+            if ($current_seo_option === "Yes") {
+                $home_root = parse_url( home_url() );
+                if ( isset( $home_root['path'] ) ) {
+                   $home_root = trailingslashit( $home_root['path'] );
+                } else {
+                   $home_root = '/';
+                }
+                $all_langs = get_option('g11n_additional_lang', array());
+                $rewrite_rules = strtolower(implode("|", $all_langs));
+                $rewrite_rules = str_replace('_', '-', $rewrite_rules);
+    
+                $content = array(
+                    '<IfModule mod_rewrite.c>',
+                    'RewriteEngine On',
+                    'RewriteCond %{REQUEST_FILENAME} -d',
+                    'RewriteCond %{REQUEST_URI} /+[^\.]+$',
+                    'RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]',
+                    'RewriteRule ^(' . $rewrite_rules . ')/(.*) http://%{HTTP_HOST}' . esc_attr($home_root) .'$2?g11n_tmy_lang_code=$1 [QSA,P,NC]',
+                    '</IfModule>'
+                );
+            } else {
+                $content = array();
+            }
             $htaccess_location = get_home_path() . '.htaccess';
-            $ret = insert_with_markers( $htaccess_location, 'TMY_G11N_RULES', $content );
+            $ret = insert_with_markers_default_front( $htaccess_location, 'TMY_G11N_RULES', $content );
 
         }
 

@@ -224,10 +224,10 @@ class TMY_G11n_Public {
                     $new_lang_code = $all_configed_langs[$new_lang];
                 }
 
-                //if ( WP_TMY_G11N_DEBUG ) {
+                if ( WP_TMY_G11N_DEBUG ) {
         	    error_log("In G11nStartSession current_lang " . $current_lang . " " . $current_lang_code);
         	    error_log("In G11nStartSession new_lang " . $new_lang . " " . $new_lang_code);
-                //}
+                }
 
                 $template_name = get_template();
                 $active_plugins = get_option('active_plugins'); 
@@ -564,10 +564,6 @@ public function g11n_add_floating_menu() {
                 if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
                     return $locale_in; 
                 }
-
-//error_log("LOCALE _SERVER " . json_encode($_SERVER));
-//error_log("LOCALE _REQUEST " . json_encode($_REQUEST));
-
 
                 /* array format ((English -> en), ...) */
                 $language_options = get_option('g11n_additional_lang', array());
@@ -1333,10 +1329,16 @@ public function g11n_add_floating_menu() {
                 if (array_key_exists("tmy_dynamic_url", $query_arr)) {
                     $new_part = str_replace($site_url_arr["path"], "", $current_url_arr["path"]);
                     if  ($current_seo_option == 'Yes') {
-                        $atts['href'] = esc_url($site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part);
+                        parse_str($_SERVER['QUERY_STRING'], $query_str_arr);
+                        if (array_key_exists("g11n_tmy_lang_code", $query_str_arr)) {
+                            unset($query_str_arr["g11n_tmy_lang_code"]);
+                        }
+                        $new_herf = $site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part;
+                        $atts['href'] = esc_url(add_query_arg($query_str_arr, $new_herf));
+                        //$atts['href'] = esc_url($site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part . "?" . esc_attr($_SERVER['QUERY_STRING']));
                         return $atts;
                     } else {
-                        $all_configed_langs = get_option('g11n_additional_lang'); /* array format ((English -> en), ...) */
+                        $all_configed_langs = get_option('g11n_additional_lang',array()); /* array format ((English -> en), ...) */
                         $lang_code = strtolower(str_replace('-', '_', $query_arr["tmy_dynamic_url"]));
                         $language = array_search(strtolower($lang_code), array_map('strtolower',$all_configed_langs));
                         if (! $language) {
