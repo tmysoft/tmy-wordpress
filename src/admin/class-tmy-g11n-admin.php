@@ -965,6 +965,9 @@ class TMY_G11n_Admin {
 RewriteCond %{REQUEST_FILENAME} -d  <br> 
 RewriteCond %{REQUEST_URI} /+[^\.]+$  <br>
 RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L] <br> 
+RewriteCond %{HTTPS} off <br>
+RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) http://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
+RewriteCond %{HTTPS} on <br>
 RewriteRule ^(<?php echo $rewrite_rules; ?>)/(.*) https://%{HTTP_HOST}<?php echo esc_attr($home_root); ?>$2?g11n_tmy_lang_code=$1 [QSA,P,NC] <br>
 &lt;IfModule&gt; <br>
 # END TMY_G11N_RULES <br> </b>
@@ -2711,7 +2714,10 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                     'RewriteCond %{REQUEST_FILENAME} -d',
                     'RewriteCond %{REQUEST_URI} /+[^\.]+$',
                     'RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]',
+                    'RewriteCond %{HTTPS} off',
                     'RewriteRule ^(' . $rewrite_rules . ')/(.*) http://%{HTTP_HOST}' . esc_attr($home_root) .'$2?g11n_tmy_lang_code=$1 [QSA,P,NC]',
+                    'RewriteCond %{HTTPS} on',
+                    'RewriteRule ^(' . $rewrite_rules . ')/(.*) https://%{HTTP_HOST}' . esc_attr($home_root) .'$2?g11n_tmy_lang_code=$1 [QSA,P,NC]',
                     '</IfModule>'
                 );
             } else {
