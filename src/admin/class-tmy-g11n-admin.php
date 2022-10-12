@@ -2645,6 +2645,8 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                             </label>
                                  <input type="hidden" class="menu-item-type" name="menu-item[1][menu-item-type]" value="custom" />
                                  <input type="hidden" class="menu-item-title" name="menu-item[1][menu-item-title]" value="Choose Language" />
+                                 <input type="hidden" class="menu-item-url" name="menu-item[1][menu-item-url]" 
+                                     value="<?php echo site_url(); ?>/?tmy_dynamic_main=yes" />
                                  <input type="hidden" class="menu-item-classes" name="menu-item[1][menu-item-classes]" />
                         </li>
 

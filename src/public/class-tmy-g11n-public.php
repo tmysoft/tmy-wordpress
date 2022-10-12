@@ -247,12 +247,12 @@ class TMY_G11n_Public {
                         }
                     } else {
                         if (! is_textdomain_loaded("default")) {
-                            error_log("In G11nStartSession default domain is NOT loaded");
+                            //error_log("In G11nStartSession default domain is NOT loaded");
                             load_textdomain( "default", WP_LANG_DIR . '/' . $current_lang_code . '.mo' );
                         }
 
                         if (! is_textdomain_loaded($template_name)) {
-                            error_log("In G11nStartSession {$template_name} is NOT loaded");
+                            //error_log("In G11nStartSession {$template_name} is NOT loaded");
                             load_textdomain( $template_name, WP_LANG_DIR . '/themes/'. $template_name . '-' . $current_lang_code . '.mo' );
                         }
                         foreach ($active_plugins as $key => $value) {
@@ -1294,6 +1294,97 @@ public function g11n_add_floating_menu() {
 
         public function tmy_nav_menu_objects_filter( $sorted_menu_items, $args ) 
         {
+
+            $current_locale = get_locale();
+            $current_locale = strtolower(str_replace("_", "-", $current_locale));
+            $current_active_label = "";
+
+            $tmy_dynamic_main = False;
+            $tmy_dynamic_index = 0;
+
+            $include_flag = True; 
+            if (strcmp('Text', get_option('g11n_switcher_type','Text')) === 0) {
+                $include_flag = False; 
+            }
+
+            $current_seo_option = esc_attr(get_option('g11n_seo_url_enable','No'));
+            if (strcmp($current_seo_option, "")===0) {
+                $current_seo_option = "No";
+            }
+
+            $current_url = sanitize_url($_SERVER['REQUEST_URI']);
+            $site_url = get_site_url();
+            $current_url_arr = wp_parse_url($current_url);
+            $site_url_arr = wp_parse_url($site_url);
+
+            $all_configed_langs = get_option('g11n_additional_lang',array()); /* array format ((English -> en), ...) */
+
+            foreach ($sorted_menu_items as $menu_index => &$menu_item) {
+                $url_arr = wp_parse_url($menu_item->url);
+                if (isset($url_arr['query'])) {
+                    parse_str($url_arr['query'], $url_query_arr);
+                    if (array_key_exists("tmy_dynamic_main", $url_query_arr)) {
+                        $tmy_dynamic_main = True;
+                        $tmy_dynamic_index = $menu_index;
+                        $menu_item->url = "/";
+                        continue;
+                    }
+                    if (array_key_exists("tmy_dynamic_url", $url_query_arr)) {
+
+                        $new_part = str_replace($site_url_arr["path"], "", $current_url_arr["path"]);
+                        $url_lang = $url_query_arr["tmy_dynamic_url"];
+                        $flag_lang = str_replace("-", "_", $url_lang);
+
+                        if  ($current_seo_option == 'Yes') {
+                            parse_str($_SERVER['QUERY_STRING'], $query_str_arr);
+                            if (array_key_exists("g11n_tmy_lang_code", $query_str_arr)) {
+                                unset($query_str_arr["g11n_tmy_lang_code"]);
+                            }
+                            $new_herf = $site_url . "/" . $url_lang . $new_part;
+                            $menu_item->url = esc_url(add_query_arg($query_str_arr, $new_herf));
+                        } else {
+                            $lang_code = strtolower(str_replace('-', '_', $url_query_arr["tmy_dynamic_url"]));
+                            $language = array_search(strtolower($lang_code), array_map('strtolower',$all_configed_langs));
+                            if (! $language) {
+                                $language = get_option("g11n_default_lang", "English");
+                            }
+                            $menu_item->url = esc_url(add_query_arg( array( 'g11n_tmy_lang' => $language),
+                                                           $current_url ));
+                        }
+                        if ( $include_flag ) {
+                            $img_html = '<img style="display: inline-block" src="' .
+                                     plugin_dir_url(__DIR__) . 'includes/flags/' . "24/" .
+                                     strtoupper($flag_lang) . '.png" alt="' .
+                                     strtoupper($flag_lang) . "\" > ";
+                        } else {
+                            $img_html = "";
+                        }
+                        $menu_item->title = $img_html . $menu_item->title;
+
+                        if ($current_locale === trim($url_query_arr["tmy_dynamic_url"])) {
+                            $current_active_label = "<b>" . $menu_item->title . "</b>";
+                            $menu_item->title = "<u><b>"  . $menu_item->title . "</b></u>";
+                        }
+                        continue;
+                    }
+                }
+                if  ($current_seo_option == 'Yes') {
+                    if ($url_arr['host'] === $site_url_arr['host']) {
+                        $lang_code = get_locale();
+                        $lang_code = strtolower(str_replace('_', '-', $lang_code));
+
+                        $lang_path = explode('/', str_replace($site_url, '', $menu_item->url))[1];
+                        $lang_path = str_replace('-', '_', $lang_path);
+
+                        if (! array_search(strtolower($lang_path), array_map('strtolower',$all_configed_langs))) {
+                            $menu_item->url = esc_url(str_replace($site_url, $site_url . '/' . esc_attr($lang_code), $menu_item->url));
+                        }
+                    }
+                }
+            }
+            if (($current_active_label !== "") && ($tmy_dynamic_main)) {
+                $sorted_menu_items[$tmy_dynamic_index]->title = $current_active_label;
+            }
             return $sorted_menu_items;
         }
 
@@ -1317,6 +1408,7 @@ public function g11n_add_floating_menu() {
                 $current_seo_option = "No";
             }
 
+
             $current_url = sanitize_url($_SERVER['REQUEST_URI']);
             $site_url = get_site_url();
 
@@ -1334,7 +1426,7 @@ public function g11n_add_floating_menu() {
                             unset($query_str_arr["g11n_tmy_lang_code"]);
                         }
                         $new_herf = $site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part;
-                        $atts['href'] = esc_url(add_query_arg($query_str_arr, $new_herf));
+                        $atts['href'] =  esc_url(add_query_arg($query_str_arr, $new_herf)) ;
                         //$atts['href'] = esc_url($site_url . "/" . $query_arr["tmy_dynamic_url"] . $new_part . "?" . esc_attr($_SERVER['QUERY_STRING']));
                         return $atts;
                     } else {

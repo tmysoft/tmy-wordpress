@@ -318,9 +318,9 @@ class TMY_G11n {
                 $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
 
                 //$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'tmy_nav_menu_item_filter', 10, 2 );
-                //$this->loader->add_filter( 'wp_nav_menu_objects', $plugin_public, 'tmy_nav_menu_objects_filter', 10, 2);
+                $this->loader->add_filter( 'wp_nav_menu_objects', $plugin_public, 'tmy_nav_menu_objects_filter', 10, 2);
 
-                $this->loader->add_filter( 'nav_menu_link_attributes', $plugin_public, 'tmy_nav_menu_link_attributes_filter', 15, 4);
+                //$this->loader->add_filter( 'nav_menu_link_attributes', $plugin_public, 'tmy_nav_menu_link_attributes_filter', 15, 4);
 	}
 
 	/**
