@@ -2127,7 +2127,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                         }
 		        if (is_array($payload->detailedStats)) {
                             $return_msg .= "<br>Document List(s):";
-                            $return_msg .= "<br>Fully translated will be in <b>bold</b> and and pulling down to local database.";
+                            $return_msg .= "<br>Fully translated will be in <b>bold</b> and and pulling down to local database.<br>";
                             $return_msg .= "<table>";
                             //$return_msg .= var_export($payload,true);
                             //$return_msg .= json_encode($payload);
@@ -2140,18 +2140,12 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 		                    $default_lang_post_id = $g11n_res_filename[2];
 		                    $payload_post_type = $g11n_res_filename[1];
     
-		                                   //$debug_log .= " Finished translation,id=".$default_lang_post_id."post type=" . $payload_post_type;
-
-                                             // checking the post id/default_lang_post_id is a valid post in the system now, if yes, pulling the translation
-                                             // otherwise ignore it
-
+                                    $default_post_title =  get_the_title($default_lang_post_id);
+                                    $default_post_title =  substr($default_post_title, 0 , 30);
                                     
                                     if ( strcmp($g11n_res_filename[0], "WordpressG11nAret") !== 0 ) {
-                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats)).
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td>" . $default_post_title . "</td><td colspan=\"".esc_attr(count($row->stats)).
                                                        "\"> Skipping </td></tr>";
-                                    //if( is_null(get_post($default_lang_post_id))){
-                                        //$return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td colspan=\"".esc_attr(count($row->stats)).
-                                                       //"\"> No local post/page found for id ". esc_attr($default_lang_post_id) . "</td></tr>";
 
                                     } else {
 
@@ -2246,7 +2240,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                                              }
                                         }//foreach language
 
-                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td>". tmy_g11n_html_kses_esc($doc_lang_str) . "</tr>";
+                                        $return_msg .= "<tr><td><b>" . esc_attr($row->id) ."</b></td><td>" .$default_post_title . "</td>". tmy_g11n_html_kses_esc($doc_lang_str) . "</tr>";
                                     }
 
                                 }// if (is_array($row->stats))
