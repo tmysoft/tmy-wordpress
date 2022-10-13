@@ -2127,7 +2127,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                         }
 		        if (is_array($payload->detailedStats)) {
                             $return_msg .= "<br>Document List(s):";
-                            $return_msg .= "<br>Fully translated will be in <b>bold</b> and and pulling down to local database.<br>";
+                            $return_msg .= "<br>Fully translated will be in <b>bold</b> and and pulling down to local database.<br><br>";
                             $return_msg .= "<table>";
                             //$return_msg .= var_export($payload,true);
                             //$return_msg .= json_encode($payload);
