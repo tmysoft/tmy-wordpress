@@ -1284,11 +1284,24 @@ public function g11n_add_floating_menu() {
         }
         public function tmy_woocommerce_option_filter( $value, $option ) {
 
-            //error_log("tmy_woocommerce_option_filter option, " . $option);
-            //error_log("tmy_woocommerce_option_filter title, " . $value["title"]);
-            //error_log("tmy_woocommerce_option_filter description, " . $value["description"]);
-            //error_log("tmy_woocommerce_option_filter instructions, " . $value["instructions"]);
+            error_log("tmy_woocommerce_option_filter option, " . $option);
 
+            if (($option === "woocommerce_cheque_settings") || ($option === "woocommerce_cod_settings")) {
+                $language_options = get_option('g11n_additional_lang');
+                $g11n_current_language = $this->translator->get_preferred_language();
+                $lang = $language_options[$g11n_current_language];
+
+                $value["title"] = $this->tmy_text_translator( $value["title"], $lang);
+                $value["description"] = $this->tmy_text_translator( $value["description"], $lang);
+                $value["instructions"] = $this->tmy_text_translator( $value["instructions"], $lang);
+
+                error_log("tmy_woocommerce_option_filter title, " . $value["title"]);
+                error_log("tmy_woocommerce_option_filter description, " . $value["description"]);
+                error_log("tmy_woocommerce_option_filter instructions, " . $value["instructions"]);
+
+                return $value;
+            }
+            
             return $value;
         }
 
@@ -1494,4 +1507,22 @@ public function g11n_add_floating_menu() {
         }
 
 
+        public function tmy_text_translator( $text, $lang ) {
+
+            global $wpdb;
+            $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($text) . "\" and post_status=\"private\"";
+            $result = $wpdb->get_results($sql);
+            if (isset($result[0]->ID)) {
+                error_log("tmy_text_translator {$text} {$result[0]->ID}");
+                $translation_post_id = $this->translator->get_translation_id($result[0]->ID, $lang, "post", false);
+                if (isset($translation_post_id)) {
+                    return get_post_field("post_content", $translation_post_id);
+                } else {
+                    return $text;
+                }
+            } else {
+                return $text;
+            }
+            return $text;
+        }
 }

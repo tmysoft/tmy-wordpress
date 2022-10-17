@@ -251,6 +251,49 @@ public function __construct() {
                                             );
 
             }
+            // find all woo commerce options
+
+            $woocommerce_cod_settings = maybe_unserialize(get_option("woocommerce_cod_settings", ""));
+            if (isset($woocommerce_cod_settings['title'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cod_settings['title'],
+                                           "taxonomy"=>"WooCommerce Code Payment Title",
+                                           "translations"=>""
+                                         );
+            }
+            if (isset($woocommerce_cod_settings['description'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cod_settings['description'],
+                                           "taxonomy"=>"WooCommerce Code Payment Desc",
+                                           "translations"=>""
+                                         );
+            }
+            if (isset($woocommerce_cod_settings['instructions'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cod_settings['instructions'],
+                                           "taxonomy"=>"WooCommerce Code Payment Instructions",
+                                           "translations"=>""
+                                         );
+            }
+
+
+
+            $woocommerce_cheque_settings = maybe_unserialize(get_option("woocommerce_cheque_settings", ""));
+            if (isset($woocommerce_cheque_settings['title'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cheque_settings['title'],
+                                           "taxonomy"=>"WooCommerce ChequePayment Title",
+                                           "translations"=>""
+                                         );
+            }
+            if (isset($woocommerce_cheque_settings['description'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cheque_settings['description'],
+                                           "taxonomy"=>"WooCommerce ChequePayment Desc",
+                                           "translations"=>""
+                                         );
+            }
+            if (isset($woocommerce_cheque_settings['instructions'])) {
+                $qualified_rows[] = array( "text_str"=>$woocommerce_cheque_settings['instructions'],
+                                           "taxonomy"=>"WooCommerce ChequePayment Instructions",
+                                           "translations"=>""
+                                         );
+            }
 
             // checking if the private post has been created and if translation started
             foreach ($qualified_rows as &$row) {
