@@ -311,6 +311,8 @@ class TMY_G11n {
                     }
                 }
 
+                $this->loader->add_filter( 'option_widget_block', $plugin_public, 'tmy_option_widget_block', 10, 2 );
+
                 $this->loader->add_filter( 'option_woocommerce_cheque_settings', $plugin_public, 'tmy_woocommerce_option_filter', 10, 2 );
                 $this->loader->add_filter( 'option_woocommerce_cod_settings', $plugin_public, 'tmy_woocommerce_option_filter', 10, 2 );
                 $this->loader->add_filter( 'woocommerce_cart_item_name', $plugin_public, 'tmy_woocommerce_cart_item_name', 10, 3 );
