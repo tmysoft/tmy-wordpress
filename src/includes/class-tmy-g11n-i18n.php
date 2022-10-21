@@ -34,9 +34,10 @@ class TMY_G11n_i18n {
 	public function tmy_load_plugin_textdomain() {
 
 		load_plugin_textdomain(
-			'plugin-name',
+			'tmy-globalization',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			//dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+                        WP_LANG_DIR . '/plugins/' 
 		);
 
 	}

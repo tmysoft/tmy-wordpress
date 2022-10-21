@@ -4,7 +4,7 @@ Donate link: https://tmysoft.com/solutions.html
 Tags: i18n, l10n, translation, localization, globalization, multilingual, internationalization, SEO, taxonomies, woocommerce
 Requires at least: 5.0
 Tested up to: 6.0.2
-Stable tag: 1.8.8
+Stable tag: 1.8.9
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,10 @@ On CentOS/Feodra Linux system, the error is mostly due to the SE Linux setting w
 12. TMY Globalization Switcher Widget
 
 == Changelog ==
+
+= 1.8.9 =
+* Wooocmmerce product names in order confirmation translation
+* tmy-globalization i18n domain, POT, Chinese translations
 
 = 1.8.0 =
 * Wooocmmerce improvements

@@ -162,16 +162,16 @@ class TMY_G11n_Admin {
                 $tmy_logo_svg = file_get_contents( plugin_dir_path( __FILE__ ) . 'include/tmy.svg', false);
                 $tmy_menu_icon = 'data:image/svg+xml;base64,' . base64_encode( $tmy_logo_svg );
 
-                add_menu_page('TMY Globalization',
-                              'TMY Globalization',
+                add_menu_page( __( 'TMY Globalization', 'tmy-globalization'),
+                               __( 'TMY Globalization', 'tmy-globalization'),
                               'manage_options',
                               'tmy-g11n-main-menu',
                               false,
                               $tmy_menu_icon);
 
 		add_submenu_page( 'tmy-g11n-main-menu',
-                                  'TMY Setup', 
-                          	  'TMY Setup', 
+                                  __( 'TMY Setup', 'tmy-globalization'),
+                          	  __( 'TMY Setup', 'tmy-globalization'),
                             	  'manage_options', 
                           	  'tmy-g11n-setup-menu', 
                           	  array( $this,
@@ -179,32 +179,32 @@ class TMY_G11n_Admin {
                                   1 );
 
         	add_submenu_page( 'tmy-g11n-main-menu',
-                                  'TMY Dashboard',
-                          	  'TMY Dashboard',
+                                  __( 'TMY Dashboard', 'tmy-globalization'),
+                          	  __( 'TMY Dashboard', 'tmy-globalization'),
                           	  'manage_options',
                           	  'tmy-g11n-dashboard-menu',
                           	  array( $this,
                                          'tmy_l10n_manager_page') );
 
         	add_submenu_page( 'tmy-g11n-main-menu',
-                                  'TMY Taxonomies',
-                          	  'TMY Taxonomies',
+                                  __( 'TMY Taxonomies', 'tmy-globalization'),
+                          	  __( 'TMY Taxonomies', 'tmy-globalization'),
                           	  'manage_options',
                           	  'tmy-g11n-taxonomy-menu',
                           	  array( $this,
                                          'tmy_l10n_taxonomy_page') );
 	
         	add_submenu_page( 'tmy-g11n-main-menu',
-                                  'TMY Text',
-                          	  'TMY Text',
+                                  __( 'TMY Text', 'tmy-globalization'),
+                          	  __( 'TMY Text', 'tmy-globalization'),
                           	  'manage_options',
                           	  'tmy-g11n-text-menu',
                           	  array( $this,
                                          'tmy_l10n_text_page') );
 
         	add_submenu_page( 'tmy-g11n-main-menu',
-                                  'TMY Diagnosis',
-                          	  'TMY Diagnosis',
+                                  __( 'TMY Diagnosis', 'tmy-globalization'),
+                          	  __( 'TMY Diagnosis', 'tmy-globalization'),
                           	  'manage_options',
                           	  'tmy-support-manager',
                           	  array( $this,
@@ -216,7 +216,7 @@ class TMY_G11n_Admin {
                 $all_post_types['g11n_translation'] = 'g11n_translation';
 	
                	add_meta_box( 'tmy_g11n_trans_status_box', 
-		                  'Translation Status', 
+		                  __( 'Translation Status', 'tmy-globalization'),
 		                  array( $this, 'tmy_translation_metabox_callback'), 
 		                  array_values($all_post_types),
 		                  //format: array('post','page','g11n_translation','product'),
@@ -250,13 +250,15 @@ class TMY_G11n_Admin {
                             $translation_entry_status = 'LIVE'; 
                             update_post_meta( $post_id, 'g11n_tmy_lang_status', 'LIVE');
                             if ( $html_flag ) {
-                                $translation_entry_status = '<button type="button" style="background-color:#4CAF50;color:white; height:25px;" >LIVE</button>';
+                                $translation_entry_status = '<button type="button" style="background-color:#4CAF50;color:white; height:25px;" >' . 
+                                __( 'LIVE', 'tmy-globalization') . '</button>';
                             }
                         } else {
                             $translation_entry_status = 'PROGRESS'; 
                             update_post_meta( $post_id, 'g11n_tmy_lang_status', 'PROGRESS');
                             if ( $html_flag ) {
-                                $translation_entry_status = '<button type="button" style="background-color:#EE9A4D;color:white; height:25px;" >IN PROGRESS</button>';
+                                $translation_entry_status = '<button type="button" style="background-color:#EE9A4D;color:white; height:25px;" >' .
+                                __( 'IN PROGRESS', 'tmy-globalization') . '</button>';
                             }
                         }
                     } else {
@@ -264,13 +266,15 @@ class TMY_G11n_Admin {
                             $translation_entry_status = 'DISABLED-LIVE'; 
                             update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-LIVE');
                             if ( $html_flag ) {
-                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
+                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >' .
+                                __( 'DISABLED', 'tmy-globalization') . '</button>';
                             }
                         } else {
                             $translation_entry_status = 'DISABLED-PROGRESS'; 
                             update_post_meta( $post_id, 'g11n_tmy_lang_status', 'DISABLED-PROGRESS');
                             if ( $html_flag ) {
-                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >DISABLED</button>';
+                                $translation_entry_status = '<button type="button" style="background-color:#C0C0C0;color:white; height:25px;" >' .
+                                __( 'DISABLED', 'tmy-globalization') . '</button>';
                             }
                         }
                     }
@@ -294,12 +298,19 @@ class TMY_G11n_Admin {
 		    $origin_type = get_post_meta($post_id,'g11n_tmy_orig_type',true);
 		    $trans_lang = get_post_meta($post_id,'g11n_tmy_lang',true);
 
+                    /* translators: %1$s is languge code */
+                    $return_msg_format .= __('This is the %1$s translation page of <a href="%2$s">%3$s (ID:%4$s)</a>', 'tmy-globalization');
+
                     if (array_key_exists($origin_type, $qualified_taxonomies)) {
 	    	    //if (strcmp($origin_type,"taxonomy")===0) {
                         $original_id = get_post_meta($post_id,'orig_post_id',true);
-                        $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
-                             esc_url( get_edit_term_link($original_id) ) . '">' . "Taxonomy" . 
-                           ' (ID:' . esc_attr($original_id) . ')</a>';
+                        //$return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                        //     esc_url( get_edit_term_link($original_id) ) . '">' . "Taxonomy" . 
+                        //   ' (ID:' . esc_attr($original_id) . ')</a>';
+                        $return_msg .= '<b>' . sprintf($return_msg_format, esc_attr($trans_lang), 
+                                                                           esc_url(get_edit_term_link($original_id)),
+                                                                           "Taxonomy",
+                                                                           esc_attr($original_id));
 
                     } else {
                         if (isset($trans_info[0])) {
@@ -307,12 +318,16 @@ class TMY_G11n_Admin {
                             $original_title = $trans_info[0]->post_title;
                         }
 
-                        $return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
-                             esc_url( get_edit_post_link($original_id) ) . '">' . esc_attr($original_title) . 
-                           ' (ID:' . esc_attr($original_id) . ')</a>';
+                        //$return_msg .= '<b>This is the ' . esc_attr($trans_lang) . ' translation page of <a href="' . 
+                        //     esc_url( get_edit_post_link($original_id) ) . '">' . esc_attr($original_title) . 
+                        //   ' (ID:' . esc_attr($original_id) . ')</a>';
+                        $return_msg .= '<b>' . sprintf($return_msg_format, esc_attr($trans_lang), 
+                                                                           esc_url(get_edit_post_link($original_id)),
+                                                                           esc_attr($original_title),
+                                                                           esc_attr($original_id));
                     }
 
-		    $return_msg .= ' Status: ' . $this->_update_g11n_translation_status($post_id, true) . '</br>';
+		    $return_msg .= ' ' . __('Status', 'tmy-globalization') . ': ' . $this->_update_g11n_translation_status($post_id, true) . '</br>';
                     //$return_msg .= "</div>";
 
                 } elseif ((array_key_exists($post_type, $all_post_types)) ||
@@ -322,7 +337,9 @@ class TMY_G11n_Admin {
                 //} elseif ((strcmp($post_type,"post")===0) || (strcmp($post_type,"page")===0)) {
                     $return_msg .= '<div style="border:1px solid #A8A7A7;padding: 10px;">';
                     $return_msg .= '<table class="wp-list-table striped table-view-list">';
-    		    $return_msg .= '<tr><td><b>Language</b></td> <td><b>Code</b></td> <td><b>Id</b></th> <td><b>Status</b></td></tr>';
+    		    $return_msg .= '<tr><td><b>' . __('Language', 'tmy-globalization') . '</b></td> <td><b>' . 
+                                                   __('Code', 'tmy-globalization') . '</b></td> <td><b>Id</b></th> <td><b>' . 
+                                                   __('Status', 'tmy-globalization') . '</b></td></tr>';
 
                     $all_langs = get_option('g11n_additional_lang', array());
                     $default_lang = get_option('g11n_default_lang');
@@ -344,20 +361,24 @@ class TMY_G11n_Admin {
     		                $return_msg .= '<tr><td>' . esc_attr($value) . '</td>
                                                     <td>' . esc_attr($code) . '</td>
                                                     <td> </td>
-                                                    <td> Not Started Yet</td></tr>';
+                                                    <td> ' . __('Not Started Yet', 'tmy-globalization') . '</td></tr>';
                             }
 
                          }
                     }
                     $return_msg .= "</table>";
 
-                    $return_msg .= '<button type="button" aria-disabled="false" class="components-button editor-post-publish-button editor-post-publish-button__button is-primary" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . esc_attr($post_type) . '\')">Start or Sync Translation</button> Press to Start Translation Or Send To Translation Server';
+                    $return_msg .= '<button type="button" aria-disabled="false" class="components-button editor-post-publish-button editor-post-publish-button__button is-primary" onclick="create_sync_translation(' . esc_attr($post_id) . ', \'' . 
+                                           esc_attr($post_type) . '\')">' . __('Start or Sync Translation', 'tmy-globalization') . '</button> ' .
+                                                                            __('Press to Start Translation Or Send To Translation Server', 'tmy-globalization');
                 }
-                $return_msg .= '<br>Visit <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . '">TMY Translations</a> for all translations';
-                $return_msg .= '<br>Or, visit <a href="' . get_home_url() . '/wp-admin/admin.php?page=tmy-g11n-dashboard-menu' . '">TMY Dashboard</a> for translation summary<br>';
+                $return_msg .= '<br>' . __('Visit', 'tmy-globalization'). ' <a href="' . get_home_url() . '/wp-admin/edit.php?post_type=g11n_translation' . 
+                               '">' . __('TMY Translations', 'tmy-globalization') . '</a> ' . __('for all translations', 'tmy-globalization');
+                $return_msg .= '<br>' . __('Or, visit', 'tmy-globalization') .' <a href="' . get_home_url() . '/wp-admin/admin.php?page=tmy-g11n-dashboard-menu' . 
+                               '">' . __('TMY Dashboard', 'tmy-globalization') . '</a> ' . __('for translation summary', 'tmy-globalization') . '<br>';
 
                 if ((strcmp('', get_option('g11n_server_user','')) !== 0) && (strcmp('', get_option('g11n_server_token','')) !== 0)) {
-    		    $return_msg .= '<br>Latest status with Translation Server:<div id="g11n_push_status_text_id"><h5>'. 
+    		    $return_msg .= '<br>' . __('Latest status with Translation Server:', 'tmy-globalization') . '<div id="g11n_push_status_text_id"><h5>'. 
 		    get_post_meta(get_the_ID(),'translation_push_status',true) . '</h5></div>';
                 }
                 $return_msg .= "</div>";
@@ -367,7 +388,7 @@ class TMY_G11n_Admin {
         public function tmy_translation_metabox_taxonomy_edit( $wp_term, $taxonomy ) {
 
             echo ("<table><tr><td><div id=\"tmy_translation_status_box_div\">");
-            echo ("<br><b>Translation Status: </b>" );
+            echo ("<br><b>" . __('Translation Status:', 'tmy-globalization') . " </b>" );
             //echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, "taxonomy"));
             echo tmy_g11n_html_kses_esc($this->_get_tmy_g11n_metabox($wp_term->term_id, $taxonomy));
             echo ("</div></td></tr></table>");
@@ -390,11 +411,11 @@ class TMY_G11n_Admin {
                                         data:    data,
                                         success: function(response) {
                                             if (response === undefined) {
-                                                alert('No Server Reply, talk to system admininstrator.');
+                                                alert(__('No Server Reply, talk to system admininstrator.', 'tmy-globalization'));
                                             } else {
                                                 var response_json = $.parseJSON(response);
                                                 if (response_json.message === undefined) {
-                                                    alert('No Server Reply, talk to system admininstrator.');
+                                                    alert(__('No Server Reply, talk to system admininstrator.', 'tmy-globalization'));
                                                 } else {
                                                     if (response_json.div_status !== undefined) {
                                                         var div = document.getElementById('tmy_translation_status_box_div');
@@ -530,7 +551,7 @@ class TMY_G11n_Admin {
 
 		?>		
 
-		<div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Options</h1>
+		<div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> <?php _e('Globalization Options', 'tmy-globalization') ?></h1>
 		<form method="post" action="options.php">
 		
 		<?php
@@ -541,7 +562,7 @@ class TMY_G11n_Admin {
 		?>
                     <table class="form-table">
         		<tr valign="top">
-        		<th scope="row">Default Language</th>
+        		<th scope="row"><?php _e('Default Language', 'tmy-globalization') ?></th>
 
         		<td><select name="g11n_default_lang">
 		<?php
@@ -563,7 +584,7 @@ class TMY_G11n_Admin {
         		</td>
         		</tr>
         		<tr valign="top">
-        		<th scope="row">All Enabled Languages </th><td>
+        		<th scope="row"><?php _e('All Enabled Languages', 'tmy-globalization') ?> </th><td>
 		<?php
 
 
@@ -651,7 +672,7 @@ class TMY_G11n_Admin {
 	        </tr>
 
         	<tr valign="top">
-        	<th scope="row">Live Translation powered by Google Translate</th>
+        	<th scope="row"><?php _e('Live Translation powered by Google Translate', 'tmy-globalization') ?></th>
         	<td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" onChange="javascript:g11n_using_gtookit_change();"> 
         	<!-- <td><select id="g11n_using_google_tookit" name="g11n_using_google_tookit" > -->
                		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_using_google_tookit','No')), 'Yes' ); ?>>Yes</option>
@@ -671,21 +692,21 @@ class TMY_G11n_Admin {
                 ?>
 
         	<tr valign="top">
-        	<th scope="row">Language Switcher Location</th>
+        	<th scope="row"><?php _e('Language Switcher Location', 'tmy-globalization') ?></th>
         	<td>
             	<input type="checkbox" id="g11n_switcher_title" name="g11n_switcher_title" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_title')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Title <br>
             	<input type="checkbox" id="g11n_switcher_tagline" name="g11n_switcher_tagline" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_tagline')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Tagline <br>
             	<input type="checkbox" id="g11n_switcher_post" name="g11n_switcher_post" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_post')), "Yes" ); ?> <?php echo esc_attr($config_selected_disable); ?>/> In Each Post <br>
             	<input type="checkbox" id="g11n_switcher_sidebar" name="g11n_switcher_sidebar" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_sidebar')), "Yes" ); ?><?php echo esc_attr($config_selected_disable); ?> /> Top of Sidebar <br>
             	<input type="checkbox" id="g11n_switcher_floating" name="g11n_switcher_floating" value="Yes" <?php checked( esc_attr(get_option('g11n_switcher_floating')), "Yes" ); ?> /> Draggable Floating Menu <br> <br>
-                Language Switchers could be added to different locations via widget "TMY Language Switcher Widget" from "Appearance-> Widgets",<br>
-                                                         or Gutenberg block(block) titled "TMY Language Switcher Block". 
+                <?php _e('Language Switchers could be added to different locations via widget "TMY Language Switcher Widget" from "Appearance-> Widgets",<br>
+                                                         or Gutenberg block(block) titled "TMY Language Switcher Block". ', 'tmy-globalization') ?>
  	    	</td>
                 </tr>
  
 
 	        <tr valign="top">
-	        <th scope="row">Get Visitor Language Preference From</th>
+	        <th scope="row"><?php _e('Get Visitor Language Preference From', 'tmy-globalization') ?></th>
 	        <td>Cookie <input type="checkbox" id="g11n_site_lang_cookie" name="g11n_site_lang_cookie" value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_cookie')), "Yes"); echo esc_attr($config_disable); ?> /><br>
             		Browser Language Preference <input type="checkbox" id="g11n_site_lang_browser" name="g11n_site_lang_browser" 
                                                            value="Yes" <?php checked(esc_attr( get_option('g11n_site_lang_browser')), "Yes"); echo esc_attr($config_disable); ?> />
@@ -693,7 +714,7 @@ class TMY_G11n_Admin {
         	</tr>
 
         	<tr valign="top">
-        	<th scope="row">Translation Server(Optional)</th>
+        	<th scope="row"><?php _e('Translation Server(Optional)', 'tmy-globalization') ?></th>
         	<td>URL <input type="text" id="g11n_server_url" name="g11n_server_url" value="<?php echo esc_attr( get_option('g11n_server_url') ); ?>" <?php echo esc_attr($config_disable); ?> /><br>
             	User <input type="text" id="g11n_server_user" name="g11n_server_user" value="<?php echo esc_attr( get_option('g11n_server_user') ); ?>" <?php echo esc_attr($config_disable); ?> />
             	Token <input type="text" id="g11n_server_token" name="g11n_server_token" value="<?php echo esc_attr( get_option('g11n_server_token') ); ?>" <?php echo esc_attr($config_disable); ?> /> <br>
@@ -748,7 +769,7 @@ class TMY_G11n_Admin {
 
 
 		<tr valign="top">
-        	<th scope="row">Enable Translation On</th>
+        	<th scope="row"><?php esc_html_e('Enable Translation On', 'tmy-globalization') ?></th>
         	<td>
             	<br>
             	<input type="checkbox" id="g11n_l10n_props_blogname" name="g11n_l10n_props_blogname" value="Yes" <?php checked( esc_attr(get_option('g11n_l10n_props_blogname')), "Yes" ); echo esc_attr($config_disable); ?> /> 
@@ -774,7 +795,7 @@ class TMY_G11n_Admin {
         	</tr>             
  
 		<tr valign="top">
-        	<th scope="row">Taxonomy Translation Option</th>
+        	<th scope="row"><?php esc_html_e('Taxonomy Translation Option', 'tmy-globalization') ?></th>
         	<td>
             	<br>
                 <?php
@@ -808,12 +829,12 @@ class TMY_G11n_Admin {
             	<?php
 
          
-		echo '<tr valign="top"><th scope="row">Language Switcher Type</th><td>';
+		echo '<tr valign="top"><th scope="row">' . __('Language Switcher Type', 'tmy-globalization') . '</th><td>';
 
 		  
 		$g11n_switch_type = array(
-		          'Text' => __('Text'),
-		          'Flag' => __('Flag')
+		          'Text' => __('Text', 'tmy-globalization'),
+		          'Flag' => __('Flag', 'tmy-globalization')
 		);
 		
 		foreach ($g11n_switch_type as $key => $desc) :
@@ -828,7 +849,7 @@ class TMY_G11n_Admin {
         	</tr>
 
         	<tr valign="top">
-        	<th scope="row">Use Classic Editor</th>
+        	<th scope="row"><?php esc_html_e('Use Classic Editor', 'tmy-globalization') ?></th>
         	<td><select name="g11n_editor_choice">
                		<option value='Yes'  <?php selected( esc_attr(get_option('g11n_editor_choice','No')), 'Yes' ); ?>>Yes</option>
                		<option value='No'  <?php selected( esc_attr(get_option('g11n_editor_choice','No')), 'No' ); ?>>No</option>
@@ -836,20 +857,20 @@ class TMY_G11n_Admin {
         	</td>
         	</tr>
         	<tr valign="top">
-        	<th scope="row">Auto Push/Pull Translation</th>
+        	<th scope="row"><?php esc_html_e('Auto Push/Pull Translation', 'tmy-globalization') ?></th>
         	<td><select name="g11n_auto_pullpush_translation">
                		<option value='No'  <?php selected( esc_attr(get_option('g11n_auto_pullpush_translation')), 'No' ); ?>>No</option>
             	</select>
         	</td>
         	</tr>
         	<tr valign="top">
-        	<th scope="row">Translation Resource File Directory</th>
+        	<th scope="row"><?php esc_html_e('Translation Resource File Directory', 'tmy-globalization') ?></th>
         	<td><input type="text" name="g11n_resource_file_location" value="<?php echo esc_attr( get_option('g11n_resource_file_location') ); ?>" /></td>
         	</tr>
 
         	</tr>
         	<tr valign="top">
-        	<th scope="row">Theme Translation Files</th>
+        	<th scope="row"><?php esc_html_e('Theme Translation Files', 'tmy-globalization') ?></th>
         	<td> <?php 
                          $theme_name = get_template();
                          $all_langs = get_option('g11n_additional_lang', array());
@@ -863,7 +884,7 @@ class TMY_G11n_Admin {
                 </td>
         	</tr>
                 <tr valign="top">
-                <th scope="row">Search Engine Optimization(SEO) URL</th>
+                <th scope="row"><?php esc_html_e('Search Engine Optimization(SEO) URL', 'tmy-globalization') ?></th>
                 <td> 
                     <?php
 		
@@ -1006,7 +1027,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
  	    }
             ?>
-            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Text Translation Manager</h1>
+            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> <?php esc_html_e('Globalization Text Translation Manager', 'tmy-globalization') ?></h1>
             <?php
 
             $tmy_g11n_dir = dirname( __FILE__ );
@@ -1034,7 +1055,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
  	    }
             ?>
-            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Taxonomy Translation Manager</h1>
+            <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> <?php esc_html_e('Globalization Taxonomy Translation Manager', 'tmy-globalization') ?></h1>
             <?php
 
             //echo "<br>Abc<br>";
@@ -1269,7 +1290,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
                     }
 
                     </script>
-                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Dashboard</h1>
+                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> <?php esc_html_e('Globalization Dashboard', 'tmy-globalization') ?></h1>
                 <!--- 
 		<h2>Translation Status:</h2>
                 <button type="button" onclick="G11nGetLocalTranslationStatus()">Refresh Translation Status</button>
@@ -1295,10 +1316,10 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
                 //echo "</div>";
            
-		echo "<h2>Translation Server Status:</h2>";
+		echo "<h2>" . __('Translation Server Status', 'tmy-globalization') . ":</h2>";
 
                 if ((strcmp('', get_option('g11n_server_user','')) === 0) || (strcmp('', get_option('g11n_server_token','')) === 0)) {
-                     echo "Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>";
+                     echo __("Translation server is not in use, configure the Translation Server(Optional) section in the setup page to start<br>", 'tmy-globalization');
                 } else {
 
                     $query_string = array(
@@ -1349,16 +1370,16 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
 
 		?>
 		<div class="wrap">
-                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> Globalization Diagnosis</h1><br>
-                This Diagnosis tool provides advanced system information on how your site is running and collects the following information:<br><br>
+                <div class="wrap"><h1> <img src="<?php echo plugin_dir_url( __FILE__ ) . 'include/tmy-full.png'; ?>" width="64" alt="TMY"> <?php esc_html_e('Globalization Diagnosis', 'tmy-globalization') ?></h1><br>
+              <?php _e('This Diagnosis tool provides advanced system information on how your site is running and collects the following information:<br><br>
                  - Base system(phpinfo)<br>
                  - TMYSoft plugin version<br>
                  - Default theme<br>
                  - Some system options that can impact how the plugin may be functioning<br><br>
-                 If you need further assistance to trouble shoot your site, please review the below diagnostic information to ensure there is no sensitive information included, click copy and email it to <a href="mailto:yu.shao.gm@gmail.com">yu.shao.gm@gmail.com</a> in email.
+                 If you need further assistance to trouble shoot your site, please review the below diagnostic information to ensure there is no sensitive information included, click copy and email it to <a href="mailto:yu.shao.gm@gmail.com">yu.shao.gm@gmail.com</a> in email.', 'tmy-globalization') ?>
 		  <br>
 		  <br>
-		    <button onclick="g11ncopysysteminfotext()">Copy Text</button>
+		    <button onclick="g11ncopysysteminfotext()"><?php esc_html_e('Copy Text', 'tmy-globalization') ?></button>
 		  <br>
 		<?php
 
@@ -2449,13 +2470,13 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
         function tmy_plugin_g11n_translation_set_columns( $columns ){
 
             unset($columns['date']);
-            $columns['post_id']     = 'ID';
-            $columns['origin_type']     = 'Type';
-            $columns['original_id']     = 'Original Post ID';
-            $columns['Language']     = 'Language';
-            $columns['post_status']     = 'Translation Status';
-            $columns['tmy_server_status']     = 'Translation Server Status';
-            $columns['date']     = 'Date';
+            $columns['post_id']     = __('ID', 'tmy-globalization');
+            $columns['origin_type']     = __('Type', 'tmy-globalization');
+            $columns['original_id']     = __('Original Post ID', 'tmy-globalization');
+            $columns['Language']     = __('Language', 'tmy-globalization');
+            $columns['post_status']     = __('Translation Status', 'tmy-globalization');
+            $columns['tmy_server_status']     = __('Translation Server Status', 'tmy-globalization');
+            $columns['date']     = __('Date', 'tmy-globalization');
             return $columns;
 
         }
@@ -2551,7 +2572,7 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
         }
 
         function tmy_plugin_g11n_register_bulk_actions( $bulk_actions ) {
-            $bulk_actions['start_sync_tranlations'] = __( 'Start or Sync Translation', 'tmy_globalization');
+            $bulk_actions['start_sync_tranlations'] = __( 'Start or Sync Translation', 'tmy-globalization');
             return $bulk_actions;
         }
 

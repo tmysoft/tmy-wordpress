@@ -316,6 +316,7 @@ class TMY_G11n {
                 $this->loader->add_filter( 'option_woocommerce_cheque_settings', $plugin_public, 'tmy_woocommerce_option_filter', 10, 2 );
                 $this->loader->add_filter( 'option_woocommerce_cod_settings', $plugin_public, 'tmy_woocommerce_option_filter', 10, 2 );
                 $this->loader->add_filter( 'woocommerce_cart_item_name', $plugin_public, 'tmy_woocommerce_cart_item_name', 10, 3 );
+                $this->loader->add_filter( 'woocommerce_order_item_name', $plugin_public, 'tmy_woocommerce_order_item_name', 10, 3 );
                 $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
                 $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
 

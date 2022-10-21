@@ -636,8 +636,8 @@ public function g11n_add_floating_menu() {
 		register_post_type( 'g11n_translation',
 		    array(
 		      'labels' => array(
-			'name' => __( 'TMY Translations' ),
-			'singular_name' => __( 'TMY Translation' )
+			'name' => __( 'TMY Translations', 'tmy-globalization' ),
+			'singular_name' => __( 'TMY Translation', 'tmy-globalization' )
 		      ),
 		      'public' => true,
 		      'show_ui' => true,
@@ -1413,6 +1413,18 @@ public function g11n_add_floating_menu() {
             return $sorted_menu_items;
         }
 
+        public function tmy_woocommerce_order_item_name( $item_name, $item, $false ) {
+
+            $language_name = get_locale();
+
+            $translation_post_id = $this->translator->get_translation_id($item->get_product_id(), $language_name, "product", false);
+            if (isset($translation_post_id)) {
+                return get_post_field("post_title", $translation_post_id);
+            } else {
+                return $item_name;
+            }
+
+        }
 
         public function tmy_woocommerce_cart_item_name( $title, $values, $cart_item_key ) {
 

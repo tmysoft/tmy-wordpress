@@ -23,11 +23,11 @@ public function __construct() {
         public function get_columns() {
             return array(
                 'cb'  => '<input type="checkbox" />',
-                'term_id'      => 'Term ID',
-                'name'   => 'Name',
-                'slug'   => 'Slug',
-                'taxonomy'   => 'Taxonomy',
-                'translations'   => 'Translations',
+                'term_id'      => __('Term ID', 'tmy-globalization'),
+                'name'   => __('Name', 'tmy-globalization'),
+                'slug'   => __('Slug', 'tmy-globalization'),
+                'taxonomy'   => __('Taxonomy', 'tmy-globalization'),
+                'translations'   => __('Translations', 'tmy-globalization'),
             );
         }
 
@@ -205,10 +205,10 @@ public function __construct() {
         public function get_columns() {
             return array(
                 'cb'  => '<input type="checkbox" />',
-                'text_str'   => 'Text',
-                'taxonomy'   => 'Taxonomy',
-                'place_holder_id'   => 'Translation Place Holder ID',
-                'translations'   => 'Translations',
+                'text_str'   => __('Text', 'tmy-globalization'),
+                'taxonomy'   => __('Taxonomy', 'tmy-globalization'),
+                'place_holder_id'   => __('Translation Place Holder ID', 'tmy-globalization'),
+                'translations'   => __('Translations', 'tmy-globalization'),
             );
         }
 
