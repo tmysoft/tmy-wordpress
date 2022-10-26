@@ -215,6 +215,32 @@ class TMY_G11n {
                 $this->loader->add_action( 'product_cat_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
                 $this->loader->add_action( 'product_tag_edit_form', $plugin_admin, 'tmy_translation_metabox_taxonomy_edit', 10, 2 );
 
+                $this->loader->add_action( 'woocommerce_before_resend_order_emails', $plugin_admin, 'tmy_woocommerce_before_resend_order_emails', 10, 2 );
+
+                //$this->loader->add_action( 'woocommerce_allow_switching_email_locale', $plugin_admin, 'tmy_woocommerce_email_locale_handler', 10, 2 );
+
+                $this->loader->add_action( 'woocommerce_new_customer_note_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+
+                $this->loader->add_action( 'woocommerce_order_status_processing_to_cancelled_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_on-hold_to_cancelled_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_completed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_on-hold_to_processing_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_fully_refunded_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_partially_refunded_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_on-hold_to_failed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_pending_to_failed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+
+                $this->loader->add_action( 'woocommerce_order_status_pending_to_completed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_pending_to_on-hold_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_pending_to_processing_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_failed_to_on-hold_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_failed_to_processing_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_failed_to_completed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_cancelled_to_on-hold_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_cancelled_to_processing_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+                $this->loader->add_action( 'woocommerce_order_status_cancelled_to_completed_notification', $plugin_admin, 'tmy_woocommerce_email_locale_action', 10, 1 );
+
+
 	}
 
 	/**
@@ -318,6 +344,8 @@ class TMY_G11n {
                 $this->loader->add_filter( 'woocommerce_cart_item_name', $plugin_public, 'tmy_woocommerce_cart_item_name', 10, 3 );
                 $this->loader->add_filter( 'woocommerce_order_item_name', $plugin_public, 'tmy_woocommerce_order_item_name', 10, 3 );
                 $this->loader->add_filter( 'woocommerce_attribute_label', $plugin_public, 'tmy_woocommerce_attribute_label_filter', 10, 3 );
+
+                $this->loader->add_action( 'woocommerce_new_order', $plugin_public, 'tmy_woocommerce_new_order', 10, 2 );
                 $this->loader->add_filter( 'nav_menu_item_title', $plugin_public, 'tmy_nav_menu_item_title_filter', 10, 4 );
 
                 //$this->loader->add_filter( 'wp_nav_menu_items', $plugin_public, 'tmy_nav_menu_item_filter', 10, 2 );

@@ -2706,6 +2706,34 @@ RewriteRule . <?php echo esc_attr($home_root); ?>index.php [L]<br>
            <?php
                      
         }
+
+        function tmy_woocommerce_email_locale_admin_action( $order_id ) {
+
+            $order_lang = get_post_meta($order_id, "tmy_order_lang_code", True);
+
+            if (strcmp($order_lang, "") !== 0) {
+                switch_to_locale($order_lang);
+            }
+
+        }
+        function tmy_woocommerce_email_locale_action( $order_id ) {
+
+            $order_lang = get_post_meta($order_id, "tmy_order_lang_code", True);
+            if (strcmp($order_lang, "") !== 0) {
+                switch_to_locale($order_lang);
+            }
+
+        }
+
+        function tmy_woocommerce_before_resend_order_emails( $order, $string ) {
+
+            $order_lang = get_post_meta($order->get_id(), "tmy_order_lang_code", True);
+            if (strcmp($order_lang, "") !== 0) {
+                switch_to_locale($order_lang);
+            }
+
+        }
+
         function tmy_plugin_g11n_update_htaccess() {
 
 

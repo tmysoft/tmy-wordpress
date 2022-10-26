@@ -561,6 +561,9 @@ public function g11n_add_floating_menu() {
 
 	public function g11n_locale_filter($locale_in) {
 
+          //error_log("g11n_locale_ filter MAIN " . $locale_in);
+          //error_log("g11n_locale_ filter MAIN " . json_encode($_SERVER));
+          //error_log("g11n_locale_ filter MAIN " . json_encode($_REQUEST));
                 if ( is_admin() || defined( 'REST_REQUEST' ) && REST_REQUEST ) {
                     return $locale_in; 
                 }
@@ -1296,7 +1299,7 @@ public function g11n_add_floating_menu() {
         }
         public function tmy_woocommerce_option_filter( $value, $option ) {
 
-            error_log("tmy_woocommerce_option_filter option, " . $option);
+            //error_log("tmy_woocommerce_option_filter option, " . $option);
 
             if (($option === "woocommerce_cheque_settings") || ($option === "woocommerce_cod_settings")) {
                 $language_options = get_option('g11n_additional_lang');
@@ -1307,9 +1310,9 @@ public function g11n_add_floating_menu() {
                 $value["description"] = $this->tmy_text_translator( $value["description"], $lang);
                 $value["instructions"] = $this->tmy_text_translator( $value["instructions"], $lang);
 
-                error_log("tmy_woocommerce_option_filter title, " . $value["title"]);
-                error_log("tmy_woocommerce_option_filter description, " . $value["description"]);
-                error_log("tmy_woocommerce_option_filter instructions, " . $value["instructions"]);
+                //error_log("tmy_woocommerce_option_filter title, " . $value["title"]);
+                //error_log("tmy_woocommerce_option_filter description, " . $value["description"]);
+                //error_log("tmy_woocommerce_option_filter instructions, " . $value["instructions"]);
 
                 return $value;
             }
@@ -1501,6 +1504,15 @@ public function g11n_add_floating_menu() {
             return $atts;
 
         }
+
+        public function tmy_woocommerce_new_order( $order_id, $order ) {
+
+            error_log("tmy_woocommerce_new_order id " . $order_id);
+            error_log("tmy_woocommerce_new_order locale" . get_locale());
+            add_post_meta( $order_id, 'tmy_order_lang_code', get_locale(), true );
+
+        }
+
         public function tmy_woocommerce_attribute_label_filter( $label, $name, $product ) {
         
             //error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product}");
@@ -1510,7 +1522,7 @@ public function g11n_add_floating_menu() {
             $result = $wpdb->get_results($sql);
 
             if (isset($result[0]->ID)) {
-                error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product} item_id {$result[0]->ID}");
+                //error_log("tmy_woocommerce_attribute_label_filterer {$label}, {$name}, {$product} item_id {$result[0]->ID}");
 
                 $language_options = get_option('g11n_additional_lang');
                 $g11n_current_language = $this->translator->get_preferred_language();
@@ -1537,7 +1549,7 @@ public function g11n_add_floating_menu() {
             $sql = "select ID from {$wpdb->prefix}posts where post_title=\"" . esc_sql($text) . "\" and post_status=\"private\"";
             $result = $wpdb->get_results($sql);
             if (isset($result[0]->ID)) {
-                error_log("tmy_text_translator {$text} {$result[0]->ID}");
+                //error_log("tmy_text_translator {$text} {$result[0]->ID}");
                 $translation_post_id = $this->translator->get_translation_id($result[0]->ID, $lang, "post", false);
                 if (isset($translation_post_id)) {
                     return get_post_field("post_content", $translation_post_id);
